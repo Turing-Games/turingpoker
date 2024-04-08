@@ -1,0 +1,10 @@
+{
+  "$schema": "https://www.partykit.io/schema.json",
+  "name": "clean-pass",
+  "main": "src/server.js",
+  "compatibilityDate": "2024-04-08",
+  "serve": {
+    "path": "public",
+    "build": "src/client.js"
+  }
+}
