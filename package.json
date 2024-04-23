@@ -10,7 +10,6 @@
     "partysocket": "^1.0.1"
   },
   "devDependencies": {
-    "partykit": "^0.0.100",
-    "typescript": "^5.4.2"
+    "partykit": "^0.0.100"
   }
 }

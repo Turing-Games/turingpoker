@@ -13,6 +13,15 @@ body {
   color: #333;
 }
 
+#app {
+  display: block; /* Ensure it is not set to 'none' */
+  height: auto;   /* Ensure it has enough space */
+}
+button {
+  display: inline-block; /* Ensure buttons are visible */
+}
+
+
 h1,
 h2,
 h3,
@@ -28,4 +37,32 @@ h6 {
 
 #app {
   padding: 1rem;
+}
+
+
+#app {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 15px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.player {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
 }

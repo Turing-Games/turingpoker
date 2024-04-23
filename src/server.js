@@ -1,50 +1,323 @@
-/* eslint-env browser */
-
-// @ts-check
-// Optional JS type checking, powered by TypeScript.
-/** @typedef {import("partykit/server").Room} Room */
-/** @typedef {import("partykit/server").Server} Server */
-/** @typedef {import("partykit/server").Connection} Connection */
-/** @typedef {import("partykit/server").ConnectionContext} ConnectionContext */
-
-/**
- * @implements {Server}
- */
 class PartyServer {
-  /**
-   * @param {Room} room
-   */
   constructor(room) {
-    /** @type {Room} */
     this.room = room;
+    this.usedCards = new Set();
+    this.suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+    this.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    this.gameState = {
+      gameType: "Texas Hold'em",
+      maxPlayers: 8,
+      bigBlind: 100,
+      smallBlind: 50,
+      dealerPosition: 0,
+      currentPlayer: -1,
+      gamePhase: "pending",
+      communityCards: [],
+      potTotal: 0,
+      bettingRound: {
+        currentBet: 0,
+        totalBets: []
+      },
+      lastAction: {},
+      players: [],
+      spectators: []
+    };
+    // this.startBroadcastingGameState();
   }
 
-  /**
-   * @param {Connection} conn - The connection object.
-   * @param {ConnectionContext} ctx - The context object.
-   */
+  startBroadcastingGameState() {
+    // this.interval = setInterval(() => {
+    //   this.room.broadcast(JSON.stringify(this.gameState));
+    // }, 5000);
+  }
+
   onConnect(conn, ctx) {
-    // A websocket just connected!
-    console.log(
-      `Connected:
-  id: ${conn.id}
-  room: ${this.room.id}
-  url: ${new URL(ctx.request.url).pathname}`
-    );
-
-    // Send a message to the connection
-    conn.send("hello from server");
+    console.log("client connected")
+    if (this.gameState.gamePhase === "active" || this.gameState.players.length >= this.gameState.maxPlayers) {
+      // Add as a spectator if the game is active or player slots are full
+      this.gameState.spectators.push({
+        playerId: conn.id,
+        status: "spectating"
+      });
+      conn.send("You are now spectating the game.");
+    } else {
+      // Add as a player if slots are available and game is not active
+      const newPlayer = {
+        playerId: conn.id,
+        stackSize: 5000,
+        currentBet: 0,
+        status: "waiting",
+        cards: []
+      };
+      this.gameState.players.push(newPlayer);
+      conn.send("Welcome to the game!");
+      if (this.gameState.players.length >= 2 && this.gameState.gamePhase === "pending") {
+        this.startGame();
+      }
+    }
+    this.broadcastGameState(conn.id);
   }
+  
 
-  /**
-   * @param {string} message
-   * @param {Connection} sender
-   */
-  onMessage(message, sender) {
-    console.log(`connection ${sender.id} sent message: ${message}`);
-    // Broadcast the received message to all other connections in the room except the sender
-    this.room.broadcast(`${sender.id}: ${message}`, [sender.id]);
+  onClose(conn) {
+    // Attempt to remove from players list first
+    const playerIndex = this.gameState.players.findIndex(player => player.playerId === conn.id);
+    if (playerIndex !== -1) {
+        this.gameState.players.splice(playerIndex, 1);
+        if (this.gameState.players.length < 2) {
+            this.gameState.gamePhase = "pending";  // If not enough players, pause the game
+        }
+        if (this.gameState.currentPlayer === playerIndex) {
+            this.gameState.currentPlayer = 0;  // Reset to the first player
+        }
+    } else {
+        // If not a player, remove from spectators list
+        const spectatorIndex = this.gameState.spectators.findIndex(spectator => spectator.playerId === conn.id);
+        if (spectatorIndex !== -1) {
+            this.gameState.spectators.splice(spectatorIndex, 1);
+        }
+    }
+
+    this.room.broadcast("A participant has disconnected. Updating game state...");
+    this.broadcastGameState();
+}
+
+onMessage(message, websocket) {
+  try {
+    console.log("theres a message")
+    console.log("Received raw message:", websocket);
+    let data = message;
+    
+    if (typeof message === 'string') {  // Check if the message is string to parse it
+      data = JSON.parse(message);
+      console.log("Parsed string: ", data);
+    }
+    console.log("Action data: ", data.action);
+    console.log("Is handlePlayerAction a function? ", typeof this.handlePlayerAction === 'function');
+    
+    if (data.action && typeof this.handlePlayerAction === 'function') {
+      console.log("Handling action");
+      this.handlePlayerAction(websocket.id, data.action, data.amount);
+    }
+  } catch (error) {
+    console.error(`Error parsing message from ${websocket.id}:`, error);
+    if (typeof websocket.send === 'function') {
+      websocket.send(JSON.stringify({ error: "Error processing your action" }));
+    } else {
+      console.error('websocket.send is not a function', websocket);
+    }
   }
 }
 
+///TODO refactor out poker logic away from server logic 
+
+  getRandomCard() {
+    let card;
+    let array = new Uint32Array(2);  // Create a Uint32Array to hold two random numbers
+
+    do {
+        crypto.getRandomValues(array);  // Generate cryptographically secure random numbers
+        const rankIndex = array[0] % this.ranks.length;  // Secure random index for ranks
+        const suitIndex = array[1] % this.suits.length;  // Secure random index for suits
+
+        const rank = this.ranks[rankIndex];
+        const suit = this.suits[suitIndex];
+        card = `${rank} of ${suit}`;
+    } while (this.usedCards.has(card)); // Check for duplicates
+
+    this.usedCards.add(card);  // Add to used cards to prevent future duplicates
+    return card;
+}
+
+  dealInitialCards() {
+    this.gameState.players.forEach(player => {
+      player.cards = [this.getRandomCard(), this.getRandomCard()];
+    });
+  }
+
+  handlePlayerAction(playerId, action, amount) {
+    console.log("Handling player action:", action, "Amount:", amount);
+    const player = this.gameState.players.find(p => p.playerId === playerId);
+    
+    // Check if it's this player's turn
+    if (!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) {
+      console.log("Not player's turn or player not found:", playerId);
+      return; // It's not this player's turn or player not found
+    }
+  
+    // Validate the action
+    switch (action) {
+      case 'raise':
+        if (amount <= this.gameState.bettingRound.currentBet) {
+          console.log("Raise amount too low:", amount, "current bet:", this.gameState.bettingRound.currentBet);
+          return; // Raise amount must be greater than the current bet
+        }
+        if (amount > player.stackSize) {
+          console.log("Not enough chips to raise:", amount, "stack size:", player.stackSize);
+          return; // Not enough chips to raise
+        }
+        player.stackSize -= amount;
+        player.currentBet += amount;
+        this.gameState.potTotal += amount;
+        this.gameState.bettingRound.currentBet = amount; // Update current bet to the raised amount
+        break;
+      case 'call':
+        const callAmount = this.gameState.bettingRound.currentBet - player.currentBet;
+        if (callAmount > player.stackSize) {
+          console.log("Not enough chips to call:", callAmount, "stack size:", player.stackSize);
+          return; // Not enough chips to call
+        }
+        player.stackSize -= callAmount;
+        player.currentBet += callAmount;
+        this.gameState.potTotal += callAmount;
+        break;
+      case 'check':
+        if (this.gameState.bettingRound.currentBet !== player.currentBet) {
+          console.log("Cannot check, current bet is higher than player's bet:", this.gameState.bettingRound.currentBet, "player's bet:", player.currentBet);
+          return; // Cannot check because there is an outstanding bet
+        }
+        break;
+      case 'fold':
+        player.status = 'folded';
+        break;
+      default:
+        console.log("Invalid action:", action);
+        return; // Invalid action
+    }
+  
+    this.advanceTurn(); // Move to the next player
+  }
+  
+  advanceTurn() {
+    // Find the next active player who has not folded
+    let index = (this.gameState.currentPlayer + 1) % this.gameState.players.length;
+    while (this.gameState.players[index].status === 'folded' && index !== this.gameState.currentPlayer) {
+      index = (index + 1) % this.gameState.players.length;
+    }
+    this.gameState.currentPlayer = index;
+  
+    this.broadcastGameState(); // Update all clients with the new state
+  }
+  
+
+dealCommunityCards() {
+  if (this.gameState.communityCards.length === 0) { // Flop
+      this.gameState.communityCards.push(this.getRandomCard(), this.getRandomCard(), this.getRandomCard());
+  } else if (this.gameState.communityCards.length === 3) { // Turn
+      this.gameState.communityCards.push(this.getRandomCard());
+  } else if (this.gameState.communityCards.length === 4) { // River
+      this.gameState.communityCards.push(this.getRandomCard());
+  }
+
+  this.broadcastGameState();
+}
+
+determineWinner() {
+  let activePlayers = this.gameState.players.filter(player => player.status !== 'folded');
+  if (activePlayers.length > 1) {
+    activePlayers.forEach(player => {
+      player.handDetails = this.getHandDetails(player.cards.concat(this.gameState.communityCards).map(card => card.replace(" ", "")));
+    });
+    activePlayers.sort((a, b) => this.compareHands(a.handDetails, b.handDetails));
+    let highestRank = activePlayers[0].handDetails.rank;
+    let winners = activePlayers.filter(player => player.handDetails.rank === highestRank);
+    let potShare = this.gameState.potTotal / winners.length;
+    winners.forEach(winner => {
+      winner.stackSize += potShare;
+    });
+    this.gameState.potTotal = 0; // Reset pot after distribution
+    this.room.broadcast(`${winners.map(w => `Player ${w.playerId}`).join(', ')} wins the pot of $${potShare * winners.length}!`);
+  } else if (activePlayers.length === 1) {
+    // Handle scenario where all but one player have folded
+    let winner = activePlayers[0];
+    winner.stackSize += this.gameState.potTotal;
+    this.gameState.potTotal = 0;
+    this.room.broadcast(`Player ${winner.playerId} wins the pot by default!`);
+  }
+  this.broadcastGameState();
+}
+
+getHandDetails(hand) {
+  const order = "23456789TJQKA";
+  const cards = hand.map(card => card[0] + card.slice(-1));  // Normalize cards to be in the format "5H", "TD", etc.
+  const faces = cards.map(a => String.fromCharCode([77 - order.indexOf(a[0])])).sort();
+  const suits = cards.map(a => a[1]).sort();
+  const counts = faces.reduce((count, a) => {
+      count[a] = (count[a] || 0) + 1;
+      return count;
+  }, {});
+  const duplicates = Object.values(counts).reduce((count, a) => {
+      count[a] = (count[a] || 0) + 1;
+      return count;
+  }, {});
+  const flush = suits[0] === suits[4];
+  const first = faces[0].charCodeAt(0);
+  const straight = faces.every((f, index) => f.charCodeAt(0) - first === index);
+  let rank =
+      (flush && straight && 1) ||
+      (duplicates[4] && 2) ||
+      (duplicates[3] && duplicates[2] && 3) ||
+      (flush && 4) ||
+      (straight && 5) ||
+      (duplicates[3] && 6) ||
+      (duplicates[2] > 1 && 7) ||
+      (duplicates[2] && 8) ||
+      9;
+
+  return { rank, value: faces.sort((a, b) => b.charCodeAt(0) - a.charCodeAt(0)).join("") };
+}
+
+
+compareHands(h1, h2) {
+  if (h1.rank === h2.rank) {
+    return h2.value.localeCompare(h1.value); // Assuming value comparison needs to be tailored to your game's logic
+  }
+  return h1.rank - h2.rank;
+}
+
+
+startGame() {
+  this.gameState.gamePhase = "active";
+  this.gameState.currentPlayer = 0;  // Assuming the first player in the array starts
+  this.gameState.dealerPosition = 0;  // Could be randomized or set by some rule
+
+  this.dealInitialCards();
+
+  // Update all player statuses to 'active' and set the first player's turn
+  this.gameState.players.forEach((player, index) => {
+      player.status = 'active';
+      // Optionally, mark the first player's turn explicitly
+      if (index === 0) player.turn = true;
+  });
+
+  this.room.broadcast("The game has started!");
+  this.broadcastGameState();
+}
+
+
+broadcastGameState(newConnectionId = null) {
+  this.gameState.players.concat(this.gameState.spectators).forEach(person => {
+    const personalizedGameState = {
+      ...this.gameState,
+      players: this.gameState.players.map(player => ({
+        ...player,
+        cards: player.playerId === person.playerId ? player.cards : []
+      }))
+    };
+
+    // Send game state; ensure spectators do not receive any cards information
+    const gameStateForBroadcast = person.status === "spectating" ? {...personalizedGameState, players: personalizedGameState.players.map(p => ({...p, cards: []}))} : personalizedGameState;
+    
+    const conn = this.room.getConnection(person.playerId);
+    if (conn) {
+      conn.send(JSON.stringify(gameStateForBroadcast));
+    } else if (newConnectionId && person.playerId === newConnectionId) {
+      // This is primarily for the new connection which might not yet be fully registered in the room's connection pool
+      this.room.getConnection(newConnectionId).send(JSON.stringify(gameStateForBroadcast));
+    }
+  });
+}
+
+
+}
 export default PartyServer;
