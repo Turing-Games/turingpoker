@@ -109,7 +109,7 @@ const App = {
 
     console.log(gameState?.gameData?.players)
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
-    const isCurrentPlayerTurn = gameState?.gameData?.players[gameState?.gameData?.currentPlayer]?.playerId === gameState.playerId;
+    const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState.gameData.currentPlayer].playerId;
 
     const gameOverview = [
       { label: 'Current Pot:', value: gameState?.gameData?.potTotal, prefix: '$' },
@@ -161,7 +161,7 @@ const App = {
         currentPlayer &&
         m("div.tg-poker__table__bottom", [
           m("div.tg-poker__player", [
-            m("h4", `You (${currentPlayer?.status}) ${currentPlayer?.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+            m("h4", `You (${currentPlayer?.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`),
             m("div", `Stack: $${currentPlayer?.stackSize}`),
             m("div", `Current Bet: $${currentPlayer?.currentBet}`),
             m("div", {
