@@ -1,3 +1,4 @@
+/* rgb(187, 39, 26) */
 /* 
   We've already included normalize.css. 
 
@@ -37,6 +38,10 @@ h6 {
   line-height: 1.25;
   margin-top: 0;
   margin-bottom: 0.5rem;
+}
+
+p {
+  margin: 0;
 }
 
 #app {

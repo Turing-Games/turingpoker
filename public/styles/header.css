@@ -1,39 +1,58 @@
-.tg__header {
+.tg-header {
   align-items: center;
   border: 6px solid #000;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   padding: 8px 12px;
   position: relative;
+  text-align: center;
 }
 
-.tg__logo>img {
+.tg-header__logo {
+  position: absolute;
+}
+
+.tg-header__logo>img {
   height: 40px;
 }
 
-.tg__header__squares {
+.tg-header__title * {
+  font-family: monospace;
+}
+
+.tg-header__title h2 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.tg-header__title p {
+  color: rgb(187, 39, 26);
+  font-size: 14px;
+}
+
+.tg-header__squares {
   background: #fff;
   height: 6px;
   position: absolute;
   width: 6px;
 }
 
-.tg__header__squares--0 {
+.tg-header__squares--0 {
   left: -6px;
   top: -6px;
 }
 
-.tg__header__squares--1 {
+.tg-header__squares--1 {
   left: -6px;
   bottom: -6px;
 }
 
-.tg__header__squares--2 {
+.tg-header__squares--2 {
   right: -6px;
   top: -6px;
 }
 
-.tg__header__squares--3 {
+.tg-header__squares--3 {
   right: -6px;
   bottom: -6px;
 }

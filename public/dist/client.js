@@ -1,4 +1,4 @@
-new EventSource('http://127.0.0.1:57381/esbuild').addEventListener('change', () => location.reload())
+new EventSource('http://127.0.0.1:55523/esbuild').addEventListener('change', () => location.reload())
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __esm = (fn, res) => function __init() {
   return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
@@ -675,16 +675,33 @@ var init_header = __esm({
     init_string_utilities();
     header_default = {
       view: (vnode) => {
+        console.log(vnode);
         return m(
           "div",
           {
-            class: "tg__header"
+            class: "tg-header"
           },
           [
             m(
               "div",
               {
-                class: "tg__logo"
+                class: "tg-header__logo",
+                style: { left: "12px" }
+              },
+              m("img", {
+                src: getImagePath(logo_default)
+              })
+            ),
+            // text
+            m("div.tg-header__title", [
+              m("h2", `Table: ${vnode.attrs.gameType}`),
+              m("p", "Turing Games")
+            ]),
+            m(
+              "div",
+              {
+                class: "tg-header__logo",
+                style: { right: "12px" }
               },
               m("img", {
                 src: getImagePath(logo_default)
@@ -692,7 +709,7 @@ var init_header = __esm({
             ),
             ...Array(4).fill("_").map((el, i) => {
               return m("div", {
-                class: `tg__header__squares tg__header__squares--${i}`
+                class: `tg-header__squares tg-header__squares--${i}`
               });
             })
           ]
@@ -795,32 +812,42 @@ var require_client = __commonJS({
     var App = {
       oninit: gameState.connect,
       view: () => {
+        const currentPlayer = gameState?.gameData?.players?.find((player) => gameState?.playerId);
         if (!gameState.gameData) {
           return m("p", "Loading...");
         }
         return m("div", [
-          m(header_default),
+          m(header_default, {
+            gameType: gameState.gameData.gameType
+          }),
           typeof gameState.gameData === "string" ? m("p", gameState.gameData) : m("div", [
-            m("h2", `Table: ${gameState.gameData.gameType}`),
             m("div", `Current Pot: $${gameState.gameData.potTotal}`),
             m("div", `Current Bet: $${gameState.gameData.bettingRound.currentBet}`),
             m("div", `Dealer Position: Player ${gameState.gameData.dealerPosition + 1}`),
-            m("h3", "Players:"),
-            gameState.gameData.players.map(
-              (player, index) => m("div.player", {
-                class: gameState.playerId === player.playerId ? "current-player" : ""
-              }, [
-                m("h4", `Player ${index + 1} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? " - Your Turn" : ""}`),
-                m("div", `Stack: $${player.stackSize}`),
-                m("div", `Current Bet: $${player.currentBet}`),
-                m("div", `Cards: ${player.cards.join(", ")}`),
-                gameState.playerId === player.playerId ? m("div", "This is You") : null
-              ])
-            ),
+            m("h3", "You:"),
+            m("div.player", {
+              class: "current-player"
+            }, [
+              m("h4", `Player ${index + 1} (${currentPlayer.status}) ${currentPlayer.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? " - Your Turn" : ""}`),
+              m("div", `Stack: $${currentPlayer.stackSize}`),
+              m("div", `Current Bet: $${currentPlayer.currentBet}`),
+              m("div", `Cards: ${currentPlayer.cards.join(", ")}`)
+            ]),
+            // gameState.gameData.players.map((player, index) =>
+            // m("div.player", {
+            //   class: gameState.playerId === player.playerId ? 'current-player' : ''
+            // }, [
+            //   m("h4", `Player ${index + 1} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+            //   m("div", `Stack: $${player.stackSize}`),
+            //   m("div", `Current Bet: $${player.currentBet}`),
+            //   m("div", `Cards: ${player.cards.join(', ')}`),
+            //   gameState.playerId === player.playerId ? m("div", "This is You") : null
+            // ])
+            // ),
             m("h3", "Spectators:"),
             gameState.gameData.spectators.map(
-              (spectator, index) => m("div.spectator", [
-                m("h4", `Spectator ${index + 1}`),
+              (spectator, index2) => m("div.spectator", [
+                m("h4", `Spectator ${index2 + 1}`),
                 m("div", `Status: ${spectator.status}`)
               ])
             )

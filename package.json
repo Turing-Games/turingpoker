@@ -10,6 +10,7 @@
     "partysocket": "^1.0.1"
   },
   "devDependencies": {
+    "dotenv": "^16.4.5",
     "partykit": "^0.0.100"
   }
 }

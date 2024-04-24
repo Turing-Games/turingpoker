@@ -104,31 +104,42 @@ const GameControls = {
 const App = {
   oninit: gameState.connect,
   view: () => {
+    const currentPlayer = gameState?.gameData?.players?.find(player => gameState?.playerId)
+
     if (!gameState.gameData) {
       return m("p", "Loading...");
     }
 
     return m("div", [
-      m(header),
+      m(header, {
+        gameType: gameState.gameData.gameType
+      }),
       typeof gameState.gameData === "string" ?
         m("p", gameState.gameData) :
         m("div", [
-          m("h2", `Table: ${gameState.gameData.gameType}`),
           m("div", `Current Pot: $${gameState.gameData.potTotal}`),
           m("div", `Current Bet: $${gameState.gameData.bettingRound.currentBet}`),
           m("div", `Dealer Position: Player ${gameState.gameData.dealerPosition + 1}`),
-          m("h3", "Players:"),
-          gameState.gameData.players.map((player, index) =>
-            m("div.player", {
-              class: gameState.playerId === player.playerId ? 'current-player' : ''
-            }, [
-              m("h4", `Player ${index + 1} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
-              m("div", `Stack: $${player.stackSize}`),
-              m("div", `Current Bet: $${player.currentBet}`),
-              m("div", `Cards: ${player.cards.join(', ')}`),
-              gameState.playerId === player.playerId ? m("div", "This is You") : null
-            ])
-          ),
+          m("h3", "You:"),
+          m("div.player", {
+            class: 'current-player'
+          }, [
+            m("h4", `Player ${index + 1} (${currentPlayer.status}) ${currentPlayer.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+            m("div", `Stack: $${currentPlayer.stackSize}`),
+            m("div", `Current Bet: $${currentPlayer.currentBet}`),
+            m("div", `Cards: ${currentPlayer.cards.join(', ')}`)
+          ]),
+          // gameState.gameData.players.map((player, index) =>
+          // m("div.player", {
+          //   class: gameState.playerId === player.playerId ? 'current-player' : ''
+          // }, [
+          //   m("h4", `Player ${index + 1} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+          //   m("div", `Stack: $${player.stackSize}`),
+          //   m("div", `Current Bet: $${player.currentBet}`),
+          //   m("div", `Cards: ${player.cards.join(', ')}`),
+          //   gameState.playerId === player.playerId ? m("div", "This is You") : null
+          // ])
+          // ),
           m("h3", "Spectators:"),
           gameState.gameData.spectators.map((spectator, index) =>
             m("div.spectator", [
