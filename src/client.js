@@ -1,6 +1,7 @@
 // Global state management
 
 import PartySocket from "partysocket";
+import header from "./components/header";
 
 const gameState = {
   isConnected: false,
@@ -9,39 +10,39 @@ const gameState = {
   playerId: null, // This will store the client's player ID
 
   connect: () => {
-      this.socket = new PartySocket({
-          host: PARTYKIT_HOST,
-          room: "my-new-room"
-      });
+    this.socket = new PartySocket({
+      host: PARTYKIT_HOST,
+      room: "my-new-room"
+    });
 
-      this.socket.addEventListener("open", () => {
-          gameState.isConnected = true;
-          gameState.playerId = this.socket.id; // some issue here with properly setting this and using it for proper rendering logic
-          console.log("Connected with ID:", this.playerId);
-          console.log(gameState.playerId);
-          m.redraw();
-      });
+    this.socket.addEventListener("open", () => {
+      gameState.isConnected = true;
+      gameState.playerId = this.socket.id; // some issue here with properly setting this and using it for proper rendering logic
+      console.log("Connected with ID:", this.playerId);
+      console.log(gameState.playerId);
+      m.redraw();
+    });
 
-      this.socket.addEventListener("message", (event) => {
-          try {
-              const data = JSON.parse(event.data);
-              console.log(event.data)
-              gameState.gameData = data;
-          } catch {
-              gameState.gameData = event.data; // Handle plain text messages
-          }
-          m.redraw();
-      });
+    this.socket.addEventListener("message", (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log(event.data)
+        gameState.gameData = data;
+      } catch {
+        gameState.gameData = event.data; // Handle plain text messages
+      }
+      m.redraw();
+    });
 
-      this.socket.addEventListener("close", () => {
-          this.isConnected = false;
-          console.log("WebSocket closed");
-          m.redraw();
-      });
+    this.socket.addEventListener("close", () => {
+      this.isConnected = false;
+      console.log("WebSocket closed");
+      m.redraw();
+    });
 
-      this.socket.addEventListener("error", (event) => {
-          console.error("WebSocket error:", event);
-      });
+    this.socket.addEventListener("error", (event) => {
+      console.error("WebSocket error:", event);
+    });
   },
   sendAction: (action, amount = 0) => {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
@@ -58,7 +59,7 @@ const GameControls = {
     console.log("here is the bug")
     console.log(gameState.isConnected)
     console.log(!gameState.gameData)
-    if (!gameState.isConnected || !gameState.gameData ) {
+    if (!gameState.isConnected || !gameState.gameData) {
       return m("p", "Waiting for the game to start or connect...");
     }
 
@@ -108,6 +109,7 @@ const App = {
     }
 
     return m("div", [
+      m(header),
       m("h1", "Poker Game Client"),
       typeof gameState.gameData === "string" ?
         m("p", gameState.gameData) :

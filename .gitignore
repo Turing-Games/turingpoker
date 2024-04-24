@@ -113,7 +113,9 @@ out
 # Nuxt.js build / generate output
 
 .nuxt
-dist
+
+# build folder
+build
 
 # Gatsby files
 
