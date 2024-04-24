@@ -115,7 +115,7 @@ out
 .nuxt
 
 # build folder
-build
+dist
 
 # Gatsby files
 

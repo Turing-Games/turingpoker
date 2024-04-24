@@ -6,19 +6,27 @@
   Clean type, sans-serif, and a nice color palette. 
   
 */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+#app {
+  font-family: Arial, sans-serif;
+  height: 100%;
+  padding: 20px;
+}
 
 body {
+  background: #A8B3B0;
   font-family: sans-serif;
   font-size: 16px;
   line-height: 1.5;
   color: #333;
-}
-
-#app {
-  display: block;
-  /* Ensure it is not set to 'none' */
-  height: auto;
-  /* Ensure it has enough space */
 }
 
 button {
@@ -42,16 +50,6 @@ h6 {
 
 p {
   margin: 0;
-}
-
-#app {
-  padding: 1rem;
-}
-
-
-#app {
-  font-family: Arial, sans-serif;
-  padding: 20px;
 }
 
 button {

@@ -104,43 +104,50 @@ const GameControls = {
 const App = {
   oninit: gameState.connect,
   view: () => {
+
     const currentPlayer = gameState?.gameData?.players?.find(player => gameState?.playerId)
+
+    const gameOverview = [
+      { label: 'Current Pot:', value: gameState?.gameData?.potTotal, prefix: '$' },
+      { label: 'Current Bet:', value: gameState?.gameData?.bettingRound?.currentBet, prefix: '$' },
+      { label: 'Dealer Position:', value: gameState?.gameData?.dealerPosition + 1, prefix: '' }
+    ]
 
     if (!gameState.gameData) {
       return m("p", "Loading...");
     }
 
-    return m("div", [
+    return m.fragment([
+      // header
       m(header, {
         gameType: gameState.gameData.gameType
       }),
+      // game overview data
       typeof gameState.gameData === "string" ?
         m("p", gameState.gameData) :
-        m("div", [
-          m("div", `Current Pot: $${gameState.gameData.potTotal}`),
-          m("div", `Current Bet: $${gameState.gameData.bettingRound.currentBet}`),
-          m("div", `Dealer Position: Player ${gameState.gameData.dealerPosition + 1}`),
-          m("h3", "You:"),
-          m("div.player", {
-            class: 'current-player'
-          }, [
-            m("h4", `Player ${index + 1} (${currentPlayer.status}) ${currentPlayer.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+        m("div.tg-poker__overview",
+          gameOverview.map((stat, i) => {
+            return (
+              m("div", [
+                m("div", stat.label),
+                m("div", `${stat.prefix}${stat.value}`)
+              ])
+            )
+          })
+        ),
+      m("div.tg-poker__table", [
+
+        // current player and spectators
+        currentPlayer &&
+        m("div.tg-poker__table__bottom", [
+          m("div.tg-poker__player", [
+            m("h4", `Current Player (${currentPlayer.status}) ${currentPlayer.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
             m("div", `Stack: $${currentPlayer.stackSize}`),
             m("div", `Current Bet: $${currentPlayer.currentBet}`),
             m("div", `Cards: ${currentPlayer.cards.join(', ')}`)
           ]),
-          // gameState.gameData.players.map((player, index) =>
-          // m("div.player", {
-          //   class: gameState.playerId === player.playerId ? 'current-player' : ''
-          // }, [
-          //   m("h4", `Player ${index + 1} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
-          //   m("div", `Stack: $${player.stackSize}`),
-          //   m("div", `Current Bet: $${player.currentBet}`),
-          //   m("div", `Cards: ${player.cards.join(', ')}`),
-          //   gameState.playerId === player.playerId ? m("div", "This is You") : null
-          // ])
-          // ),
-          m("h3", "Spectators:"),
+
+          m("h4", "Spectators:"),
           gameState.gameData.spectators.map((spectator, index) =>
             m("div.spectator", [
               m("h4", `Spectator ${index + 1}`),
@@ -148,7 +155,9 @@ const App = {
             ])
           )
         ]),
-      m(GameControls) // Render game controls as a child component
+      ]),
+      // game controls
+      m(GameControls)
     ]);
   }
 };

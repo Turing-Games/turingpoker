@@ -10,10 +10,16 @@
 
 .tg-header__logo {
   position: absolute;
+  z-index: 2;
 }
 
 .tg-header__logo>img {
   height: 40px;
+}
+
+.tg-header__title {
+  position: relative;
+  z-index: 3;
 }
 
 .tg-header__title * {
@@ -21,17 +27,15 @@
 }
 
 .tg-header__title h2 {
-  font-size: 20px;
   margin: 0;
 }
 
 .tg-header__title p {
   color: rgb(187, 39, 26);
-  font-size: 14px;
 }
 
 .tg-header__squares {
-  background: #fff;
+  background: #A8B3B0;
   height: 6px;
   position: absolute;
   width: 6px;

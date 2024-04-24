@@ -1,0 +1,20 @@
+.tg-poker__overview {
+  background: rgba(0, 0, 0, 0.8);
+  border-radius: 4px;
+  color: #fff;
+  display: grid;
+  font-size: 12px;
+  gap: 20px;
+  grid-template-columns: repeat(3, auto);
+  justify-content: center;
+  margin: 20px auto 0 auto;
+  max-width: 400px;
+  padding: 8px;
+}
+
+.tg-poker__table {}
+
+.tg-poker__table__bottom {
+  display: flex;
+  justify-content: space-between;
+}
