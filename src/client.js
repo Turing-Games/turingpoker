@@ -2,6 +2,8 @@
 
 import PartySocket from "partysocket";
 import header from "./components/header";
+import { getImagePath } from "./utils/string_utilities";
+import card from './components/card'
 
 const gameState = {
   isConnected: false,
@@ -18,15 +20,19 @@ const gameState = {
     this.socket.addEventListener("open", () => {
       gameState.isConnected = true;
       gameState.playerId = this.socket.id; // some issue here with properly setting this and using it for proper rendering logic
-      console.log("Connected with ID:", this.playerId);
-      console.log(gameState.playerId);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("Connected with ID:", this.playerId);
+        console.log(gameState.playerId);
+      }
       m.redraw();
     });
 
     this.socket.addEventListener("message", (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log(event.data)
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(event.data)
+        }
         gameState.gameData = data;
       } catch {
         gameState.gameData = event.data; // Handle plain text messages
@@ -66,10 +72,6 @@ const GameControls = {
     // Determine if it's the current player's turn
     console.log(gameState.gameData.currentPlayer)
     console.log(gameState.playerId)
-    const isCurrentPlayerTurn = gameState.gameData.players[gameState.gameData.currentPlayer].playerId === gameState.playerId;
-    if (!isCurrentPlayerTurn) {
-      return m("p", "Waiting for your turn...");
-    }
 
     // Retrieve the current bet and minimum raise amount
     const currentBet = gameState.gameData.bettingRound.currentBet;
@@ -105,7 +107,9 @@ const App = {
   oninit: gameState.connect,
   view: () => {
 
-    const currentPlayer = gameState?.gameData?.players?.find(player => gameState?.playerId)
+    console.log(gameState?.gameData?.players)
+    const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
+    const isCurrentPlayerTurn = gameState?.gameData?.players[gameState?.gameData?.currentPlayer]?.playerId === gameState.playerId;
 
     const gameOverview = [
       { label: 'Current Pot:', value: gameState?.gameData?.potTotal, prefix: '$' },
@@ -116,6 +120,8 @@ const App = {
     if (!gameState.gameData) {
       return m("p", "Loading...");
     }
+
+    console.log({ currentPlayer })
 
     return m.fragment([
       // header
@@ -136,28 +142,36 @@ const App = {
           })
         ),
       m("div.tg-poker__table", [
-
         // current player and spectators
         currentPlayer &&
         m("div.tg-poker__table__bottom", [
           m("div.tg-poker__player", [
-            m("h4", `Current Player (${currentPlayer.status}) ${currentPlayer.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+            m("h4", `You (${currentPlayer.status}) ${currentPlayer.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
             m("div", `Stack: $${currentPlayer.stackSize}`),
             m("div", `Current Bet: $${currentPlayer.currentBet}`),
-            m("div", `Cards: ${currentPlayer.cards.join(', ')}`)
+            m("div", {
+              style: { display: 'flex', gap: '6px' }
+            },
+              currentPlayer.cards.map((c, i) => {
+                return m(card, { value: c.value, style: { height: '80px' } })
+              })
+            )
           ]),
 
-          m("h4", "Spectators:"),
-          gameState.gameData.spectators.map((spectator, index) =>
-            m("div.spectator", [
-              m("h4", `Spectator ${index + 1}`),
-              m("div", `Status: ${spectator.status}`)
-            ])
-          )
+          m("div", [
+            m("h4", "Spectators:"),
+            gameState.gameData.spectators.map((spectator, index) =>
+              m("div.spectator", [
+                m("h4", `Spectator ${index + 1}`),
+                m("div", `Status: ${spectator.status}`)
+              ])
+            )
+          ])
         ]),
+        isCurrentPlayerTurn ?
+          m(GameControls) :
+          m("p", "Waiting for your turn...")
       ]),
-      // game controls
-      m(GameControls)
     ]);
   }
 };

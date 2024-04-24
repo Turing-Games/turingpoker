@@ -3,7 +3,6 @@ import { getImagePath } from '../utils/string_utilities'
 
 export default {
   view: (vnode) => {
-    console.log(vnode)
     return m("div", {
       class: "tg-header",
     }, [

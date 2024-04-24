@@ -124,10 +124,13 @@ class PartyServer {
 
       const rank = this.ranks[rankIndex];
       const suit = this.suits[suitIndex];
-      card = `${rank} of ${suit}`;
-    } while (this.usedCards.has(card)); // Check for duplicates
+      card = {
+        label: `${rank} of ${suit}`,
+        value: `${rank}_${suit}`
+      }
+    } while (this.usedCards.has(card.value)); // Check for duplicates
 
-    this.usedCards.add(card);  // Add to used cards to prevent future duplicates
+    this.usedCards.add(card.value);  // Add to used cards to prevent future duplicates
     return card;
   }
 
