@@ -1,4 +1,5 @@
 import Logo from '../../public/images/logo.png'
+import { getImagePath } from '../utils/string_utilities'
 
 export default {
   view: (vnode) => {
@@ -9,7 +10,7 @@ export default {
         class: 'tg__logo'
       },
         m('img', {
-          src: Logo
+          src: getImagePath(Logo)
         })
       )
     ]

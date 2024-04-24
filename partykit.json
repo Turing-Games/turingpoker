@@ -4,7 +4,7 @@
   "main": "src/server.js",
   "compatibilityDate": "2024-04-08",
   "serve": {
-    "path": "build",
+    "path": "public",
     "build": {
       "entry": "src/client.js",
       "loader": {
