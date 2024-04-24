@@ -143,9 +143,20 @@ const App = {
         ),
       m("div.tg-poker__table", [
         // other players
-        m("div.tg-poker__table__top", [
-
-        ]),
+        m("div.tg-poker__table__top",
+          // filter out current player
+          gameState.gameData.players.filter(player => player.playerId !== currentPlayer.playerId).map((player, index) =>
+            m("div.tg-poker__player", {
+              class: gameState.playerId === player.playerId ? 'current-player' : ''
+            }, [
+              m("h4", `Player ${index + 1} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+              m("div", `Stack: $${player.stackSize}`),
+              m("div", `Current Bet: $${player.currentBet}`),
+              m("div", `Cards: ${player.cards.join(', ')}`),
+              gameState.playerId === player.playerId ? m("div", "This is You") : null
+            ])
+          ),
+        ),
         // current player and spectators
         currentPlayer &&
         m("div.tg-poker__table__bottom", [
@@ -162,12 +173,12 @@ const App = {
             )
           ]),
 
-          m("div", [
-            m("h4", "Spectators:"),
+          m("div.tg-poker__table__spectators", [
+            m("h4", "Spectators"),
             gameState.gameData.spectators.map((spectator, index) =>
-              m("div.spectator", [
-                m("h4", `Spectator ${index + 1}`),
-                m("div", `Status: ${spectator.status}`)
+              m("div.tg-poker__table__spectators__spectator", [
+                m("p", `Spectator ${index + 1}:`),
+                m("p", `${spectator.status}`)
               ])
             )
           ])
