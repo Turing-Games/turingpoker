@@ -1,4 +1,4 @@
-new EventSource('http://127.0.0.1:64402/esbuild').addEventListener('change', () => location.reload())
+new EventSource('http://127.0.0.1:57381/esbuild').addEventListener('change', () => location.reload())
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __esm = (fn, res) => function __init() {
   return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
@@ -689,7 +689,12 @@ var init_header = __esm({
               m("img", {
                 src: getImagePath(logo_default)
               })
-            )
+            ),
+            ...Array(4).fill("_").map((el, i) => {
+              return m("div", {
+                class: `tg__header__squares tg__header__squares--${i}`
+              });
+            })
           ]
         );
       }
@@ -795,7 +800,6 @@ var require_client = __commonJS({
         }
         return m("div", [
           m(header_default),
-          m("h1", "Poker Game Client"),
           typeof gameState.gameData === "string" ? m("p", gameState.gameData) : m("div", [
             m("h2", `Table: ${gameState.gameData.gameType}`),
             m("div", `Current Pot: $${gameState.gameData.potTotal}`),

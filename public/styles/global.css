@@ -14,11 +14,15 @@ body {
 }
 
 #app {
-  display: block; /* Ensure it is not set to 'none' */
-  height: auto;   /* Ensure it has enough space */
+  display: block;
+  /* Ensure it is not set to 'none' */
+  height: auto;
+  /* Ensure it has enough space */
 }
+
 button {
-  display: inline-block; /* Ensure buttons are visible */
+  display: inline-block;
+  /* Ensure buttons are visible */
 }
 
 

@@ -12,7 +12,14 @@ export default {
         m('img', {
           src: getImagePath(Logo)
         })
-      )
+      ),
+      ...Array(4).fill('_').map((el, i) => {
+        return (
+          m("div", {
+            class: `tg__header__squares tg__header__squares--${i}`
+          })
+        )
+      })
     ]
     )
   }

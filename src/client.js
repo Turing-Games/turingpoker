@@ -110,7 +110,6 @@ const App = {
 
     return m("div", [
       m(header),
-      m("h1", "Poker Game Client"),
       typeof gameState.gameData === "string" ?
         m("p", gameState.gameData) :
         m("div", [

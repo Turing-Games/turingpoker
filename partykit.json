@@ -9,7 +9,8 @@
       "entry": "src/client.js",
       "loader": {
         // configure loaders, defaults to {}
-        ".png": "file" // see https://esbuild.github.io/content-types/ for more info
+        ".png": "file", // see https://esbuild.github.io/content-types/ for more info
+        ".css": "file"
       }
     }
   }
