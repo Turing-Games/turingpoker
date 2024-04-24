@@ -143,7 +143,7 @@ const App = {
         ),
       m("div.tg-poker__table", [
         // other players
-        m("div.tg-poker__table__bottom", [
+        m("div.tg-poker__table__top", [
 
         ]),
         // current player and spectators
