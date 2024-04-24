@@ -3,7 +3,6 @@
   border-radius: 4px;
   color: #fff;
   display: grid;
-  font-size: 12px;
   gap: 20px;
   grid-template-columns: repeat(3, auto);
   justify-content: center;

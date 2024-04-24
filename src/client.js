@@ -134,7 +134,7 @@ const App = {
         m("div.tg-poker__overview",
           gameOverview.map((stat, i) => {
             return (
-              m("div", [
+              m("div", { style: { color: "#5cc133" } }, [
                 m("div", stat.label),
                 m("div", `${stat.prefix}${stat.value}`)
               ])
