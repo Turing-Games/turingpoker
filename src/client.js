@@ -145,11 +145,11 @@ const App = {
         // other players
         m("div.tg-poker__table__top",
           // filter out current player
-          gameState.gameData.players.filter(player => player.playerId !== currentPlayer.playerId).map((player, index) =>
+          gameState.gameData.players.filter(player => player.playerId !== currentPlayer?.playerId).map((player, index) =>
             m("div.tg-poker__player", {
               class: gameState.playerId === player.playerId ? 'current-player' : ''
             }, [
-              m("h4", `Player ${index + 1} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+              m("h4", `Player ${index + 2} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
               m("div", `Stack: $${player.stackSize}`),
               m("div", `Current Bet: $${player.currentBet}`),
               m("div", `Cards: ${player.cards.join(', ')}`),
@@ -161,13 +161,13 @@ const App = {
         currentPlayer &&
         m("div.tg-poker__table__bottom", [
           m("div.tg-poker__player", [
-            m("h4", `You (${currentPlayer.status}) ${currentPlayer.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
-            m("div", `Stack: $${currentPlayer.stackSize}`),
-            m("div", `Current Bet: $${currentPlayer.currentBet}`),
+            m("h4", `You (${currentPlayer?.status}) ${currentPlayer?.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+            m("div", `Stack: $${currentPlayer?.stackSize}`),
+            m("div", `Current Bet: $${currentPlayer?.currentBet}`),
             m("div", {
               style: { display: 'flex', gap: '6px' }
             },
-              currentPlayer.cards.map((c, i) => {
+              currentPlayer?.cards.map((c, i) => {
                 return m(card, { value: c.value, style: { height: '80px' } })
               })
             )
