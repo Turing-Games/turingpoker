@@ -16,7 +16,8 @@ class PartyServer {
       potTotal: 0,
       bettingRound: {
         currentBet: 0,
-        totalBets: []
+        totalBets: [],
+        round: 1
       },
       lastAction: {},
       players: [],
@@ -49,7 +50,8 @@ class PartyServer {
         stackSize: 5000,
         currentBet: 0,
         status: "waiting",
-        cards: []
+        cards: [],
+        completedRound: 0
       };
       this.gameState.players.push(newPlayer);
       conn.send("Welcome to the game!");
@@ -111,6 +113,23 @@ class PartyServer {
     }
   }
 
+  checkRoundCompleted() {
+    // check all players to see if their completedRound is equal
+    // to bettingRound of gameState
+    const playerRounds = this.gameState.players.map(player => player.completedRound)
+    // sum of rounds
+    const roundSum = playerRounds.reduce((acc, val) => acc + val, 0)
+    // round is complete if sum divided by players is same as gameData.bettingRound.round
+    if ((roundSum / this.gameState.players.length) === this.gameState.bettingRound.round) {
+      this.gameState.bettingRound.round += 1
+      this.changeTurn(0); // Move to the next player
+    } else {
+      this.changeTurn(); // Move to the next player
+    }
+
+    this.broadcastGameState(); // Update all clients with the new state
+  }
+
   ///TODO refactor out poker logic away from server logic 
 
   getRandomCard() {
@@ -165,6 +184,8 @@ class PartyServer {
         player.currentBet += amount;
         this.gameState.potTotal += amount;
         this.gameState.bettingRound.currentBet = amount; // Update current bet to the raised amount
+        this.gameState.bettingRound.round += 1 // if raise, another round of betting to raise or call
+        player.completedRound += 2 // player who raised, does not have to bet again
         break;
       case 'call':
         const callAmount = this.gameState.bettingRound.currentBet - player.currentBet;
@@ -174,12 +195,15 @@ class PartyServer {
         }
         player.stackSize -= callAmount;
         player.currentBet += callAmount;
+        player.completedRound += 1 // player completed round of betting
         this.gameState.potTotal += callAmount;
         break;
       case 'check':
         if (this.gameState.bettingRound.currentBet !== player.currentBet) {
           console.log("Cannot check, current bet is higher than player's bet:", this.gameState.bettingRound.currentBet, "player's bet:", player.currentBet);
           return; // Cannot check because there is an outstanding bet
+        } else {
+          player.completedRound += 1 // player completed round of betting
         }
         break;
       case 'fold':
@@ -190,18 +214,20 @@ class PartyServer {
         return; // Invalid action
     }
 
-    this.advanceTurn(); // Move to the next player
+    this.checkRoundCompleted()
   }
 
-  advanceTurn() {
+  changeTurn(playerIndex = null) {
     // Find the next active player who has not folded
-    let index = (this.gameState.currentPlayer + 1) % this.gameState.players.length;
-    while (this.gameState.players[index].status === 'folded' && index !== this.gameState.currentPlayer) {
-      index = (index + 1) % this.gameState.players.length;
+    if (!playerIndex && playerIndex !== 0) {
+      let index = (this.gameState.currentPlayer + 1) % this.gameState.players.length;
+      while (this.gameState.players[index].status === 'folded' && index !== this.gameState.currentPlayer) {
+        index = (index + 1) % this.gameState.players.length;
+      }
+      this.gameState.currentPlayer = index;
+    } else {
+      this.gameState.currentPlayer = playerIndex;
     }
-    this.gameState.currentPlayer = index;
-
-    this.broadcastGameState(); // Update all clients with the new state
   }
 
 

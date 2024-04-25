@@ -54,6 +54,14 @@ export default {
       { label: 'Dealer Position:', value: gameState?.gameData?.dealerPosition + 1, prefix: '' }
     ]
 
+    if (process.env.NODE_ENV != 'producion') {
+      gameOverview.push({
+        label: 'Betting Round',
+        value: gameState?.gameData?.bettingRound?.round,
+        prefix: ''
+      })
+    }
+
     if (process.env.NODE_ENV != 'production') {
       console.log('players', gameState?.gameData?.players)
       console.log('gameData', gameState?.gameData)
