@@ -60,7 +60,7 @@ export default {
       console.log({ currentPlayer })
     }
 
-    if (!gameState.gameData.gameType) {
+    if (!gameState.gameData) {
       return m("p", "Loading game...");
     } else if (gameState.gameData.players < 2) {
 
