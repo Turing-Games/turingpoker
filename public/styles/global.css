@@ -16,9 +16,10 @@ body {
 }
 
 #app {
+  display: flex;
+  flex-direction: column;
   font-family: Arial, sans-serif;
   height: 100%;
-  padding: 20px;
   overflow: hidden;
 }
 
