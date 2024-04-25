@@ -95,7 +95,7 @@ export default {
                 m("div", `Current Bet: $${player.currentBet}`),
                 m("div", `Cards: ${player.cards.join(', ')}`),
                 m("div", {
-                  style: { display: 'flex', gap: '6px' }
+                  style: { display: 'flex', gap: '6px', margin: '16px 0' }
                 },
                   player?.cards.map((c, i) => {
                     return m(card, { value: c.value, style: { height: '80px' } })
@@ -117,15 +117,17 @@ export default {
               ])
             ]),
             m("div", {
-              style: { display: 'flex', gap: '6px' }
+              style: { display: 'flex', gap: '6px', margin: '16px 0' }
             },
               currentPlayer?.cards.map((c, i) => {
                 return m(card, { value: c.value, style: { height: '80px' } })
               })
             ),
             isCurrentPlayerTurn ?
-              m(GameControls, { gameState }) :
-              m("p", "Waiting for your turn...")
+              m(GameControls, {
+                gameState: gameState
+              }) :
+              m("p", { style: { height: '40px' } }, "Waiting for your turn...")
           ]),
 
           m("div.tg-poker__table__spectators", [

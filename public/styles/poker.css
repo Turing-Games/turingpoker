@@ -64,5 +64,6 @@
 
 .tg-poker__controls {
   display: flex;
+  height: 40px;
   gap: 5px;
 }

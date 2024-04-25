@@ -110,11 +110,9 @@ const cardMap = {
 
 export default {
   view: (vnode) => {
-    return m("div",
-      m('img', {
-        src: getImagePath(cardMap[vnode.attrs.value]),
-        style: { ...vnode.attrs.style }
-      })
-    )
+    return m('img', {
+      src: getImagePath(cardMap[vnode.attrs.value]),
+      style: { ...vnode.attrs.style }
+    })
   }
 } 
