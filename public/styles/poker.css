@@ -70,7 +70,6 @@
   align-items: center;
   display: flex;
   gap: 8px;
-  justify-content: flex-end;
   margin: 0 auto;
   max-width: 600px;
   width: 100%;

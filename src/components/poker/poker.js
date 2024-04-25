@@ -104,7 +104,13 @@ export default {
           ),
           // center of table / deck / dealer cards
           m("div.tg-poker__table__dealer", {},
-            m(card, { style: { width: '70px' } })
+            m(card, { style: { width: '70px' } }),
+            gameState.gameData.communityCards.map((data, i) => {
+              return m(card, {
+                value: data.value,
+                style: { width: '70px' }
+              })
+            })
           ),
           // bottom
           currentPlayer &&

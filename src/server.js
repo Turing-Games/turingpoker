@@ -122,6 +122,7 @@ class PartyServer {
     // round is complete if sum divided by players is same as gameData.bettingRound.round
     if ((roundSum / this.gameState.players.length) === this.gameState.bettingRound.round) {
       this.gameState.bettingRound.round += 1
+      this.dealCommunityCards()
       this.changeTurn(0); // Move to the next player
     } else {
       this.changeTurn(); // Move to the next player
