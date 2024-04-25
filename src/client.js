@@ -20,8 +20,7 @@ const gameState = {
       gameState.isConnected = true;
       gameState.playerId = this.socket.id; // some issue here with properly setting this and using it for proper rendering logic
       if (process.env.NODE_ENV !== 'production') {
-        console.log("Connected with ID:", this.playerId);
-        console.log(gameState.playerId);
+        console.log("Connected with ID:", this.socket.id);
       }
       m.redraw();
     });
@@ -30,7 +29,7 @@ const gameState = {
       try {
         const data = JSON.parse(event.data);
         if (process.env.NODE_ENV !== 'production') {
-          console.log(event.data)
+          console.log('event data', data)
         }
         gameState.gameData = data;
       } catch {

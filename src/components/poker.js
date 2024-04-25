@@ -1,24 +1,20 @@
-// Global state management
-
-import PartySocket from "partysocket";
-import { getImagePath } from "../utils/string_utilities";
-import header from "./header";
 import card from "./card";
 
 const GameControls = {
   view: ({ attrs }) => {
     const gameState = attrs.gameState
     // Do not display controls until the game state is fully received and the game is active
-    console.log("here is the bug")
-    console.log(gameState.isConnected)
-    console.log(!gameState.gameData)
+    if (process.env.NODE_ENV != 'production') {
+      console.log("Game controls rendered")
+      console.log('isConnected', gameState.isConnected)
+      // Determine if it's the current player's turn
+      console.log('currentPlayer', gameState.gameData.currentPlayer)
+      console.log('playerId', gameState.playerId)
+    }
+
     if (!gameState.isConnected || !gameState.gameData) {
       return m("p", "Waiting for the game to start or connect...");
     }
-
-    // Determine if it's the current player's turn
-    console.log(gameState.gameData.currentPlayer)
-    console.log(gameState.playerId)
 
     // Retrieve the current bet and minimum raise amount
     const currentBet = gameState.gameData.bettingRound.currentBet;
@@ -55,7 +51,7 @@ export default {
   view: ({ attrs }) => {
     const gameState = attrs.gameState;
 
-    console.log(gameState?.gameData?.players)
+    console.log('players', gameState?.gameData?.players)
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
     const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState.gameData.currentPlayer].playerId;
 
@@ -90,12 +86,11 @@ export default {
             ),
           // filter out current player
           gameState.gameData.players.filter(player => player.playerId !== currentPlayer?.playerId).map((player, index) => {
-            console.log({ player })
             return (
               m("div.tg-poker__player", {
                 class: gameState.playerId === player.playerId ? 'current-player' : ''
               }, [
-                m("h4", `Player ${index + 2} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer].playerId ? ' - Your Turn' : ''}`),
+                m("h4", `Player ${index + 2} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId ? ' - Their Turn' : ''}`),
                 m("div", `Stack: $${player.stackSize}`),
                 m("div", `Current Bet: $${player.currentBet}`),
                 m("div", `Cards: ${player.cards.join(', ')}`),
