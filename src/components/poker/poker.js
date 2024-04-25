@@ -1,16 +1,9 @@
-import card from "./card";
+import card from "../card";
+import player from "./player";
 
 const GameControls = {
   view: ({ attrs }) => {
     const gameState = attrs.gameState
-    // Do not display controls until the game state is fully received and the game is active
-    if (process.env.NODE_ENV != 'production') {
-      console.log("Game controls rendered")
-      console.log('isConnected', gameState.isConnected)
-      // Determine if it's the current player's turn
-      console.log('currentPlayer', gameState.gameData.currentPlayer)
-      console.log('playerId', gameState.playerId)
-    }
 
     if (!gameState.isConnected || !gameState.gameData) {
       return m("p", "Waiting for the game to start or connect...");
@@ -54,6 +47,7 @@ export default {
     console.log('players', gameState?.gameData?.players)
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
     const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState.gameData.currentPlayer].playerId;
+    const opponents = gameState?.gameData.players.filter(player => player.playerId !== currentPlayer?.playerId)
 
     const gameOverview = [
       { label: 'Current Pot:', value: gameState?.gameData?.potTotal, prefix: '$' },
@@ -69,7 +63,6 @@ export default {
 
     return m("div.tg-poker__table",
       [
-        // other players
         m("div.tg-poker__table__top",
           // game overview data
           typeof gameState.gameData === "string" ?
@@ -84,8 +77,8 @@ export default {
                 )
               })
             ),
-          // filter out current player
-          gameState.gameData.players.filter(player => player.playerId !== currentPlayer?.playerId).map((player, index) => {
+          // opponents, filtered out current player
+          opponents.map((player, index) => {
             return (
               m("div.tg-poker__player", {
                 class: gameState.playerId === player.playerId ? 'current-player' : ''
@@ -93,7 +86,6 @@ export default {
                 m("h4", `Player ${index + 2} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId ? ' - Their Turn' : ''}`),
                 m("div", `Stack: $${player.stackSize}`),
                 m("div", `Current Bet: $${player.currentBet}`),
-                m("div", `Cards: ${player.cards.join(', ')}`),
                 m("div", {
                   style: { display: 'flex', gap: '6px', margin: '16px 0' }
                 },
@@ -105,31 +97,23 @@ export default {
             )
           }),
         ),
-        // current player and spectators
         currentPlayer &&
         m("div.tg-poker__table__bottom", [
-          m("div.tg-poker__player.tg-poker__player--1", [
-            m("div.tg-poker__player__details", [
-              m("h4", `You (${currentPlayer?.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`),
-              m("div", [
-                m("div", `$${currentPlayer?.stackSize}`),
-                m("div", `Bet: $${currentPlayer?.currentBet}`),
-              ])
-            ]),
-            m("div", {
-              style: { display: 'flex', gap: '6px', margin: '16px 0' }
-            },
-              currentPlayer?.cards.map((c, i) => {
-                return m(card, { value: c.value, style: { height: '80px' } })
-              })
-            ),
+          m("div", { style: { margin: '12px' } }, [
+            // current player
+            m(player, {
+              className: 'tg-poker__player--1',
+              player: currentPlayer,
+              isCurrentPlayerTurn
+            }),
+            // controls
             isCurrentPlayerTurn ?
               m(GameControls, {
                 gameState: gameState
               }) :
-              m("p", { style: { height: '40px' } }, "Waiting for your turn...")
+              m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
           ]),
-
+          // spectators
           m("div.tg-poker__table__spectators", [
             m("h4", "Spectators"),
             gameState.gameData.spectators.map((spectator, index) =>
