@@ -47,7 +47,7 @@ export default {
     console.log('players', gameState?.gameData?.players)
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
     const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState.gameData.currentPlayer].playerId;
-    const opponents = gameState?.gameData.players.filter(player => player.playerId !== currentPlayer?.playerId)
+    const opponents = gameState?.gameData?.players.filter(player => player.playerId !== currentPlayer?.playerId)
 
     const gameOverview = [
       { label: 'Current Pot:', value: gameState?.gameData?.potTotal, prefix: '$' },
@@ -69,33 +69,26 @@ export default {
             m("p", gameState.gameData) :
             m("div.tg-poker__overview",
               gameOverview.map((stat, i) => {
-                return (
-                  m("div", { style: { color: "#5cc133" } }, [
-                    m("div", stat.label),
-                    m("div", `${stat.prefix}${stat.value}`)
-                  ])
-                )
+                return m("div", { style: { color: "#5cc133" } }, [
+                  m("div", stat.label),
+                  m("div", `${stat.prefix}${stat.value}`)
+                ])
               })
             ),
           // opponents, filtered out current player
-          opponents.map((player, index) => {
-            return (
-              m("div.tg-poker__player", {
-                class: gameState.playerId === player.playerId ? 'current-player' : ''
-              }, [
-                m("h4", `Player ${index + 2} (${player.status}) ${player.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId ? ' - Their Turn' : ''}`),
-                m("div", `Stack: $${player.stackSize}`),
-                m("div", `Current Bet: $${player.currentBet}`),
-                m("div", {
-                  style: { display: 'flex', gap: '6px', margin: '16px 0' }
-                },
-                  player?.cards.map((c, i) => {
-                    return m(card, { value: c.value, style: { height: '80px' } })
-                  })
-                )
-              ])
-            )
-          }),
+          opponents?.length > 0 &&
+          m("div", { style: { display: 'flex', gap: '16px' } },
+            opponents.map((opp, index) => {
+              // starts at 1 if spectator is viewing
+              const playerNumberOffset = !currentPlayer ? 1 : 0
+              return m(player, {
+                player: opp,
+                isCurrentPlayerTurn: opp.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId,
+                title: `Player ${index + 2 - playerNumberOffset} (${opp.status}) ${opp.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId ? ' - Their Turn' : ''}`,
+                className: ''
+              })
+            })
+          ),
         ),
         currentPlayer &&
         m("div.tg-poker__table__bottom", [
@@ -104,7 +97,8 @@ export default {
             m(player, {
               className: 'tg-poker__player--1',
               player: currentPlayer,
-              isCurrentPlayerTurn
+              isCurrentPlayerTurn,
+              title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
             }),
             // controls
             isCurrentPlayerTurn ?
@@ -123,7 +117,7 @@ export default {
               ])
             )
           ]),
-        ]),
+        ])
       ]);
   }
 };

@@ -4,9 +4,9 @@ export default {
   view: ({ attrs }) => {
     const player = attrs.player;
 
-    return m(`div.tg-poker__player.${attrs.className || ''}`, [
+    return m(`div.tg-poker__player${attrs.className ? '.' + attrs.className : ''}`, [
       m("div.tg-poker__player__details", [
-        m("h4", `You (${player.status}) ${attrs.isCurrentPlayerTurn ? ' - Your Turn' : ''}`),
+        m("h4", attrs.title),
         m("div", [
           m("div", `$${player.stackSize}`),
           m("div", `Bet: $${player.currentBet}`),
