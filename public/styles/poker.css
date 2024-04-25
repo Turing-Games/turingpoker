@@ -59,5 +59,10 @@
 
 .tg-poker__player.tg-poker__player--1 {
   margin: 12px;
-  width: 300px;
+  width: 350px;
+}
+
+.tg-poker__controls {
+  display: flex;
+  gap: 5px;
 }

@@ -21,7 +21,7 @@ const GameControls = {
     const minRaiseAmount = currentBet > 0 ? currentBet + gameState.gameData.bigBlind : gameState.gameData.bigBlind;
 
     // Render game controls if it's the current player's turn
-    return m("div", [
+    return m("div.tg-poker__controls", [
       currentBet > 0 ? m("button", {
         onclick: () => gameState.sendAction("call", currentBet)
       }, "Call") : null,
