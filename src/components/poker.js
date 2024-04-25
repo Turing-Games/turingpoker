@@ -7,45 +7,46 @@ import card from "./card";
 
 const GameControls = {
   view: ({ attrs }) => {
-    //   // Do not display controls until the game state is fully received and the game is active
-    //   console.log("here is the bug")
-    //   console.log(gameState.isConnected)
-    //   console.log(!gameState.gameData)
-    //   if (!gameState.isConnected || !gameState.gameData) {
-    //     return m("p", "Waiting for the game to start or connect...");
-    //   }
+    const gameState = attrs.gameState
+    // Do not display controls until the game state is fully received and the game is active
+    console.log("here is the bug")
+    console.log(gameState.isConnected)
+    console.log(!gameState.gameData)
+    if (!gameState.isConnected || !gameState.gameData) {
+      return m("p", "Waiting for the game to start or connect...");
+    }
 
-    //   // Determine if it's the current player's turn
-    //   console.log(gameState.gameData.currentPlayer)
-    //   console.log(gameState.playerId)
+    // Determine if it's the current player's turn
+    console.log(gameState.gameData.currentPlayer)
+    console.log(gameState.playerId)
 
-    //   // Retrieve the current bet and minimum raise amount
-    //   const currentBet = gameState.gameData.bettingRound.currentBet;
-    //   const minRaiseAmount = currentBet > 0 ? currentBet + gameState.gameData.bigBlind : gameState.gameData.bigBlind;
+    // Retrieve the current bet and minimum raise amount
+    const currentBet = gameState.gameData.bettingRound.currentBet;
+    const minRaiseAmount = currentBet > 0 ? currentBet + gameState.gameData.bigBlind : gameState.gameData.bigBlind;
 
-    //   // Render game controls if it's the current player's turn
-    //   return m("div", [
-    //     currentBet > 0 ? m("button", {
-    //       onclick: () => gameState.sendAction("call", currentBet)
-    //     }, "Call") : null,
-    //     m("button", {
-    //       onclick: () => gameState.sendAction("check"),
-    //       disabled: currentBet > 0
-    //     }, "Check"),
-    //     m("button", {
-    //       onclick: () => {
-    //         const amount = prompt(`Enter amount to raise (minimum: $${minRaiseAmount}):`, minRaiseAmount);
-    //         if (amount && parseInt(amount, 10) >= minRaiseAmount) {
-    //           gameState.sendAction("raise", parseInt(amount, 10));
-    //         } else {
-    //           alert(`Invalid raise amount. You must raise at least $${minRaiseAmount}.`);
-    //         }
-    //       }
-    //     }, "Raise"),
-    //     m("button", {
-    //       onclick: () => gameState.sendAction("fold")
-    //     }, "Fold")
-    //   ]);
+    // Render game controls if it's the current player's turn
+    return m("div", [
+      currentBet > 0 ? m("button", {
+        onclick: () => gameState.sendAction("call", currentBet)
+      }, "Call") : null,
+      m("button", {
+        onclick: () => gameState.sendAction("check"),
+        disabled: currentBet > 0
+      }, "Check"),
+      m("button", {
+        onclick: () => {
+          const amount = prompt(`Enter amount to raise (minimum: $${minRaiseAmount}):`, minRaiseAmount);
+          if (amount && parseInt(amount, 10) >= minRaiseAmount) {
+            gameState.sendAction("raise", parseInt(amount, 10));
+          } else {
+            alert(`Invalid raise amount. You must raise at least $${minRaiseAmount}.`);
+          }
+        }
+      }, "Raise"),
+      m("button", {
+        onclick: () => gameState.sendAction("fold")
+      }, "Fold")
+    ]);
   }
 };
 
@@ -128,7 +129,7 @@ export default {
               })
             ),
             isCurrentPlayerTurn ?
-              m(GameControls) :
+              m(GameControls, { gameState }) :
               m("p", "Waiting for your turn...")
           ]),
 

@@ -2,8 +2,6 @@
 
 import PartySocket from "partysocket";
 import header from "./components/header";
-import { getImagePath } from "./utils/string_utilities";
-import card from './components/card'
 import poker from "./components/poker";
 
 const gameState = {
