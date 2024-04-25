@@ -44,7 +44,6 @@ export default {
   view: ({ attrs }) => {
     const gameState = attrs.gameState;
 
-    console.log('players', gameState?.gameData?.players)
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
     const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState.gameData.currentPlayer].playerId;
     const opponents = gameState?.gameData?.players.filter(player => player.playerId !== currentPlayer?.playerId)
@@ -55,69 +54,80 @@ export default {
       { label: 'Dealer Position:', value: gameState?.gameData?.dealerPosition + 1, prefix: '' }
     ]
 
-    if (!gameState.gameData) {
-      return m("p", "Loading...");
+    if (process.env.NODE_ENV != 'production') {
+      console.log('players', gameState?.gameData?.players)
+      console.log('gameData', gameState?.gameData)
+      console.log({ currentPlayer })
     }
 
-    console.log({ currentPlayer })
+    if (!gameState.gameData.gameType) {
+      return m("p", "Loading game...");
+    } else if (gameState.gameData.players < 2) {
 
-    return m("div.tg-poker__table",
-      [
-        m("div.tg-poker__table__top",
-          // game overview data
-          typeof gameState.gameData === "string" ?
-            m("p", gameState.gameData) :
-            m("div.tg-poker__overview",
-              gameOverview.map((stat, i) => {
-                return m("div", { style: { color: "#5cc133" } }, [
-                  m("div", stat.label),
-                  m("div", `${stat.prefix}${stat.value}`)
-                ])
+    } else {
+      return m("div.tg-poker__table",
+        [
+          m("div.tg-poker__table__top",
+            // game overview data
+            typeof gameState.gameData === "string" ?
+              m("p", gameState.gameData) :
+              m("div.tg-poker__overview",
+                gameOverview.map((stat, i) => {
+                  return m("div", { style: { color: "#5cc133" } }, [
+                    m("div", stat.label),
+                    m("div", `${stat.prefix}${stat.value}`)
+                  ])
+                })
+              ),
+            // opponents, filtered out current player
+            opponents?.length > 0 &&
+            m("div", { style: { display: 'flex', gap: '16px' } },
+              opponents.map((opp, index) => {
+                // starts at 1 if spectator is viewing
+                const playerNumberOffset = !currentPlayer ? 1 : 0
+                return m(player, {
+                  player: opp,
+                  isCurrentPlayerTurn: opp.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId,
+                  title: `Player ${index + 2 - playerNumberOffset} (${opp.status}) ${opp.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId ? ' - Their Turn' : ''}`,
+                  className: ''
+                })
               })
             ),
-          // opponents, filtered out current player
-          opponents?.length > 0 &&
-          m("div", { style: { display: 'flex', gap: '16px' } },
-            opponents.map((opp, index) => {
-              // starts at 1 if spectator is viewing
-              const playerNumberOffset = !currentPlayer ? 1 : 0
-              return m(player, {
-                player: opp,
-                isCurrentPlayerTurn: opp.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId,
-                title: `Player ${index + 2 - playerNumberOffset} (${opp.status}) ${opp.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId ? ' - Their Turn' : ''}`,
-                className: ''
-              })
-            })
           ),
-        ),
-        currentPlayer &&
-        m("div.tg-poker__table__bottom", [
-          m("div", { style: { margin: '12px' } }, [
-            // current player
-            m(player, {
-              className: 'tg-poker__player--1',
-              player: currentPlayer,
-              isCurrentPlayerTurn,
-              title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
-            }),
-            // controls
-            isCurrentPlayerTurn ?
-              m(GameControls, {
-                gameState: gameState
-              }) :
-              m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
-          ]),
-          // spectators
-          m("div.tg-poker__table__spectators", [
-            m("h4", "Spectators"),
-            gameState.gameData.spectators.map((spectator, index) =>
-              m("div.tg-poker__table__spectators__spectator", [
-                m("p", `Spectator ${index + 1}:`),
-                m("p", `${spectator.status}`)
-              ])
-            )
-          ]),
-        ])
-      ]);
+          // center of table / deck / dealer cards
+          m("div.tg-poker__table__dealer", {},
+            m(card, { style: { width: '70px' } })
+          ),
+          // bottom
+          currentPlayer &&
+          m("div.tg-poker__table__bottom", [
+            m("div", { style: { margin: '12px' } }, [
+              // current player
+              m(player, {
+                className: 'tg-poker__player--1',
+                player: currentPlayer,
+                isCurrentPlayerTurn,
+                title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
+              }),
+              // controls
+              isCurrentPlayerTurn ?
+                m(GameControls, {
+                  gameState: gameState
+                }) :
+                m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
+            ]),
+            // spectators
+            m("div.tg-poker__table__spectators", [
+              m("h4", "Spectators"),
+              gameState.gameData.spectators.map((spectator, index) =>
+                m("div.tg-poker__table__spectators__spectator", [
+                  m("p", `Spectator ${index + 1}:`),
+                  m("p", `${spectator.status}`)
+                ])
+              )
+            ]),
+          ])
+        ]);
+    }
   }
 };

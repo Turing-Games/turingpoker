@@ -52,6 +52,7 @@ import clubsKing from '../../public/images/cards/svg-cards/king_of_clubs.svg'
 import diamondsKing from '../../public/images/cards/svg-cards/king_of_diamonds.svg'
 import heartsKing from '../../public/images/cards/svg-cards/king_of_hearts.svg'
 import spadesKing from '../../public/images/cards/svg-cards/king_of_spades.svg'
+import cardBack from '../../public/images/cards/turing-card-back.png'
 
 const cardMap = {
   '2_Clubs': clubs2,
@@ -111,7 +112,7 @@ const cardMap = {
 export default {
   view: (vnode) => {
     return m('img', {
-      src: getImagePath(cardMap[vnode.attrs.value]),
+      src: getImagePath(cardMap[vnode.attrs.value]) || getImagePath(cardBack),
       style: { ...vnode.attrs.style }
     })
   }
