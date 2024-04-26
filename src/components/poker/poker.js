@@ -85,11 +85,16 @@ export default {
                     m("div", stat.label),
                     m("div", `${stat.prefix}${stat.value}`)
                   ])
-                })
+                }),
+                (location.host.includes('localhost') &&
+                  m('div', {
+                    onclick: () => gameState.sendAction("reset_game"),
+                    style: { textAlign: 'center', cursor: 'pointer' }
+                  }, "Reset Game (dev)")),
               ),
             // opponents, filtered out current player
             opponents?.length > 0 &&
-            m("div", { style: { display: 'flex', gap: '16px' } },
+            m("div", { style: { display: 'flex', gap: '16px', margin: '0 12px' } },
               opponents.map((opp, index) => {
                 // starts at 1 if spectator is viewing
                 const playerNumberOffset = !currentPlayer ? 1 : 0
@@ -107,8 +112,10 @@ export default {
             m(card, { style: { width: '70px' } }),
             gameState.gameData.communityCards.map((data, i) => {
               return m(card, {
-                value: data.value,
-                style: { width: '70px' }
+                style: {
+                  transform: `translateX(-${78 * (i + 1)}px)`
+                },
+                value: data.value
               })
             })
           ),

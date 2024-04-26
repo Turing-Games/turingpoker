@@ -210,6 +210,27 @@ class PartyServer {
       case 'fold':
         player.status = 'folded';
         break;
+      case 'reset_game':
+        this.gameState = {
+          gameType: "Texas Hold'em",
+          maxPlayers: 8,
+          bigBlind: 100,
+          smallBlind: 50,
+          dealerPosition: 0,
+          currentPlayer: -1,
+          gamePhase: "pending",
+          communityCards: [],
+          potTotal: 0,
+          bettingRound: {
+            currentBet: 0,
+            totalBets: [],
+            round: 1
+          },
+          lastAction: {},
+          players: [],
+          spectators: []
+        };
+        break;
       default:
         console.log("Invalid action:", action);
         return; // Invalid action

@@ -1,3 +1,13 @@
+@keyframes slideRight {
+  0% {
+    transform: translateX(-70px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
 .tg-poker__table {
   display: flex;
   flex-direction: column;
@@ -9,12 +19,12 @@
   background: #000;
   border-radius: 4px;
   color: #fff;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 20px;
-  grid-template-columns: repeat(3, auto);
   justify-content: center;
   margin: 0 auto 20px auto;
-  max-width: 400px;
+  max-width: 500px;
   padding: 8px;
 }
 
@@ -72,5 +82,15 @@
   gap: 8px;
   margin: 0 auto;
   max-width: 600px;
+  position: relative;
   width: 100%;
+}
+
+/* dealer cards */
+.tg-poker__table__dealer>img {
+  width: 70px;
+}
+
+.tg-poker__table__dealer>img:not(:nth-child(1)) {
+  animation: slideRight 0.3s linear forwards;
 }
