@@ -1,9 +1,17 @@
+const Hand = require('pokersolver').Hand;
+// var hand1 = Hand.solve(['Ad', 'As', 'Jc', 'Th', '2d', '3c', 'Kd']);
+// var hand2 = Hand.solve(['Ad', 'As', 'Jc', 'Th', '2d', 'Qs', 'Qd']);
+// var winner = Hand.winners([hand1, hand2]); // hand2
+// var hand = Hand.solve(['Ad', 'As', 'Jc', 'Th', '2d', 'Qs', 'Qd']);
+// console.log(hand.name); // Two Pair
+// console.log(hand.descr); // Two Pair, A's & Q's
+
 class PartyServer {
   constructor(room) {
     this.room = room;
     this.usedCards = new Set();
-    this.suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
-    this.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+    this.suits = ['h', 'd', 'c', 's'];
+    this.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
     this.gameState = {
       gameType: "Texas Hold'em",
       maxPlayers: 8,
@@ -21,7 +29,8 @@ class PartyServer {
       },
       lastAction: {},
       players: [],
-      spectators: []
+      spectators: [],
+      isLastRound: false
     };
     // this.startBroadcastingGameState();
   }
@@ -113,7 +122,22 @@ class PartyServer {
     }
   }
 
+  findWinner() {
+    // console.log(hand.name); // Two Pair
+    // console.log(hand.descr); // Two Pair, A's & Q's
+    const playerHands = this.gameState.players.map((p) => {
+      const playerCards = p.cards.map(c => c.value)
+      const communityCards = this.gameState.communityCards.map(c => c.value)
+      return Hand.solve([...playerCards, ...communityCards])
+    })
+
+    return Hand.winners(playerHands);
+  }
+
   checkRoundCompleted() {
+    // first check for one player to see if all others have folded
+    // const activePlayers =
+
     // check all players to see if their completedRound is equal
     // to bettingRound of gameState
     const playerRounds = this.gameState.players.map(player => player.completedRound)
@@ -121,9 +145,13 @@ class PartyServer {
     const roundSum = playerRounds.reduce((acc, val) => acc + val, 0)
     // round is complete if sum divided by players is same as gameData.bettingRound.round
     if ((roundSum / this.gameState.players.length) === this.gameState.bettingRound.round) {
-      this.gameState.bettingRound.round += 1
-      this.dealCommunityCards()
-      this.changeTurn(0); // Move to the next player
+      if (this.gameState.isLastRound) {
+        this.findWinner()
+      } else {
+        this.gameState.bettingRound.round += 1
+        this.dealCommunityCards()
+        this.changeTurn(0); // Move to the next player
+      }
     } else {
       this.changeTurn(); // Move to the next player
     }
@@ -146,7 +174,7 @@ class PartyServer {
       const suit = this.suits[suitIndex];
       card = {
         label: `${rank} of ${suit}`,
-        value: `${rank}_${suit}`
+        value: `${rank}${suit}`
       }
     } while (this.usedCards.has(card.value)); // Check for duplicates
 
@@ -226,6 +254,7 @@ class PartyServer {
             totalBets: [],
             round: 1
           },
+          isLastRound: false,
           lastAction: {},
           players: [],
           spectators: []
@@ -260,6 +289,7 @@ class PartyServer {
       this.gameState.communityCards.push(this.getRandomCard());
     } else if (this.gameState.communityCards.length === 4) { // River
       this.gameState.communityCards.push(this.getRandomCard());
+      this.gameState.isLastRound = true
     }
 
     this.broadcastGameState();
