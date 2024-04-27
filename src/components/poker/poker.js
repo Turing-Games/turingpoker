@@ -4,7 +4,6 @@ import player from "./player";
 const GameControls = {
   view: ({ attrs }) => {
     const gameState = attrs.gameState
-
     if (!gameState.isConnected || !gameState.gameData) {
       return m("p", "Waiting for the game to start or connect...");
     }
@@ -40,9 +39,12 @@ const GameControls = {
 };
 
 export default {
-  oninit: () => false,
   view: ({ attrs }) => {
     const gameState = attrs.gameState;
+    console.log('winner', gameState?.gameData?.winner)
+    if (gameState?.gameData?.winner?.length) {
+      alert(`Winner: Player #${gameState?.gameData?.winner[0].rank - 1} with ${gameState?.gameData?.winner[0].name}`)
+    }
 
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
     const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState.gameData.currentPlayer].playerId;
@@ -63,9 +65,7 @@ export default {
     }
 
     if (process.env.NODE_ENV != 'production') {
-      console.log('players', gameState?.gameData?.players)
       console.log('gameData', gameState?.gameData)
-      console.log({ currentPlayer })
     }
 
     if (!gameState.gameData) {

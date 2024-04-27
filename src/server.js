@@ -30,7 +30,8 @@ class PartyServer {
       lastAction: {},
       players: [],
       spectators: [],
-      isLastRound: false
+      isLastRound: false,
+      winner: null
     };
     // this.startBroadcastingGameState();
   }
@@ -131,7 +132,7 @@ class PartyServer {
       return Hand.solve([...playerCards, ...communityCards])
     })
 
-    return Hand.winners(playerHands);
+    this.gameState.winner = Hand.winners(playerHands);
   }
 
   checkRoundCompleted() {
@@ -257,7 +258,8 @@ class PartyServer {
           isLastRound: false,
           lastAction: {},
           players: [],
-          spectators: []
+          spectators: [],
+          winner: null
         };
         break;
       default:
