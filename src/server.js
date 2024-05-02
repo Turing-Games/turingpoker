@@ -24,7 +24,8 @@ class PartyServer {
       players: [],
       spectators: [],
       isLastRound: false,
-      winner: null
+      winner: null,
+      isFlop: false
     };
     // this.startBroadcastingGameState();
   }
@@ -156,7 +157,6 @@ class PartyServer {
   }
 
   ///TODO refactor out poker logic away from server logic 
-
   getRandomCard() {
     let card;
     let array = new Uint32Array(2);  // Create a Uint32Array to hold two random numbers
@@ -254,7 +254,8 @@ class PartyServer {
           lastAction: {},
           players: [],
           spectators: [],
-          winner: null
+          winner: null,
+          isFlop: false
         };
         break;
       default:
@@ -278,10 +279,10 @@ class PartyServer {
     }
   }
 
-
   dealCommunityCards() {
     if (this.gameState.communityCards.length === 0) { // Flop
       this.gameState.communityCards.push(this.getRandomCard(), this.getRandomCard(), this.getRandomCard());
+      this.gameState.isFlop = true
     } else if (this.gameState.communityCards.length === 3) { // Turn
       this.gameState.communityCards.push(this.getRandomCard());
     } else if (this.gameState.communityCards.length === 4) { // River
@@ -352,16 +353,12 @@ class PartyServer {
 
   broadcastGameState(newConnectionId = null) {
     this.gameState.players.concat(this.gameState.spectators).forEach(person => {
-      const personalizedGameState = {
-        ...this.gameState,
-        players: this.gameState.players.map(player => ({
-          ...player,
-          cards: player.playerId === person.playerId ? player.cards : []
-        }))
-      };
-
       // Send game state; ensure spectators do not receive any cards information
-      const gameStateForBroadcast = person.status === "spectating" ? { ...personalizedGameState, players: personalizedGameState.players.map(p => ({ ...p, cards: [] })) } : personalizedGameState;
+      const gameStateForBroadcast = person.status === "spectating" ?
+        {
+          ...this.gameState,
+          players: this.gameState.players.map(p => ({ ...p, cards: [] }))
+        } : this.gameState;
 
       const conn = this.room.getConnection(person.playerId);
       if (conn) {

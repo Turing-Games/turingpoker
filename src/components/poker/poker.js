@@ -99,7 +99,7 @@ export default {
                 (location.host.includes('localhost') &&
                   m('div', {
                     onclick: () => gameState.sendAction("reset_game"),
-                    style: { textAlign: 'center', cursor: 'pointer' }
+                    style: { textAlign: 'center', cursor: 'pointer', background: '#fff', position: 'absolute', top: 0, left: 0, color: '#000' }
                   }, "Reset Game (dev)")),
               ),
             // opponents, filtered out current player
@@ -111,6 +111,7 @@ export default {
                 return m(player, {
                   player: opp,
                   isCurrentPlayerTurn: opp.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId,
+                  showCards: gameState.gameData.isFlop,
                   title: `Player ${index + 2 - playerNumberOffset} (${opp.status}) ${opp.playerId === gameState.gameData.players[gameState.gameData.currentPlayer]?.playerId ? ' - Their Turn' : ''}`,
                   className: ''
                 })
@@ -137,6 +138,7 @@ export default {
                 m(player, {
                   className: 'tg-poker__player--1',
                   player: currentPlayer,
+                  showCards: true,
                   isCurrentPlayerTurn,
                   title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
                 }),

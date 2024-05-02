@@ -15,9 +15,13 @@ export default {
       m("div", {
         style: { display: 'flex', gap: '6px', margin: '16px 0' }
       },
-        player.cards.map((c, i) => {
-          return m(card, { value: c.value, style: { height: '80px' } })
-        })
+        attrs.showCards ?
+          player.cards.map((c, i) => {
+            return m(card, { value: c.value, style: { height: '80px' } })
+          }) :
+          player.cards.map((c, i) => {
+            return m(card, { value: '', style: { height: '80px' } })
+          })
       ),
     ])
   }
