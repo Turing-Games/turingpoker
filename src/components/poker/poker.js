@@ -82,8 +82,6 @@ export default {
 
     if (!gameState.gameData) {
       return m("p", "Loading game...");
-    } else if (gameState.gameData?.players?.length < 2) {
-      return m("p", "Waiting for players to join...");
     } else {
       return m("div.tg-poker__table",
         [
@@ -143,11 +141,13 @@ export default {
                 title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
               }),
               // controls
-              isCurrentPlayerTurn ?
-                m(GameControls, {
-                  gameState: gameState
-                }) :
-                m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
+              gameState.gameData?.players?.length < 2 ?
+                m("p", "Waiting for players to join...") :
+                isCurrentPlayerTurn ?
+                  m(GameControls, {
+                    gameState: gameState
+                  }) :
+                  m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
             ]),
             // spectators
             m("div.tg-poker__table__spectators", [
