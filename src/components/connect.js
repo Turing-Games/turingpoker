@@ -1,0 +1,1 @@
+// component to allow players to connect to game by game id or spectate

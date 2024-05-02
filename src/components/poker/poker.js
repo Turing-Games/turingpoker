@@ -82,6 +82,8 @@ export default {
 
     if (!gameState.gameData) {
       return m("p", "Loading game...");
+    } else if (gameState.gameData?.players?.length < 2) {
+      return m("p", "Waiting for players to join...");
     } else {
       return m("div.tg-poker__table",
         [
