@@ -1,11 +1,4 @@
 const Hand = require('pokersolver').Hand;
-// var hand1 = Hand.solve(['Ad', 'As', 'Jc', 'Th', '2d', '3c', 'Kd']);
-// var hand2 = Hand.solve(['Ad', 'As', 'Jc', 'Th', '2d', 'Qs', 'Qd']);
-// var winner = Hand.winners([hand1, hand2]); // hand2
-// var hand = Hand.solve(['Ad', 'As', 'Jc', 'Th', '2d', 'Qs', 'Qd']);
-// console.log(hand.name); // Two Pair
-// console.log(hand.descr); // Two Pair, A's & Q's
-
 class PartyServer {
   constructor(room) {
     this.room = room;
@@ -126,11 +119,12 @@ class PartyServer {
   findWinner() {
     // console.log(hand.name); // Two Pair
     // console.log(hand.descr); // Two Pair, A's & Q's
-    const playerHands = this.gameState.players.map((p) => {
-      const playerCards = p.cards.map(c => c.value)
-      const communityCards = this.gameState.communityCards.map(c => c.value)
-      return Hand.solve([...playerCards, ...communityCards])
-    })
+    const playerHands = this.gameState.players.filter(player => player.status !== 'folded')
+      .map((p) => {
+        const playerCards = p.cards.map(c => c.value)
+        const communityCards = this.gameState.communityCards.map(c => c.value)
+        return Hand.solve([...playerCards, ...communityCards])
+      })
 
     this.gameState.winner = Hand.winners(playerHands);
   }
@@ -295,31 +289,6 @@ class PartyServer {
       this.gameState.isLastRound = true
     }
 
-    this.broadcastGameState();
-  }
-
-  determineWinner() {
-    let activePlayers = this.gameState.players.filter(player => player.status !== 'folded');
-    if (activePlayers.length > 1) {
-      activePlayers.forEach(player => {
-        player.handDetails = this.getHandDetails(player.cards.concat(this.gameState.communityCards).map(card => card.replace(" ", "")));
-      });
-      activePlayers.sort((a, b) => this.compareHands(a.handDetails, b.handDetails));
-      let highestRank = activePlayers[0].handDetails.rank;
-      let winners = activePlayers.filter(player => player.handDetails.rank === highestRank);
-      let potShare = this.gameState.potTotal / winners.length;
-      winners.forEach(winner => {
-        winner.stackSize += potShare;
-      });
-      this.gameState.potTotal = 0; // Reset pot after distribution
-      this.room.broadcast(`${winners.map(w => `Player ${w.playerId}`).join(', ')} wins the pot of $${potShare * winners.length}!`);
-    } else if (activePlayers.length === 1) {
-      // Handle scenario where all but one player have folded
-      let winner = activePlayers[0];
-      winner.stackSize += this.gameState.potTotal;
-      this.gameState.potTotal = 0;
-      this.room.broadcast(`Player ${winner.playerId} wins the pot by default!`);
-    }
     this.broadcastGameState();
   }
 

@@ -130,36 +130,37 @@ export default {
             })
           ),
           // bottom
-          currentPlayer &&
-          m("div.tg-poker__table__bottom", [
-            m("div", { style: { margin: '12px' } }, [
-              // current player
-              m(player, {
-                className: 'tg-poker__player--1',
-                player: currentPlayer,
-                isCurrentPlayerTurn,
-                title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
-              }),
-              // controls
-              gameState.gameData?.players?.length < 2 ?
-                m("p", "Waiting for players to join...") :
-                isCurrentPlayerTurn ?
-                  m(GameControls, {
-                    gameState: gameState
-                  }) :
-                  m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
-            ]),
-            // spectators
-            m("div.tg-poker__table__spectators", [
-              m("h4", "Spectators"),
-              gameState.gameData.spectators.map((spectator, index) =>
-                m("div.tg-poker__table__spectators__spectator", [
-                  m("p", `Spectator ${index + 1}:`),
-                  m("p", `${spectator.status}`)
-                ])
-              )
-            ]),
-          ])
+          currentPlayer ? // else theyre a spectator
+            m("div.tg-poker__table__bottom", [
+              m("div", { style: { margin: '12px' } }, [
+                // current player
+                m(player, {
+                  className: 'tg-poker__player--1',
+                  player: currentPlayer,
+                  isCurrentPlayerTurn,
+                  title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
+                }),
+                // controls
+                gameState.gameData?.players?.length < 2 ?
+                  m("p", "Waiting for players to join...") :
+                  isCurrentPlayerTurn ?
+                    m(GameControls, {
+                      gameState: gameState
+                    }) :
+                    m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
+              ]),
+              // spectators
+              m("div.tg-poker__table__spectators", [
+                m("h4", "Spectators"),
+                gameState.gameData.spectators.map((spectator, index) =>
+                  m("div.tg-poker__table__spectators__spectator", [
+                    m("p", `Spectator ${index + 1}:`),
+                    m("p", `${spectator.status}`)
+                  ])
+                )
+              ]),
+            ]) :
+            m("div", { style: { height: 100, width: '100%' } })
         ]);
     }
   }
