@@ -11,16 +11,28 @@ const GameControls = {
     // Retrieve the current bet and minimum raise amount
     const currentBet = gameState.gameData.bettingRound.currentBet;
     const minRaiseAmount = currentBet > 0 ? currentBet + gameState.gameData.bigBlind : gameState.gameData.bigBlind;
+    const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
+    const isPlayerEvenWithBet = currentPlayer.currentBet >= currentBet
 
     // Render game controls if it's the current player's turn
     return m("div.tg-poker__controls", [
+      // call button
       currentBet > 0 ? m("button", {
         onclick: () => gameState.sendAction("call", currentBet)
       }, "Call") : null,
+      // check button
       m("button", {
-        onclick: () => gameState.sendAction("check"),
-        disabled: currentBet > 0
+        onclick: () => {
+          if (currentBet === 0 && isPlayerEvenWithBet) {
+            gameState.sendAction("check")
+          }
+        },
+        style: {
+          pointerEvents: !isPlayerEvenWithBet ? 'none' : 'auto',
+          opacity: !isPlayerEvenWithBet > 0 ? 0.3 : 1
+        }
       }, "Check"),
+      // raise button
       m("button", {
         onclick: () => {
           const amount = prompt(`Enter amount to raise (minimum: $${minRaiseAmount}):`, minRaiseAmount);
@@ -47,7 +59,7 @@ export default {
     }
 
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
-    const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState.gameData.currentPlayer].playerId;
+    const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState?.gameData?.currentPlayer]?.playerId;
     const opponents = gameState?.gameData?.players.filter(player => player.playerId !== currentPlayer?.playerId)
 
     const gameOverview = [
@@ -70,8 +82,6 @@ export default {
 
     if (!gameState.gameData) {
       return m("p", "Loading game...");
-    } else if (gameState.gameData.players < 2) {
-
     } else {
       return m("div.tg-poker__table",
         [

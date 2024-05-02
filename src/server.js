@@ -150,6 +150,7 @@ class PartyServer {
         this.findWinner()
       } else {
         this.gameState.bettingRound.round += 1
+        this.gameState.bettingRound.currentBet = 0
         this.dealCommunityCards()
         this.changeTurn(0); // Move to the next player
       }
