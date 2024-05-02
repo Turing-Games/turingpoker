@@ -180,7 +180,9 @@ class PartyServer {
 
   dealInitialCards() {
     this.gameState.players.forEach(player => {
-      player.cards = [this.getRandomCard(), this.getRandomCard()];
+      if (!player.cards?.length) {
+        player.cards = [this.getRandomCard(), this.getRandomCard()];
+      }
     });
   }
 
@@ -222,6 +224,7 @@ class PartyServer {
         player.currentBet += callAmount;
         player.completedRound += 1 // player completed round of betting
         this.gameState.potTotal += callAmount;
+        this.checkRoundCompleted()
         break;
       case 'check':
         if (this.gameState.bettingRound.currentBet !== player.currentBet) {
@@ -229,10 +232,12 @@ class PartyServer {
           return; // Cannot check because there is an outstanding bet
         } else {
           player.completedRound += 1 // player completed round of betting
+          this.checkRoundCompleted()
         }
         break;
       case 'fold':
         player.status = 'folded';
+        this.checkRoundCompleted()
         break;
       case 'reset_game':
         this.gameState = {
@@ -257,13 +262,12 @@ class PartyServer {
           winner: null,
           isFlop: false
         };
+        this.checkRoundCompleted()
         break;
       default:
         console.log("Invalid action:", action);
         return; // Invalid action
     }
-
-    this.checkRoundCompleted()
   }
 
   changeTurn(playerIndex = null) {
