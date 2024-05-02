@@ -55,7 +55,7 @@ export default {
     const gameState = attrs.gameState;
     console.log('winner', gameState?.gameData?.winner)
     if (gameState?.gameData?.winner?.length) {
-      alert(`Winner: Player #${gameState?.gameData?.winner[0].rank - 1} with ${gameState?.gameData?.winner[0].name}`)
+      alert(`Winner: Player #${gameState?.gameData?.winner[0].playerId} with ${gameState?.gameData?.winner[0].name}`)
     }
 
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
