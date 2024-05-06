@@ -83,6 +83,7 @@ export default {
     }
 
     if (!gameState.gameData) {
+      console.log({ gameState })
       return m("p", "Loading game...");
     } else {
       return m("div.tg-poker__table",

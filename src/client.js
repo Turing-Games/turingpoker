@@ -30,7 +30,6 @@ const gameState = {
     });
 
     this.socket.addEventListener("message", (event) => {
-      console.log(event)
       try {
         const data = JSON.parse(event.data);
         if (process.env.NODE_ENV !== 'production') {
