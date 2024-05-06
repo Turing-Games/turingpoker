@@ -19,6 +19,7 @@ body {
   flex-direction: column;
   height: 100%;
   justify-content: space-between;
+  color: rgb(92, 193, 51);
 }
 
 .tg-poker__overview {
@@ -61,7 +62,6 @@ body {
 
 .tg-poker__player .tg-poker__player__details {
   background: #000;
-  color: #fff;
   border-radius: 4px;
   padding: 8px;
 }

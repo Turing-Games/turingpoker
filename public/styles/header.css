@@ -3,10 +3,11 @@
   border: 6px solid #000;
   display: flex;
   justify-content: center;
-  margin: 20px 20px 5px 20px;
+  margin: 20px 20px 0px 20px;
   padding: 8px 12px;
   position: relative;
   text-align: center;
+  background-color: black;
 }
 
 .tg-header__logo {
@@ -29,10 +30,11 @@
 
 .tg-header__title h2 {
   margin: 0;
+  color: rgb(92, 193, 51);
 }
 
 .tg-header__title p {
-  color: rgb(187, 39, 26);
+  color: rgb(92, 193, 51);
 }
 
 .tg-header__squares {
