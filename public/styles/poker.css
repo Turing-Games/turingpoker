@@ -8,6 +8,12 @@
   }
 }
 
+body { 
+  background-image: url("../images/felt.jpg");
+
+
+}
+
 .tg-poker__table {
   display: flex;
   flex-direction: column;
