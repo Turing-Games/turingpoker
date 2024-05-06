@@ -15,20 +15,14 @@ export default {
       ]),
       m("div", {
         style: { display: 'flex', gap: '6px', margin: '16px 0' }
-      },
-<<<<<<< HEAD
-        attrs.showCards ?
+      },  attrs.showCards ?
           player.cards.map((c, i) => {
             return m(card, { value: c.value })
           }) :
           player.cards.map((c, i) => {
             return m(card, { value: '' })
           })
-=======
-        player.cards.map((c, i) => {
-          return m(card, { value: c.value})
-        })
->>>>>>> 544279f (style cleanup)
+
       ),
     ])
   }
