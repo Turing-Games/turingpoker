@@ -17,7 +17,7 @@ export default {
       ),
       // text
       m('div.tg-header__title', [
-        m('h2', `Table: ${vnode.attrs.gameType}`),
+        m('h2', vnode.attrs.gameType ? `Table: ${vnode.attrs.gameType}` : 'Welcome!'),
         m('p', "Turing Games")
       ]),
       m("div", {
