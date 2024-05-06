@@ -73,8 +73,13 @@ body {
 }
 
 .tg-poker__player.tg-poker__player--1 {
-  width: 350px;
+  width: 200px;
+  position: absolute; /* Absolute positioning for centering */
+  top: -100px; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  transform: translate(-50%, -50%); /* Adjust to move back by half of the element's dimensions */
 }
+
 
 .tg-poker__controls {
   display: flex;
