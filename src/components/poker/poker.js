@@ -110,7 +110,7 @@ export default {
               ),
             // opponents, filtered out current player
             opponents?.length > 0 &&
-            m("div", { style: { display: 'flex', gap: '16px', margin: '0 12px' } },
+            m("div.opponents", 
               opponents.map((opp, index) => {
                 // starts at 1 if spectator is viewing
                 const playerNumberOffset = !currentPlayer ? 1 : 0
@@ -126,7 +126,7 @@ export default {
           ),
           // center of table / deck / dealer cards
           m("div.tg-poker__table__dealer", {},
-            m(card, { style: { width: '70px' } }),
+            m(card),
             gameState.gameData.communityCards.map((data, i) => {
               return m(card, {
                 style: {
@@ -137,38 +137,35 @@ export default {
             })
           ),
           // bottom
-          currentPlayer ? // else theyre a spectator
-            m("div.tg-poker__table__bottom", [
-              m("div", { style: { margin: '12px' } }, [
-                // current player
-                m(player, {
-                  className: 'tg-poker__player--1',
-                  player: currentPlayer,
-                  showCards: true,
-                  isCurrentPlayerTurn,
-                  title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
-                }),
-                // controls
-                gameState.gameData?.players?.length < 2 ?
-                  m("p", "Waiting for players to join...") :
-                  isCurrentPlayerTurn ?
-                    m(GameControls, {
-                      gameState: gameState
-                    }) :
-                    m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
-              ]),
-              // spectators
-              m("div.tg-poker__table__spectators", [
-                m("h4", "Spectators"),
-                gameState.gameData.spectators.map((spectator, index) =>
-                  m("div.tg-poker__table__spectators__spectator", [
-                    m("p", `Spectator ${index + 1}:`),
-                    m("p", `${spectator.status}`)
-                  ])
-                )
-              ]),
-            ]) :
-            m("div", { style: { height: 100, width: '100%' } })
+
+          currentPlayer &&
+          m("div.tg-poker__table__bottom", [
+            m("div", [
+              // current player
+              m(player, {
+                className: 'tg-poker__player--1',
+                player: currentPlayer,
+                isCurrentPlayerTurn,
+                title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
+              }),
+              // controls
+              isCurrentPlayerTurn ?
+                m(GameControls, {
+                  gameState: gameState
+                }) :
+                m("p", "Waiting for your turn..."),
+            ]),
+            // spectators
+            m("div.tg-poker__table__spectators", [
+              m("h4", "Spectators"),
+              gameState.gameData.spectators.map((spectator, index) =>
+                m("div.tg-poker__table__spectators__spectator", [
+                  m("p", `Spectator ${index + 1}:`),
+                  m("p", `${spectator.status}`)
+                ])
+              )
+            ]),
+          ])
         ]);
     } else {
       return m("p", "Waiting for players to join...");
