@@ -88,9 +88,13 @@
 
 /* dealer cards */
 .tg-poker__table__dealer>img {
-  width: 70px;
+  width: 95px;
 }
 
 .tg-poker__table__dealer>img:not(:nth-child(1)) {
   animation: slideRight 0.3s linear forwards;
+}
+
+.playerCard {
+  width: 95px;
 }

@@ -18,10 +18,10 @@ export default {
       },
         attrs.showCards ?
           player.cards.map((c, i) => {
-            return m(card, { value: c.value, style: { height: '80px' } })
+            return m(card.playerCard, { value: c.value })
           }) :
           player.cards.map((c, i) => {
-            return m(card, { value: '', style: { height: '80px' } })
+            return m(card.playerCard, { value: ''})
           })
       ),
     ])
