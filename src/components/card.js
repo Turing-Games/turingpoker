@@ -1,3 +1,4 @@
+import m from "mithril";
 import { getImagePath } from '../utils/string_utilities'
 // all card svgs
 import clubs2 from '../../public/images/cards/svg-cards/2_of_clubs.svg'

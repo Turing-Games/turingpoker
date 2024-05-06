@@ -1,4 +1,5 @@
 import card from "../card";
+import m from "mithril";
 
 export default {
   view: ({ attrs }) => {

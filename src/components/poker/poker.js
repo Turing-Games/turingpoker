@@ -1,5 +1,6 @@
 import card from "../card";
 import player from "./player";
+import m from "mithril";
 
 const GameControls = {
   view: ({ attrs }) => {

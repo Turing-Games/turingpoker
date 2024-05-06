@@ -3,6 +3,7 @@
 import PartySocket from "partysocket";
 import header from "./components/header";
 import poker from "./components/poker/poker";
+import m from "mithril";
 
 const gameState = {
   isConnected: false,
