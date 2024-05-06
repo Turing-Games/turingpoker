@@ -80,7 +80,7 @@ export default {
       console.log('gameData', gameState?.gameData)
     }
 
-    if (gameState?.gameData?.players?.length > 0) {
+    if (gameState?.gameData?.players?.length > 1) {
       return m("div.tg-poker__table",
         [
           m("div.tg-poker__table__top",

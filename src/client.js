@@ -77,9 +77,7 @@ const App = {
         m(header, {
           gameType: gameState?.gameData?.gameType
         }),
-        gameState.isConnected && gameState.joinedGame ?
-          m(poker, { gameState }) :
-          m(connect, { gameState })
+        m(poker, { gameState })
       ])
     )
   }

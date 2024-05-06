@@ -18,10 +18,10 @@ export default {
       },
         attrs.showCards ?
           player.cards.map((c, i) => {
-            return m(card.playerCard, { value: c.value })
+            return m(card, { value: c.value })
           }) :
           player.cards.map((c, i) => {
-            return m(card.playerCard, { value: ''})
+            return m(card, { value: '' })
           })
       ),
     ])
