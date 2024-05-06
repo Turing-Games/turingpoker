@@ -32,12 +32,28 @@ class PartyServer {
   }
 
   onConnect(conn, ctx) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log("client connected")
-    }
-    this.connection = conn
-    if (this.gameState.players.length >= 2 && this.gameState.gamePhase === "pending") {
-      this.startGame();
+    console.log("client connected")
+    if (this.gameState.gamePhase === "active" || this.gameState.players.length >= this.gameState.maxPlayers) {
+      // Add as a spectator if the game is active or player slots are full
+      this.gameState.spectators.push({
+        playerId: conn.id,
+        status: "spectating"
+      });
+      conn.send("You are now spectating the game.");
+    } else {
+      // Add as a player if slots are available and game is not active
+      const newPlayer = {
+        playerId: conn.id,
+        stackSize: 5000,
+        currentBet: 0,
+        status: "waiting",
+        cards: []
+      };
+      this.gameState.players.push(newPlayer);
+      conn.send("Welcome to the game!");
+      if (this.gameState.players.length >= 2 && this.gameState.gamePhase === "pending") {
+        this.startGame();
+      }
     }
     this.broadcastGameState(conn.id);
   }
