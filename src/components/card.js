@@ -114,7 +114,10 @@ export default {
   view: (vnode) => {
     return m('img', {
       src: getImagePath(cardMap[vnode.attrs.value]) || getImagePath(cardBack),
-      style: { ...vnode.attrs.style }
+      style: {
+        width: '70px',
+        ...vnode.attrs.style
+      }
     })
   }
 } 
