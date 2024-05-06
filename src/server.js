@@ -297,6 +297,7 @@ class PartyServer {
     } else if (this.gameState.communityCards.length === 4) { // River
       this.gameState.communityCards.push(this.getRandomCard());
       this.gameState.isLastRound = true
+      this.gameState.isFlop = true
     }
 
     this.broadcastGameState();
