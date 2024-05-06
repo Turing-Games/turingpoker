@@ -59,8 +59,8 @@ export default {
     }
 
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
-    const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players[gameState?.gameData?.currentPlayer]?.playerId;
-    const opponents = gameState?.gameData?.players.filter(player => player.playerId !== currentPlayer?.playerId)
+    const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players?.[gameState?.gameData?.currentPlayer]?.playerId;
+    const opponents = gameState?.gameData?.players?.filter(player => player.playerId !== currentPlayer?.playerId)
 
     const gameOverview = [
       { label: 'Current Pot:', value: gameState?.gameData?.potTotal, prefix: '$' },
@@ -80,10 +80,7 @@ export default {
       console.log('gameData', gameState?.gameData)
     }
 
-    if (!gameState.gameData) {
-      console.log({ gameState })
-      return m("p", "Loading game...");
-    } else {
+    if (gameState?.gameData?.players?.length > 0) {
       return m("div.tg-poker__table",
         [
           m("div.tg-poker__table__top",
@@ -165,6 +162,8 @@ export default {
             ]) :
             m("div", { style: { height: 100, width: '100%' } })
         ]);
+    } else {
+      return m("p", "Waiting for players to join...");
     }
   }
 };

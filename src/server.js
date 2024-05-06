@@ -29,7 +29,6 @@ class PartyServer {
       winner: null,
       isFlop: false
     };
-    // this.startBroadcastingGameState();
   }
 
   onConnect(conn, ctx) {
@@ -37,6 +36,9 @@ class PartyServer {
       console.log("client connected")
     }
     this.connection = conn
+    if (this.gameState.players.length >= 2 && this.gameState.gamePhase === "pending") {
+      this.startGame();
+    }
     this.broadcastGameState(conn.id);
   }
 
@@ -64,14 +66,11 @@ class PartyServer {
   }
 
   onMessage(message, websocket) {
-    console.log({ message })
     try {
       let data = message;
       if (typeof message === 'string') {  // Check if the message is string to parse it
         data = JSON.parse(message);
       }
-
-      console.log("Action data: ", data.action);
 
       if (data.action && typeof this.handlePlayerAction === 'function') {
         console.log("Handling action");
@@ -149,26 +148,19 @@ class PartyServer {
   }
 
   dealInitialCards() {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('========================')
-      console.log('dealing initial cards...')
-      console.log(this.gameState.room.internalId)
-      console.log('========================')
-    }
     this.gameState.players.forEach(player => {
       if (!player.cards?.length) {
         player.cards = [this.getRandomCard(), this.getRandomCard()];
       }
     });
-    // if (this.gameState.room.internalId) {
-    // }
   }
 
   handlePlayerAction(playerId, action, amount) {
-    console.log("Handling player action:", action, "Amount:", amount);
+    console.log("Handling player action:", action);
     const player = this.gameState.players.find(p => p.playerId === playerId);
 
     // Check if it's this player's turn
+    console.log({ player })
     if (
       (!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) &&
       ['join', 'spectate'].indexOf(action) === -1
@@ -243,7 +235,7 @@ class PartyServer {
           winner: null,
           isFlop: false
         };
-        this.checkRoundCompleted()
+        this.broadcastGameState();
         break;
       case 'join':
         this.joinGame()
@@ -329,7 +321,7 @@ class PartyServer {
     } else {
       // Add as a player if slots are available and game is not active
       const newPlayer = {
-        playerId: this.connection,
+        playerId: this.connection.id,
         stackSize: 5000,
         currentBet: 0,
         status: "waiting",
@@ -353,6 +345,7 @@ class PartyServer {
   }
 
   startGame() {
+    console.log('start game')
     this.gameState.gamePhase = "active";
     this.gameState.currentPlayer = 0;  // Assuming the first player in the array starts
     this.gameState.dealerPosition = 0;  // Could be randomized or set by some rule
@@ -365,8 +358,6 @@ class PartyServer {
       // Optionally, mark the first player's turn explicitly
       if (index === 0) player.turn = true;
     });
-
-    this.broadcastGameState();
   }
 
 

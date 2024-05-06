@@ -43,7 +43,7 @@ const gameState = {
     });
 
     this.socket.addEventListener("close", () => {
-      this.isConnected = false;
+      gameState.isConnected = false;
       console.log("WebSocket closed");
       m.redraw();
     });
