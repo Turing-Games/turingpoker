@@ -35,29 +35,6 @@ class PartyServer {
     if (process.env.NODE_ENV !== 'production') {
       console.log("client connected")
     }
-    if (this.gameState.gamePhase === "active" || this.gameState.players.length >= this.gameState.maxPlayers) {
-      // Add as a spectator if the game is active or player slots are full
-      this.gameState.spectators.push({
-        playerId: conn.id,
-        status: "spectating"
-      });
-      conn.send("You are now spectating the game.");
-    } else {
-      // Add as a player if slots are available and game is not active
-      const newPlayer = {
-        playerId: conn.id,
-        stackSize: 5000,
-        currentBet: 0,
-        status: "waiting",
-        cards: [],
-        completedRound: 0
-      };
-      this.gameState.players.push(newPlayer);
-      conn.send("Welcome to the game!");
-      if (this.gameState.players.length >= 2 && this.gameState.gamePhase === "pending") {
-        this.startGame();
-      }
-    }
     this.broadcastGameState(conn.id);
   }
 
@@ -86,9 +63,9 @@ class PartyServer {
   }
 
   onMessage(message, websocket) {
+    console.log({ message })
     try {
       let data = message;
-
       if (typeof message === 'string') {  // Check if the message is string to parse it
         data = JSON.parse(message);
       }
@@ -191,7 +168,10 @@ class PartyServer {
     const player = this.gameState.players.find(p => p.playerId === playerId);
 
     // Check if it's this player's turn
-    if (!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) {
+    if (
+      (!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) &&
+      ['join', 'spectate'].indexOf(action) === -1
+    ) {
       console.log("Not player's turn or player not found:", playerId);
       return; // It's not this player's turn or player not found
     }
@@ -264,6 +244,12 @@ class PartyServer {
         };
         this.checkRoundCompleted()
         break;
+      case 'join':
+        // this.joinGame()
+        break;
+      case 'spectate':
+        this.spectateGame()
+        break;
       default:
         console.log("Invalid action:", action);
         return; // Invalid action
@@ -335,6 +321,36 @@ class PartyServer {
     return h1.rank - h2.rank;
   }
 
+  joinGame() {
+    const conn = this.room.getConnection(person.playerId);
+    if (this.gameState.players.length >= this.gameState.maxPlayers) {
+      // Add as a spectator if the game is active or player slots are full
+      this.spectateGame()
+    } else {
+      // Add as a player if slots are available and game is not active
+      const newPlayer = {
+        playerId: conn.id,
+        stackSize: 5000,
+        currentBet: 0,
+        status: "waiting",
+        cards: [],
+        completedRound: 0
+      };
+      this.gameState.players.push(newPlayer);
+      conn.send("Welcome to the game!");
+      if (this.gameState.players.length >= 2 && this.gameState.gamePhase === "pending") {
+        this.startGame();
+      }
+    }
+  }
+
+  spectateGame() {
+    this.gameState.spectators.push({
+      playerId: conn.id,
+      status: "spectating"
+    });
+    conn.send("You are now spectating the game.");
+  }
 
   startGame() {
     this.gameState.gamePhase = "active";

@@ -14,10 +14,10 @@ export default {
       }
     }, [
       m("button", {
-        onClick: () => gameState.sendAction("join")
+        onclick: () => gameState.sendAction("join")
       }, "Play"),
       m("button", {
-        onClick: () => gameState.sendAction("spectate")
+        onclick: () => gameState.sendAction("spectate")
       }, "Spectate")
     ])
 

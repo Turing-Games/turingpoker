@@ -11,11 +11,13 @@ const gameState = {
   gameData: null,
   socket: null,
   playerId: null, // This will store the client's player ID
+  userType: '',
 
   connect: (isPlayer = true) => {
     this.socket = new PartySocket({
       host: PARTYKIT_HOST,
-      room: `turing-games-poker`
+      room: `turing-games-poker`,
+
     });
 
     this.socket.addEventListener("open", () => {
@@ -51,6 +53,7 @@ const gameState = {
     });
   },
   sendAction: (action, amount = 0) => {
+    console.log(action)
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({ action, amount }));
     } else {
@@ -64,6 +67,7 @@ const adminState = {
 }
 
 const App = {
+  oninit: gameState.connect,
   view: () => {
     return (
       m.fragment([
