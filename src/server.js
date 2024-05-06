@@ -1,6 +1,7 @@
 const Hand = require('pokersolver').Hand;
 class PartyServer {
   constructor(room) {
+    this.connection = null
     this.room = room;
     this.usedCards = new Set();
     this.suits = ['h', 'd', 'c', 's'];
@@ -35,6 +36,7 @@ class PartyServer {
     if (process.env.NODE_ENV !== 'production') {
       console.log("client connected")
     }
+    this.connection = conn
     this.broadcastGameState(conn.id);
   }
 
@@ -245,7 +247,7 @@ class PartyServer {
         this.checkRoundCompleted()
         break;
       case 'join':
-        // this.joinGame()
+        this.joinGame()
         break;
       case 'spectate':
         this.spectateGame()
@@ -322,14 +324,13 @@ class PartyServer {
   }
 
   joinGame() {
-    const conn = this.room.getConnection(person.playerId);
     if (this.gameState.players.length >= this.gameState.maxPlayers) {
       // Add as a spectator if the game is active or player slots are full
       this.spectateGame()
     } else {
       // Add as a player if slots are available and game is not active
       const newPlayer = {
-        playerId: conn.id,
+        playerId: this.connection,
         stackSize: 5000,
         currentBet: 0,
         status: "waiting",
@@ -337,19 +338,19 @@ class PartyServer {
         completedRound: 0
       };
       this.gameState.players.push(newPlayer);
-      conn.send("Welcome to the game!");
       if (this.gameState.players.length >= 2 && this.gameState.gamePhase === "pending") {
         this.startGame();
       }
     }
+    this.broadcastGameState();
   }
 
   spectateGame() {
     this.gameState.spectators.push({
-      playerId: conn.id,
+      playerId: this.connection.id,
       status: "spectating"
     });
-    conn.send("You are now spectating the game.");
+    this.broadcastGameState();
   }
 
   startGame() {

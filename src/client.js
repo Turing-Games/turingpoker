@@ -11,9 +11,9 @@ const gameState = {
   gameData: null,
   socket: null,
   playerId: null, // This will store the client's player ID
-  userType: '',
+  joinedGame: false,
 
-  connect: (isPlayer = true) => {
+  connect: () => {
     this.socket = new PartySocket({
       host: PARTYKIT_HOST,
       room: `turing-games-poker`,
@@ -30,6 +30,7 @@ const gameState = {
     });
 
     this.socket.addEventListener("message", (event) => {
+      console.log(event)
       try {
         const data = JSON.parse(event.data);
         if (process.env.NODE_ENV !== 'production') {
@@ -53,8 +54,10 @@ const gameState = {
     });
   },
   sendAction: (action, amount = 0) => {
-    console.log(action)
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+      if (action === 'join' || action === 'spectate') {
+        gameState.joinedGame = true
+      }
       this.socket.send(JSON.stringify({ action, amount }));
     } else {
       console.error("WebSocket is not initialized or not open.");
@@ -75,7 +78,7 @@ const App = {
         m(header, {
           gameType: gameState?.gameData?.gameType
         }),
-        this.isConnected ?
+        gameState.isConnected && gameState.joinedGame ?
           m(poker, { gameState }) :
           m(connect, { gameState })
       ])
