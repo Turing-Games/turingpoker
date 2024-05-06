@@ -60,7 +60,6 @@ class PartyServer {
       }
     }
 
-    this.room.broadcast("A participant has disconnected. Updating game state...");
     this.broadcastGameState();
   }
 
@@ -367,7 +366,6 @@ class PartyServer {
       if (index === 0) player.turn = true;
     });
 
-    this.room.broadcast("The game has started!");
     this.broadcastGameState();
   }
 
