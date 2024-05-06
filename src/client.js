@@ -65,7 +65,7 @@ const gameState = {
 };
 
 const adminState = {
-  games: []
+
 }
 
 const App = {
@@ -88,12 +88,12 @@ const App = {
 const Admin = {
   oninit: () => false,
   view: () => {
-    return m(admin)
+    return m(admin, { adminState })
   }
 }
 
-m.mount(document.getElementById('app'), App)
-// m.route(document.getElementById("app"), "/", {
-//   "/": App,
-//   "/admin": Admin,
-// })
+// m.mount(document.getElementById('app'), App)
+m.route(document.getElementById("app"), "/", {
+  "/": App,
+  "/admin": Admin,
+})

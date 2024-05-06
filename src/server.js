@@ -65,6 +65,14 @@ class PartyServer {
     this.broadcastGameState();
   }
 
+  async onRequest(req) {
+    // get all messages
+    if (req.method === "GET") {
+      const payload = await req.json();
+      return new Response(JSON.stringify(payload));
+    }
+  }
+
   onMessage(message, websocket) {
     try {
       let data = message;
@@ -73,7 +81,6 @@ class PartyServer {
       }
 
       if (data.action && typeof this.handlePlayerAction === 'function') {
-        console.log("Handling action");
         this.handlePlayerAction(websocket.id, data.action, data.amount);
       }
     } catch (error) {
@@ -159,8 +166,6 @@ class PartyServer {
     console.log("Handling player action:", action);
     const player = this.gameState.players.find(p => p.playerId === playerId);
 
-    // Check if it's this player's turn
-    console.log({ player })
     if (
       (!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) &&
       ['join', 'spectate'].indexOf(action) === -1
@@ -345,7 +350,6 @@ class PartyServer {
   }
 
   startGame() {
-    console.log('start game')
     this.gameState.gamePhase = "active";
     this.gameState.currentPlayer = 0;  // Assuming the first player in the array starts
     this.gameState.dealerPosition = 0;  // Could be randomized or set by some rule
