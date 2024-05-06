@@ -166,16 +166,14 @@ export default {
               ]),
             ]) :
             m("div", { style: { height: 100, width: '100%' } }),
-          gameState.gameData.winner?.name &&
+          this?.gameState.winner != null &&
           m('div.tg-poker__winner',
-            m("div", [
-              m("div", { stlye: { marginBottom: '24px' } }, `Player #${gameState?.gameData.winner?.id} won with ${gameState?.gameData.winner?.name}`),
+            m("div", `Player #${this?.gameState.winner?.id} won with ${this?.gameState.winner?.name}`,
               m("button", {
                 onclick: () => {
-                  gameState.sendAction('next_hand')
+                  gameState.gameData.sendAction('next_hand')
                 }
               }, "Next hand")
-            ]
             ),
           )
         ]);

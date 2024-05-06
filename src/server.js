@@ -13,6 +13,7 @@ class PartyServer {
     this.suits = ['h', 'd', 'c', 's'];
     this.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
     this.gameState = {
+      handNumber: 1,
       gameType: "Texas Hold'em",
       maxPlayers: 8,
       bigBlind: 100,
@@ -98,8 +99,6 @@ class PartyServer {
 
   onMessage(message, websocket) {
     try {
-      console.log("theres a message")
-      console.log("Received raw message:", websocket);
       let data = message;
 
       if (typeof message === 'string') {  // Check if the message is string to parse it
@@ -124,48 +123,61 @@ class PartyServer {
   }
 
   findWinner() {
-    // console.log(hand.name); // Two Pair
-    // console.log(hand.descr); // Two Pair, A's & Q's
-    const playerHands = this.gameState.players.map((p) => {
+    // filter out folded players
+    const activePlayers = this.gameState.players.filter(p => p.status === 'active')
+    const playerHands = activePlayers.map((p) => {
       const playerCards = p.cards.map(c => c.value)
       const communityCards = this.gameState.communityCards.map(c => c.value)
       return Hand.solve([...playerCards, ...communityCards])
     })
 
-    console.log(Hand.winners(playerHands))
-    this.gameState.winner = Hand.winners(playerHands);
+    const winner = Hand.winners(playerHands);
+    const winnerId = activePlayers[winner[0]?.rank]
+    this.gameState.winner = {
+      id: winnerId,
+      name: winner[0].name
+    }
+
+    // allocate winnings
+    this.gameState.players = this.gameState.players.map((p) => {
+      if (p.playerId === winnerId) {
+        return {
+          ...p,
+          stackSize: p.stackSize + this.gameState.potTotal
+        }
+      } else {
+        return p
+      }
+    })
   }
-
-  // allocateWinnings() {
-
-  // }
 
   checkRoundCompleted() {
     // first check for one player to see if all others have folded
-    // const activePlayers =
-
-    // check all players to see if their completedRound is equal
-    // to bettingRound of gameState
-    const playerRounds = this.gameState.players.map(player => player.completedRound)
-    // sum of rounds
-    const roundSum = playerRounds.reduce((acc, val) => acc + val, 0)
-    // round is complete if sum divided by players is same as gameData.bettingRound.round
-    if ((roundSum / this.gameState.players.length) === this.gameState.bettingRound.round) {
-      if (this.gameState.isLastRound) {
-        this.findWinner()
+    const activePlayers = this.gameState.players.filter(p => p.status === 'active')
+    if (activePlayers.length > 1) {
+      // check all players to see if their completedRound is equal
+      // to bettingRound of gameState
+      const playerRounds = this.gameState.players.map(player => player.completedRound)
+      // sum of rounds
+      const roundSum = playerRounds.reduce((acc, val) => acc + val, 0)
+      // round is complete if sum divided by players is same as gameData.bettingRound.round
+      if ((roundSum / this.gameState.players.length) === this.gameState.bettingRound.round) {
+        if (this.gameState.isLastRound) {
+          this.findWinner()
+        } else {
+          this.gameState.bettingRound.round += 1
+          this.dealCommunityCards()
+          this.changeTurn(0); // Move to the next player
+        }
       } else {
-        this.gameState.bettingRound.round += 1
-        this.dealCommunityCards()
-        this.changeTurn(0); // Move to the next player
+        this.changeTurn(); // Move to the next player
       }
     } else {
-      this.changeTurn(); // Move to the next player
+      this.findWinner()
     }
 
     this.broadcastGameState(); // Update all clients with the new state
   }
-
-  ///TODO refactor out poker logic away from server logic 
 
   getRandomCard() {
     let card;
@@ -221,6 +233,7 @@ class PartyServer {
         this.gameState.bettingRound.currentBet = amount; // Update current bet to the raised amount
         this.gameState.bettingRound.round += 1 // if raise, another round of betting to raise or call
         player.completedRound += 2 // player who raised, does not have to bet again
+        this.checkRoundCompleted()
         break;
       case 'call':
         const callAmount = this.gameState.bettingRound.currentBet - player.currentBet;
@@ -232,6 +245,7 @@ class PartyServer {
         player.currentBet += callAmount;
         player.completedRound += 1 // player completed round of betting
         this.gameState.potTotal += callAmount;
+        this.checkRoundCompleted()
         break;
       case 'check':
         if (this.gameState.bettingRound.currentBet !== player.currentBet) {
@@ -240,9 +254,15 @@ class PartyServer {
         } else {
           player.completedRound += 1 // player completed round of betting
         }
+        this.checkRoundCompleted()
         break;
       case 'fold':
         player.status = 'folded';
+        this.checkRoundCompleted()
+        break;
+      case 'next_hand':
+        this.startGame(this.gameState.handNumber + 1)
+        this.broadcastGameState()
         break;
       case 'reset_game':
         this.gameState = {
@@ -266,13 +286,12 @@ class PartyServer {
           spectators: [],
           winner: null
         };
+        this.broadcastGameState()
         break;
       default:
         console.log("Invalid action:", action);
         return; // Invalid action
     }
-
-    this.checkRoundCompleted()
   }
 
   changeTurn(playerIndex = null) {
@@ -342,7 +361,10 @@ class PartyServer {
   }
 
 
-  startGame() {
+  startGame(handNumber = 1) {
+    this.gameState.communityCards = []
+    this.gameState.winner = null
+    this.gameState.handNumber = handNumber
     this.gameState.gamePhase = "active";
     this.gameState.currentPlayer = 0;  // Assuming the first player in the array starts
     this.gameState.dealerPosition = 0;  // Could be randomized or set by some rule
