@@ -98,3 +98,19 @@
 .playerCard {
   width: 95px;
 }
+
+.tg-poker__winner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, 0.2);
+  width: 100%;
+  height: 100%;
+}
+
+.tg-poker__winner>div {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  color: #000;
+}

@@ -62,9 +62,6 @@ const GameControls = {
 export default {
   view: ({ attrs }) => {
     const gameState = attrs.gameState;
-    if (gameState?.gameData?.winner?.length) {
-      alert(`Winner: Player #${gameState?.gameData?.winner[0].playerId} with ${gameState?.gameData?.winner[0].name}`)
-    }
 
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
     const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players?.[gameState?.gameData?.currentPlayer]?.playerId;
@@ -168,7 +165,16 @@ export default {
                 )
               ]),
             ]) :
-            m("div", { style: { height: 100, width: '100%' } })
+            m("div", { style: { height: 100, width: '100%' } }),
+          this.gameState.winner.length &&
+          m('div.winner-modal', {},
+            m("div", "Winner!"),
+            m("div", {
+              onclick: () => {
+
+              }
+            }, "Next hand")
+          )
         ]);
     } else {
       return m("p", "Waiting for players to join...");
