@@ -6,6 +6,7 @@ class PartyServer {
     this.suits = ['h', 'd', 'c', 's'];
     this.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
     this.gameState = {
+      room: room,
       gameType: "Texas Hold'em",
       maxPlayers: 8,
       bigBlind: 100,
@@ -28,12 +29,6 @@ class PartyServer {
       isFlop: false
     };
     // this.startBroadcastingGameState();
-  }
-
-  startBroadcastingGameState() {
-    // this.interval = setInterval(() => {
-    //   this.room.broadcast(JSON.stringify(this.gameState));
-    // }, 5000);
   }
 
   onConnect(conn, ctx) {
@@ -92,16 +87,13 @@ class PartyServer {
 
   onMessage(message, websocket) {
     try {
-      console.log("theres a message")
-      console.log("Received raw message:", websocket);
       let data = message;
 
       if (typeof message === 'string') {  // Check if the message is string to parse it
         data = JSON.parse(message);
-        console.log("Parsed string: ", data);
       }
+
       console.log("Action data: ", data.action);
-      console.log("Is handlePlayerAction a function? ", typeof this.handlePlayerAction === 'function');
 
       if (data.action && typeof this.handlePlayerAction === 'function') {
         console.log("Handling action");
@@ -179,11 +171,19 @@ class PartyServer {
   }
 
   dealInitialCards() {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('========================')
+      console.log('dealing initial cards...')
+      console.log(this.gameState.room.internalId)
+      console.log('========================')
+    }
     this.gameState.players.forEach(player => {
       if (!player.cards?.length) {
         player.cards = [this.getRandomCard(), this.getRandomCard()];
       }
     });
+    // if (this.gameState.room.internalId) {
+    // }
   }
 
   handlePlayerAction(playerId, action, amount) {
@@ -286,12 +286,12 @@ class PartyServer {
   dealCommunityCards() {
     if (this.gameState.communityCards.length === 0) { // Flop
       this.gameState.communityCards.push(this.getRandomCard(), this.getRandomCard(), this.getRandomCard());
-      this.gameState.isFlop = true
     } else if (this.gameState.communityCards.length === 3) { // Turn
       this.gameState.communityCards.push(this.getRandomCard());
     } else if (this.gameState.communityCards.length === 4) { // River
       this.gameState.communityCards.push(this.getRandomCard());
       this.gameState.isLastRound = true
+      this.gameState.isFlop = true
     }
 
     this.broadcastGameState();

@@ -56,6 +56,7 @@ export default {
     const gameState = attrs.gameState;
     console.log('winner', gameState?.gameData?.winner)
     if (gameState?.gameData?.winner?.length) {
+      console.log(gameState?.gameData?.winner)
       alert(`Winner: Player #${gameState?.gameData?.winner[0].playerId} with ${gameState?.gameData?.winner[0].name}`)
     }
 

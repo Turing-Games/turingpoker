@@ -1,9 +1,10 @@
 // Global state management
-
 import PartySocket from "partysocket";
 import header from "./components/header";
 import poker from "./components/poker/poker";
 import m from "mithril";
+import admin from "./components/poker/admin";
+import connect from "./components/connect";
 
 const gameState = {
   isConnected: false,
@@ -11,10 +12,10 @@ const gameState = {
   socket: null,
   playerId: null, // This will store the client's player ID
 
-  connect: () => {
+  connect: (isPlayer = true) => {
     this.socket = new PartySocket({
       host: PARTYKIT_HOST,
-      room: "my-new-room"
+      room: `turing-games-poker`
     });
 
     this.socket.addEventListener("open", () => {
@@ -58,8 +59,11 @@ const gameState = {
   }
 };
 
+const adminState = {
+  games: []
+}
+
 const App = {
-  oninit: gameState.connect,
   view: () => {
     return (
       m.fragment([
@@ -67,10 +71,23 @@ const App = {
         m(header, {
           gameType: gameState?.gameData?.gameType
         }),
-        m(poker, { gameState })
+        this.isConnected ?
+          m(poker, { gameState }) :
+          m(connect, { gameState })
       ])
     )
   }
 };
 
-m.mount(document.getElementById("app"), App);
+const Admin = {
+  oninit: () => false,
+  view: () => {
+    return m(admin)
+  }
+}
+
+m.mount(document.getElementById('app'), App)
+// m.route(document.getElementById("app"), "/", {
+//   "/": App,
+//   "/admin": Admin,
+// })
