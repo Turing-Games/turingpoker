@@ -145,6 +145,7 @@ export default {
               m(player, {
                 className: 'tg-poker__player--1',
                 player: currentPlayer,
+                showCards: true,
                 isCurrentPlayerTurn,
                 title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
               }),
