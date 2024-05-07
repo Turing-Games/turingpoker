@@ -148,8 +148,6 @@ class PartyServer {
       if (p.playerId === winnerId) {
         return {
           ...p,
-          currentBet: 0,
-          completedRound: 0,
           stackSize: p.stackSize + this.gameState.potTotal
         }
       } else {
@@ -382,10 +380,14 @@ class PartyServer {
     this.dealInitialCards();
 
     // Update all player statuses to 'active' and set the first player's turn
-    this.gameState.players.forEach((player, index) => {
-      player.status = 'active';
-      // Optionally, mark the first player's turn explicitly
-      if (index === 0) player.turn = true;
+    this.gameState.players = this.gameState.players.map((player, index) => {
+      return {
+        ...p,
+        status: 'active',
+        turn: index === 0 ? true : false,
+        currentBet: 0,
+        completedRound: 0
+      }
     });
 
     this.room.broadcast("The game has started!");
