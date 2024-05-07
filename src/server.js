@@ -132,8 +132,13 @@ class PartyServer {
       return Hand.solve([...playerCards, ...communityCards])
     })
 
+    console.log(Hand.winners(playerHands))
     this.gameState.winner = Hand.winners(playerHands);
   }
+
+  // allocateWinnings() {
+
+  // }
 
   checkRoundCompleted() {
     // first check for one player to see if all others have folded

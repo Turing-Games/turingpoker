@@ -62,9 +62,6 @@ const GameControls = {
 export default {
   view: ({ attrs }) => {
     const gameState = attrs.gameState;
-    if (gameState?.gameData?.winner?.length) {
-      alert(`Winner: Player #${gameState?.gameData?.winner[0].playerId} with ${gameState?.gameData?.winner[0].name}`)
-    }
 
     const currentPlayer = gameState?.gameData?.players?.find(player => player.playerId === gameState?.playerId)
     const isCurrentPlayerTurn = currentPlayer?.playerId === gameState?.gameData?.players?.[gameState?.gameData?.currentPlayer]?.playerId;
@@ -110,7 +107,7 @@ export default {
               ),
             // opponents, filtered out current player
             opponents?.length > 0 &&
-            m("div.opponents", 
+            m("div.opponents",
               opponents.map((opp, index) => {
                 // starts at 1 if spectator is viewing
                 const playerNumberOffset = !currentPlayer ? 1 : 0
@@ -137,36 +134,47 @@ export default {
             })
           ),
           // bottom
+          currentPlayer ? // else theyre a spectator
+            m("div.tg-poker__table__bottom", [
+              m("div", { style: { margin: '12px' } }, [
+                // current player
+                m(player, {
+                  className: 'tg-poker__player--1',
+                  player: currentPlayer,
+                  showCards: true,
+                  isCurrentPlayerTurn,
+                  title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
+                }),
+                // controls
+                gameState.gameData?.players?.length < 2 ?
+                  m("p", "Waiting for players to join...") :
+                  isCurrentPlayerTurn ?
+                    m(GameControls, {
+                      gameState: gameState
+                    }) :
+                    m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
+              ]),
+              // spectators
+              m("div.tg-poker__table__spectators", [
+                m("h4", "Spectators"),
+                gameState.gameData.spectators.map((spectator, index) =>
+                  m("div.tg-poker__table__spectators__spectator", [
+                    m("p", `Spectator ${index + 1}:`),
+                    m("p", `${spectator.status}`)
+                  ])
+                )
+              ]),
+            ]) :
+            m("div", { style: { height: 100, width: '100%' } }),
+          this.gameState.winner.length &&
+          m('div.winner-modal', {},
+            m("div", "Winner!"),
+            m("div", {
+              onclick: () => {
 
-          currentPlayer &&
-          m("div.tg-poker__table__bottom", [
-            m("div", [
-              // current player
-              m(player, {
-                className: 'tg-poker__player--1',
-                player: currentPlayer,
-                showCards: true,
-                isCurrentPlayerTurn,
-                title: `You (${currentPlayer.status}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
-              }),
-              // controls
-              isCurrentPlayerTurn ?
-                m(GameControls, {
-                  gameState: gameState
-                }) :
-                m("p", "Waiting for your turn..."),
-            ]),
-            // spectators
-            m("div.tg-poker__table__spectators", [
-              m("h4", "Spectators"),
-              gameState.gameData.spectators.map((spectator, index) =>
-                m("div.tg-poker__table__spectators__spectator", [
-                  m("p", `Spectator ${index + 1}:`),
-                  m("p", `${spectator.status}`)
-                ])
-              )
-            ]),
-          ])
+              }
+            }, "Next hand")
+          )
         ]);
     } else {
       return m("p", "Waiting for players to join...");
