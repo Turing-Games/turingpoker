@@ -13,18 +13,24 @@ export type PokerRound = 'pre-flop' | 'flop' | 'turn' | 'river' | 'showdown';
 export type PlayerID = string;
 
 export interface IPokerPlayer {
-    id: PlayerID
+    id: PlayerID;
     stack: number;
+    folded: boolean;
+    currentBet: number;
+    lastRound: PokerRound | null;
 }
 
 export interface IPokerConfig {
+    dealerPosition: number;
     smallBlind: number;
     bigBlind: number;
     maxPlayers: number;
-    dealerPosition: number;
 }
 
 export interface IPokerSharedState {
+    dealerPosition: number;
+    smallBlind: number;
+    bigBlind: number;
     pot: number;
     targetBet: number;
     // counterclockwise order
@@ -33,15 +39,15 @@ export interface IPokerSharedState {
     // small blind is (dealerPosition+2)%players.length
     round: PokerRound;
     deck: Card[];
-    playerCompletedRound: Record<PlayerID, PokerRound>;
-    playerCurrentBet: Record<PlayerID, number>;
 }
 
-export interface IPokerState {
+export interface IPokerGame {
     state: IPokerSharedState;
     config: IPokerConfig;
     hands: Record<PlayerID, [Card, Card]>;
 }
+
+export type GameLog = string[];
 
 function createDeck(): Card[] {
     const suits: Suit[] = ['hearts', 'diamonds', 'clubs', 'spades'];
@@ -58,45 +64,79 @@ function shuffleDeck(deck: Card[]): Card[] {
     return shuffledDeck;
 }
 
-function dealHands(players: IPokerPlayer[], deck: Card[]): Record<PlayerID, [Card, Card]> {
+function dealHands(players: PlayerID[], deck: Card[]): Record<PlayerID, [Card, Card]> {
     const hands: Record<PlayerID, [Card, Card]> = {};
     for (const player of players) {
-        hands[player.id] = [deck.pop()!, deck.pop()!];
+        hands[player] = [deck.pop()!, deck.pop()!];
     }
     return hands;
 }
 
-export function createPokerGame(config: IPokerConfig, players: IPokerPlayer[]): IPokerState {
+export function createPokerGame(config: IPokerConfig, players: PlayerID[], stacks: number[]): IPokerGame {
     const deck = shuffleDeck(createDeck());
     const hands = dealHands(players, deck);
     const playerCompletedRound: Record<PlayerID, PokerRound> = {};
     const playerCurrentBet: Record<PlayerID, number> = {};
     for (const player of players) {
-        playerCompletedRound[player.id] = 'pre-flop';
-        playerCurrentBet[player.id] = 0;
+        playerCompletedRound[player] = 'pre-flop';
+        playerCurrentBet[player] = 0;
     }
-    return {
+
+    const out: IPokerGame = {
         state: {
             pot: 0,
-            players,
+            players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0 })),
             round: 'pre-flop',
             deck,
-            playerCompletedRound,
-            playerCurrentBet,
-            targetBet: 0
+            targetBet: config.bigBlind,
+            dealerPosition: config.dealerPosition,
+            smallBlind: config.smallBlind,
+            bigBlind: config.bigBlind
         },
         config,
         hands
     }
+    out.state.players[(config.dealerPosition + 1) % players.length].currentBet = 
+        Math.min(config.smallBlind, stacks[(config.dealerPosition + 1) % players.length]);
+    out.state.players[(config.dealerPosition + 2) % players.length].currentBet = 
+        Math.min(config.bigBlind, stacks[(config.dealerPosition + 2) % players.length]);
+    return out;
 }
 
 /**
- * Find the player who has the next turn. This is the first player who hasn't folder,
+ * Find the player who has the next turn. This is the first player who hasn't folded,
  * who has bet less than the current target, * or has not made a decision yet.
  * @param state Poker game state
- * @returns the id of the player who has the next turn, or null if the round is over
+ * @returns the id of the player who has the next turn, or null if the round is over, and any new lines that should be added to a log
  */
-export function whoseTurn(state: IPokerSharedState): PlayerID | null {
+export function whoseTurn(state: IPokerSharedState): { whoseTurn: PlayerID | null, log: GameLog } {
+    const log: string[] = [];
+    if (state.round == 'showdown') {
+        log.push('Round is over');
+        return null;
+    }
+
+    let start = (state.dealerPosition + 1) % state.players.length;
+    if (state.round === 'pre-flop') start = (start + 1) % state.players.length;
+
+    for (let i = 0; i < state.players.length; i++) {
+        // Use offset from the dealer to find the player whose turn it is
+        const player = state.players[(start + i) % state.players.length];
+        if (player.folded) {
+            log.push(`Skipping because ${player.id} has folded`);
+            continue;
+        }
+        if (player.stack == player.currentBet) {
+            log.push(`Skipping because ${player.id} is all in`);
+            continue;
+        }
+        if (player.currentBet == state.targetBet && player.lastRound == state.round) {
+            log.push(`Skipping because ${player.id} has already called`);
+            continue;
+        }
+        return { whoseTurn: player.id, log };
+    }
+    return { };
 }
 
 /**
