@@ -129,6 +129,7 @@ class PartyServer {
   findWinner() {
     // filter out folded players
     const activePlayers = this.gameState.players.filter(p => p.status === 'active')
+    console.log({ activePlayers })
     const playerHands = activePlayers.map((p) => {
       const playerCards = p.cards.map(c => c.value)
       const communityCards = this.gameState.communityCards.map(c => c.value)
@@ -136,6 +137,7 @@ class PartyServer {
     })
 
     const winners = Hand.winners(playerHands);
+    console.log({ winners })
     const winnerId = activePlayers[winners[0].rank - 1]?.playerId
 
     this.gameState.winner = {
@@ -217,7 +219,7 @@ class PartyServer {
     const player = this.gameState.players.find(p => p.playerId === playerId);
 
     // Check if it's this player's turn
-    if (!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) {
+    if ((!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) && action !== 'reset_game') {
       console.log("Not player's turn or player not found:", playerId);
       return; // It's not this player's turn or player not found
     }
@@ -382,7 +384,7 @@ class PartyServer {
     // Update all player statuses to 'active' and set the first player's turn
     this.gameState.players = this.gameState.players.map((player, index) => {
       return {
-        ...p,
+        ...player,
         status: 'active',
         turn: index === 0 ? true : false,
         currentBet: 0,
