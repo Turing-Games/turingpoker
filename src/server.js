@@ -152,15 +152,15 @@ class PartyServer {
   }
 
   checkRoundCompleted() {
-    console.log('checkRoundCompleted')
     // first check for one player to see if all others have folded
     const activePlayers = this.gameState.players.filter(p => p.status === 'active')
     if (activePlayers.length > 1) {
       const playerRounds = this.gameState.players.map(player => player.completedRound)
       // sum of rounds
       const roundSum = playerRounds.reduce((acc, val) => acc + val, 0)
-      // round is complete if sum divided by players is same as gameData.bettingRound.round
-      if ((roundSum / this.gameState.players.length) === this.gameState.bettingRound.round) {
+      // checks if all players have completed betting roung
+      const isRoundComplete = (roundSum / this.gameState.players.length) === this.gameState.bettingRound.round
+      if (isRoundComplete) {
         if (this.gameState.isLastRound) {
           console.log('find winner, first')
           this.findWinner()
@@ -245,7 +245,7 @@ class PartyServer {
         }
         player.stackSize -= callAmount;
         player.currentBet += callAmount;
-        player.completedRound += 1 // player completed round of betting
+        player.completedRound = this.gameState.bettingRound.round // player completed round of betting
         this.gameState.potTotal += callAmount;
         this.checkRoundCompleted()
         break;
