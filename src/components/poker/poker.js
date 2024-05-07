@@ -18,7 +18,7 @@ const GameControls = {
     // Render game controls if it's the current player's turn
     return m("div.tg-poker__controls", [
       // call button
-      currentBet > 0 ? m("button", {
+      m("button", {
         onclick: () => {
           if (!isPlayerEvenWithBet) {
             gameState.sendAction("call", currentBet)
@@ -26,9 +26,9 @@ const GameControls = {
         },
         style: {
           pointerEvents: isPlayerEvenWithBet ? 'none' : 'auto',
-          opacity: isPlayerEvenWithBet ? 0.3 : 1
+          opacity: isPlayerEvenWithBet ? 0.5 : 1
         }
-      }, "Call") : null,
+      }, "Call"),
       // check button
       m("button", {
         onclick: () => {
@@ -38,7 +38,7 @@ const GameControls = {
         },
         style: {
           pointerEvents: !isPlayerEvenWithBet ? 'none' : 'auto',
-          opacity: !isPlayerEvenWithBet ? 0.3 : 1
+          opacity: !isPlayerEvenWithBet ? 0.5 : 1
         }
       }, "Check"),
       // raise button
