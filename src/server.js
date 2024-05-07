@@ -132,18 +132,15 @@ class PartyServer {
     }
 
     // allocate winnings
-    this.gameState.players = this.gameState.players.map((p) => {
-      if (p.playerId === winnerId) {
+    this.gameState.players = this.gameState.players
+      .map((p) => {
         return {
           ...p,
-          stackSize: p.stackSize + this.gameState.potTotal
+          stackSize: p.playerId === winnerId ? p.stackSize + this.gameState.potTotal : p.stackSize,
         }
-      } else {
-        return p
-      }
-    })
+      })
+      .filter(p => p.stackSize > 0)
 
-    this.gameState.players = this.gameState.players.filter(p => p.stackSize > 0)
     this.broadcastGameState(); // Update all clients with the new state
   }
 
