@@ -152,27 +152,30 @@ class PartyServer {
   }
 
   checkRoundCompleted() {
+    console.log('checkRoundCompleted')
     // first check for one player to see if all others have folded
     const activePlayers = this.gameState.players.filter(p => p.status === 'active')
     if (activePlayers.length > 1) {
-      // check all players to see if their completedRound is equal
-      // to bettingRound of gameState
       const playerRounds = this.gameState.players.map(player => player.completedRound)
       // sum of rounds
       const roundSum = playerRounds.reduce((acc, val) => acc + val, 0)
       // round is complete if sum divided by players is same as gameData.bettingRound.round
       if ((roundSum / this.gameState.players.length) === this.gameState.bettingRound.round) {
         if (this.gameState.isLastRound) {
+          console.log('find winner, first')
           this.findWinner()
         } else {
           this.gameState.bettingRound.round += 1
           this.dealCommunityCards()
-          this.changeTurn(0); // Move to the next player
+          console.log('change turn, param')
+          this.changeTurn(); // Move to the next player
         }
       } else {
+        console.log('change turn, no param')
         this.changeTurn(); // Move to the next player
       }
     } else {
+      console.log('find winner, last')
       this.findWinner()
     }
     this.broadcastGameState()
