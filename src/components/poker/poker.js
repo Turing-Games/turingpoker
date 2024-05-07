@@ -32,7 +32,7 @@ const GameControls = {
       // check button
       m("button", {
         onclick: () => {
-          if (currentBet === 0 && isPlayerEvenWithBet) {
+          if (currentBet === 0 || isPlayerEvenWithBet) {
             gameState.sendAction("check")
           }
         },
@@ -166,14 +166,16 @@ export default {
               ]),
             ]) :
             m("div", { style: { height: 100, width: '100%' } }),
-          this?.gameState.winner != null &&
+          gameState.gameData.winner?.name &&
           m('div.tg-poker__winner',
-            m("div", `Player #${this?.gameState.winner?.id} won with ${this?.gameState.winner?.name}`,
+            m("div", [
+              m("div", { stlye: { marginBottom: '24px' } }, `Player #${this?.gameState.winner?.id} won with ${this?.gameState.winner?.name}`),
               m("button", {
                 onclick: () => {
-                  gameState.gameData.sendAction('next_hand')
+                  gameState.sendAction('next_hand')
                 }
               }, "Next hand")
+            ]
             ),
           )
         ]);

@@ -6,6 +6,10 @@ const Hand = require('pokersolver').Hand;
 // console.log(hand.name); // Two Pair
 // console.log(hand.descr); // Two Pair, A's & Q's
 
+const initialGameStateValues = {
+
+}
+
 class PartyServer {
   constructor(room) {
     this.room = room;
@@ -131,11 +135,12 @@ class PartyServer {
       return Hand.solve([...playerCards, ...communityCards])
     })
 
-    const winner = Hand.winners(playerHands);
-    const winnerId = activePlayers[winner[0]?.rank]
+    const winners = Hand.winners(playerHands);
+    const winnerId = activePlayers[winners[0].rank - 1]?.playerId
+
     this.gameState.winner = {
       id: winnerId,
-      name: winner[0].name
+      name: winners[0].name
     }
 
     // allocate winnings
@@ -143,12 +148,16 @@ class PartyServer {
       if (p.playerId === winnerId) {
         return {
           ...p,
+          currentBet: 0,
+          completedRound: 0,
           stackSize: p.stackSize + this.gameState.potTotal
         }
       } else {
         return p
       }
     })
+
+    this.broadcastGameState(); // Update all clients with the new state
   }
 
   checkRoundCompleted() {
@@ -175,8 +184,7 @@ class PartyServer {
     } else {
       this.findWinner()
     }
-
-    this.broadcastGameState(); // Update all clients with the new state
+    this.broadcastGameState()
   }
 
   getRandomCard() {
@@ -305,6 +313,8 @@ class PartyServer {
     } else {
       this.gameState.currentPlayer = playerIndex;
     }
+
+    this.broadcastGameState(); // Update all clients with the new state
   }
 
 
