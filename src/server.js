@@ -233,7 +233,7 @@ class PartyServer {
         this.gameState.potTotal += amount;
         this.gameState.bettingRound.currentBet = amount; // Update current bet to the raised amount
         this.gameState.bettingRound.round += 1 // if raise, another round of betting to raise or call
-        player.completedRound += 2 // player who raised, does not have to bet again
+        player.completedRound += 1
         this.checkRoundCompleted()
         break;
       case 'call':
