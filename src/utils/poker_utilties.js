@@ -15,9 +15,15 @@ export const isBettingRoundComplete = (bettingRound, players = []) => {
 /** getPlayersWithRemainingCall
  * finds players with who have yet to call current
  * betting round, returns player indexes
+ * @param {number} currentBet 
  * @param {Array} players 
  * @returns []
  */
-export const getPlayersWithRemainingCall = (players = []) => {
-  return []
+export const getPlayersWithRemainingCall = (currentBet = 0, players = []) => {
+  players
+  const remainingCallIndexes = players.map((player, i) => {
+    if (player.currentBet < currentBet) return i
+  }).filter(index => typeof index === 'number')
+  console.log({ remainingCallIndexes })
+  return remainingCallIndexes
 }

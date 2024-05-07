@@ -33,12 +33,6 @@ class PartyServer {
     // this.startBroadcastingGameState();
   }
 
-  startBroadcastingGameState() {
-    // this.interval = setInterval(() => {
-    //   this.room.broadcast(JSON.stringify(this.gameState));
-    // }, 5000);
-  }
-
   onConnect(conn, ctx) {
     if (process.env.NODE_ENV !== 'production') {
       console.log("client connected")
@@ -119,7 +113,7 @@ class PartyServer {
 
   findWinner() {
     // filter out folded players
-    const activePlayers = this.gameState.players.filter(p => p.status === 'active')
+    const activePlayers = this.getActivePlayers()
     let playerHands = activePlayers.map((p) => {
       const playerCards = p.cards.map(c => c.value)
       const communityCards = this.gameState.communityCards.map(c => c.value)
@@ -158,23 +152,25 @@ class PartyServer {
     const activePlayers = this.gameState.players.filter(p => p.status === 'active')
     if (activePlayers.length > 1) {
       const isRoundComplete = isBettingRoundComplete(this.gameState.bettingRound.round, this.gameState.players)
-      const playersWithRemaingCall = getPlayersWithRemainingCall()
-      if (isRoundComplete) {
-        if (this.gameState.isLastRound) {
-          console.log('find winner, first')
-          this.findWinner()
+      const playersWithRemaingCall = getPlayersWithRemainingCall(this.gameState.bettingRound.currentBet, this.gameState.players)
+      if (playersWithRemaingCall.length > 0) {
+        this.changeTurn(playersWithRemaingCall[0]); // Move to player who needs to call
+      } else {
+        if (isRoundComplete) {
+          if (this.gameState.isLastRound) {
+            this.findWinner()
+          } else {
+            this.gameState.bettingRound.round += 1
+            this.gameState.bettingRound.currentBet = 0
+            this.gameState.players.forEach(player => player.currentBet = 0)
+            this.dealCommunityCards()
+            this.changeTurn(); // Move to the next player
+          }
         } else {
-          this.gameState.bettingRound.round += 1
-          this.dealCommunityCards()
-          console.log('change turn, param')
           this.changeTurn(); // Move to the next player
         }
-      } else {
-        console.log('change turn, no param')
-        this.changeTurn(); // Move to the next player
       }
     } else {
-      console.log('find winner, last')
       this.findWinner()
     }
     this.broadcastGameState()
@@ -232,7 +228,6 @@ class PartyServer {
         player.currentBet += amount;
         this.gameState.potTotal += amount;
         this.gameState.bettingRound.currentBet = amount; // Update current bet to the raised amount
-        this.gameState.bettingRound.round += 1 // if raise, another round of betting to raise or call
         player.completedRound += 1
         this.checkRoundCompleted()
         break;
@@ -310,7 +305,6 @@ class PartyServer {
     this.broadcastGameState(); // Update all clients with the new state
   }
 
-
   dealCommunityCards() {
     if (this.gameState.communityCards.length === 0) { // Flop
       this.gameState.communityCards.push(this.getRandomCard(), this.getRandomCard(), this.getRandomCard());
@@ -355,15 +349,6 @@ class PartyServer {
     return { rank, value: faces.sort((a, b) => b.charCodeAt(0) - a.charCodeAt(0)).join("") };
   }
 
-
-  compareHands(h1, h2) {
-    if (h1.rank === h2.rank) {
-      return h2.value.localeCompare(h1.value); // Assuming value comparison needs to be tailored to your game's logic
-    }
-    return h1.rank - h2.rank;
-  }
-
-
   startGame(handNumber = 1) {
     this.gameState.communityCards = []
     this.gameState.winner = null
@@ -395,7 +380,6 @@ class PartyServer {
     this.broadcastGameState();
   }
 
-
   broadcastGameState(newConnectionId = null) {
     this.gameState.players.concat(this.gameState.spectators).forEach(person => {
       const personalizedGameState = {
@@ -419,6 +403,12 @@ class PartyServer {
     });
   }
 
+  getActivePlayers() {
+    return this.gameState.players.filter(p => p.status === 'active')
+  }
 
+  getPlayerHands() {
+
+  }
 }
 export default PartyServer;
