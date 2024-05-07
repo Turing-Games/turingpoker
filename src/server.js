@@ -159,6 +159,9 @@ class PartyServer {
         if (isRoundComplete) {
           if (this.gameState.isLastRound) {
             this.findWinner()
+            setTimeout(() => {
+              this.startGame(this.gameState.handNumber + 1)
+            }, 3000)
           } else {
             this.gameState.bettingRound.round += 1
             this.gameState.bettingRound.currentBet = 0
@@ -208,7 +211,10 @@ class PartyServer {
     const player = this.gameState.players.find(p => p.playerId === playerId);
 
     // Check if it's this player's turn
-    if ((!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) && action !== 'reset_game') {
+    if ((
+      !player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) &&
+      ['reset_game', 'next_hand'].indexOf(action) == -1
+    ) {
       console.log("Not player's turn or player not found:", playerId);
       return; // It's not this player's turn or player not found
     }
