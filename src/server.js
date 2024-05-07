@@ -100,7 +100,6 @@ class PartyServer {
         console.log("Parsed string: ", data);
       }
       console.log("Action data: ", data.action);
-      console.log("Is handlePlayerAction a function? ", typeof this.handlePlayerAction === 'function');
 
       if (data.action && typeof this.handlePlayerAction === 'function') {
         console.log("Handling action");
@@ -167,7 +166,6 @@ class PartyServer {
           this.findWinner()
         } else {
           this.gameState.bettingRound.round += 1
-          this.gameState.bettingRound.currentBet = 0
           this.dealCommunityCards()
           this.changeTurn(0); // Move to the next player
         }
