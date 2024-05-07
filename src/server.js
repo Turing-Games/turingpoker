@@ -129,20 +129,22 @@ class PartyServer {
   findWinner() {
     // filter out folded players
     const activePlayers = this.gameState.players.filter(p => p.status === 'active')
-    console.log({ activePlayers })
-    const playerHands = activePlayers.map((p) => {
+    let playerHands = activePlayers.map((p) => {
       const playerCards = p.cards.map(c => c.value)
       const communityCards = this.gameState.communityCards.map(c => c.value)
       return Hand.solve([...playerCards, ...communityCards])
     })
 
     const winners = Hand.winners(playerHands);
-    console.log({ winners })
-    const winnerId = activePlayers[winners[0].rank - 1]?.playerId
+    const winningHand = winners[0].descr
+    playerHands = playerHands.map(hand => hand.descr)
+
+    const playerIndex = playerHands.indexOf(winningHand)
+    const winnerId = activePlayers[playerIndex]?.playerId
 
     this.gameState.winner = {
       id: winnerId,
-      name: winners[0].name
+      name: winningHand
     }
 
     // allocate winnings
@@ -376,6 +378,12 @@ class PartyServer {
     this.gameState.winner = null
     this.gameState.handNumber = handNumber
     this.gameState.gamePhase = "active";
+    this.gameState.isLastRound = false
+    this.gameState.bettingRound = {
+      round: 1,
+      currentBet: 0,
+      totalBets: []
+    };
     this.gameState.currentPlayer = 0;  // Assuming the first player in the array starts
     this.gameState.dealerPosition = 0;  // Could be randomized or set by some rule
 

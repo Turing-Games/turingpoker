@@ -30,7 +30,6 @@ const gameState = {
     this.socket.addEventListener("message", (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log(event.data)
         gameState.gameData = data;
       } catch {
         gameState.gameData = event.data; // Handle plain text messages
