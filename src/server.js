@@ -1,3 +1,5 @@
+import { getPlayersWithRemainingCall, isBettingRoundComplete } from './utils/poker_utilties';
+
 const Hand = require('pokersolver').Hand;
 
 class PartyServer {
@@ -152,14 +154,11 @@ class PartyServer {
   }
 
   checkRoundCompleted() {
-    // first check for one player to see if all others have folded
+    // check for more than active one player to see if all others have folded
     const activePlayers = this.gameState.players.filter(p => p.status === 'active')
     if (activePlayers.length > 1) {
-      const playerRounds = this.gameState.players.map(player => player.completedRound)
-      // sum of rounds
-      const roundSum = playerRounds.reduce((acc, val) => acc + val, 0)
-      // checks if all players have completed betting roung
-      const isRoundComplete = (roundSum / this.gameState.players.length) === this.gameState.bettingRound.round
+      const isRoundComplete = isBettingRoundComplete(this.gameState.bettingRound.round, this.gameState.players)
+      const playersWithRemaingCall = getPlayersWithRemainingCall()
       if (isRoundComplete) {
         if (this.gameState.isLastRound) {
           console.log('find winner, first')
