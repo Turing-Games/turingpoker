@@ -112,7 +112,6 @@ class PartyServer {
   }
 
   findWinner() {
-    // filter out folded players
     const activePlayers = this.getActivePlayers()
     let playerHands = activePlayers.map((p) => {
       const playerCards = p.cards.map(c => c.value)
@@ -144,12 +143,13 @@ class PartyServer {
       }
     })
 
+    this.gameState.players = this.gameState.players.filter(p => p.stackSize > 0)
     this.broadcastGameState(); // Update all clients with the new state
   }
 
   checkRoundCompleted() {
     // check for more than active one player to see if all others have folded
-    const activePlayers = this.gameState.players.filter(p => p.status === 'active')
+    let activePlayers = this.getActivePlayers()
     if (activePlayers.length > 1) {
       const isRoundComplete = isBettingRoundComplete(this.gameState.bettingRound.round, this.gameState.players)
       const playersWithRemaingCall = getPlayersWithRemainingCall(this.gameState.bettingRound.currentBet, this.gameState.players)
@@ -207,7 +207,6 @@ class PartyServer {
   }
 
   handlePlayerAction(playerId, action, amount) {
-    console.log("Handling player action:", action, "Amount:", amount);
     const player = this.gameState.players.find(p => p.playerId === playerId);
 
     // Check if it's this player's turn
@@ -215,8 +214,10 @@ class PartyServer {
       !player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) &&
       ['reset_game', 'next_hand'].indexOf(action) == -1
     ) {
-      console.log("Not player's turn or player not found:", playerId);
-      return; // It's not this player's turn or player not found
+      if (process.env.NODE_ENV !== 'production') {
+        console.log("Not player's turn or player not found:", playerId);
+        return; // It's not this player's turn or player not found
+      }
     }
 
     // Validate the action
@@ -325,36 +326,6 @@ class PartyServer {
     this.broadcastGameState();
   }
 
-  getHandDetails(hand) {
-    const order = "23456789TJQKA";
-    const cards = hand.map(card => card[0] + card.slice(-1));  // Normalize cards to be in the format "5H", "TD", etc.
-    const faces = cards.map(a => String.fromCharCode([77 - order.indexOf(a[0])])).sort();
-    const suits = cards.map(a => a[1]).sort();
-    const counts = faces.reduce((count, a) => {
-      count[a] = (count[a] || 0) + 1;
-      return count;
-    }, {});
-    const duplicates = Object.values(counts).reduce((count, a) => {
-      count[a] = (count[a] || 0) + 1;
-      return count;
-    }, {});
-    const flush = suits[0] === suits[4];
-    const first = faces[0].charCodeAt(0);
-    const straight = faces.every((f, index) => f.charCodeAt(0) - first === index);
-    let rank =
-      (flush && straight && 1) ||
-      (duplicates[4] && 2) ||
-      (duplicates[3] && duplicates[2] && 3) ||
-      (flush && 4) ||
-      (straight && 5) ||
-      (duplicates[3] && 6) ||
-      (duplicates[2] > 1 && 7) ||
-      (duplicates[2] && 8) ||
-      9;
-
-    return { rank, value: faces.sort((a, b) => b.charCodeAt(0) - a.charCodeAt(0)).join("") };
-  }
-
   startGame(handNumber = 1) {
     this.gameState.communityCards = []
     this.gameState.winner = null
@@ -412,9 +383,6 @@ class PartyServer {
   getActivePlayers() {
     return this.gameState.players.filter(p => p.status === 'active')
   }
-
-  getPlayerHands() {
-
-  }
 }
+
 export default PartyServer;
