@@ -167,6 +167,7 @@ class PartyServer {
           this.findWinner()
         } else {
           this.gameState.bettingRound.round += 1
+          this.gameState.bettingRound.currentBet = 0
           this.dealCommunityCards()
           this.changeTurn(0); // Move to the next player
         }
@@ -248,7 +249,7 @@ class PartyServer {
         this.checkRoundCompleted()
         break;
       case 'check':
-        if (this.gameState.bettingRound.currentBet !== player.currentBet) {
+        if (this.gameState.bettingRound.currentBet > player.currentBet) {
           console.log("Cannot check, current bet is higher than player's bet:", this.gameState.bettingRound.currentBet, "player's bet:", player.currentBet);
           return; // Cannot check because there is an outstanding bet
         } else {
