@@ -51,6 +51,10 @@ const GameControls = {
           } else {
             alert(`Invalid raise amount. You must raise at least $${minRaiseAmount}.`);
           }
+        },
+        style: {
+          opacity: currentPlayer.stackSize >= minRaiseAmount ? 1 : 0.5,
+          pointerEvents: currentPlayer.stackSize >= minRaiseAmount ? 'auto' : 'none',
         }
       }, "Raise"),
       m("button", {
