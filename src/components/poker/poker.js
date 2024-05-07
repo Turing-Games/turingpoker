@@ -166,14 +166,17 @@ export default {
               ]),
             ]) :
             m("div", { style: { height: 100, width: '100%' } }),
-          this.gameState.winner.length &&
-          m('div.winner-modal', {},
-            m("div", "Winner!"),
-            m("div", {
-              onclick: () => {
-
-              }
-            }, "Next hand")
+          gameState.gameData.winner?.name &&
+          m('div.tg-poker__winner',
+            m("div", [
+              m("div", { stlye: { marginBottom: '24px' } }, `Player #${gameState?.gameData.winner?.id} won with ${gameState?.gameData.winner?.name}`),
+              m("button", {
+                onclick: () => {
+                  gameState.sendAction('next_hand')
+                }
+              }, "Next hand")
+            ]
+            ),
           )
         ]);
     } else {
