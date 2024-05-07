@@ -8,6 +8,16 @@
   }
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0)
+  }
+
+  100% {
+    transform: rotate(360deg)
+  }
+}
+
 body {
   background-image: url("../images/felt.jpg");
   color: rgb(92, 193, 51);
@@ -141,4 +151,9 @@ body {
   border-radius: 8px;
   padding: 16px;
   color: #000;
+}
+
+.tg-poker__card-loader>img {
+  animation: spin 2s linear infinite;
+  width: 50px;
 }

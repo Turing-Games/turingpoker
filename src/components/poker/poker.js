@@ -1,4 +1,5 @@
 import card from "../card";
+import loader from "../loader";
 import player from "./player";
 import m from "mithril";
 
@@ -180,7 +181,7 @@ export default {
           )
         ]);
     } else {
-      return m("p", "Waiting for players to join...");
+      return m("div")
     }
   }
 };

@@ -66,7 +66,8 @@ const App = {
       m.fragment([
         // header
         m(header, {
-          gameType: gameState?.gameData?.gameType
+          gameType: gameState?.gameData?.gameType,
+          players: gameState?.gameData?.players
         }),
         m(poker, { gameState })
       ])
