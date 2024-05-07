@@ -131,6 +131,11 @@ class PartyServer {
       name: winningHand
     }
 
+    this.allocateWinnings()
+    this.broadcastGameState(); // Update all clients with the new state
+  }
+
+  allocateWinnings() {
     // allocate winnings
     this.gameState.players = this.gameState.players
       .map((p) => {
@@ -140,8 +145,6 @@ class PartyServer {
         }
       })
       .filter(p => p.stackSize > 0)
-
-    this.broadcastGameState(); // Update all clients with the new state
   }
 
   checkRoundCompleted() {
