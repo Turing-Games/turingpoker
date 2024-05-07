@@ -210,14 +210,12 @@ class PartyServer {
     const player = this.gameState.players.find(p => p.playerId === playerId);
 
     // Check if it's this player's turn
-    if ((
-      !player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) &&
+    if (
+      (!player || playerId !== this.gameState.players[this.gameState.currentPlayer].playerId) &&
       ['reset_game', 'next_hand'].indexOf(action) == -1
     ) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log("Not player's turn or player not found:", playerId);
-        return; // It's not this player's turn or player not found
-      }
+      console.log("Not player's turn or player not found:", playerId);
+      return; // It's not this player's turn or player not found
     }
 
     // Validate the action
