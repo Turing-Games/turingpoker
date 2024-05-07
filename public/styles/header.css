@@ -3,7 +3,8 @@
   border: 6px solid #000;
   display: flex;
   justify-content: center;
-  margin: 20px 20px 0px 20px;
+  margin: auto;
+  width: 500px;
   padding: 8px 12px;
   position: relative;
   text-align: center;
@@ -37,14 +38,14 @@
   color: rgb(92, 193, 51);
 }
 
-.tg-header__squares {
+/* .tg-header__squares {
   background: #A8B3B0;
   height: 6px;
   position: absolute;
   width: 6px;
-}
+} */
 
-.tg-header__squares--0 {
+/* .tg-header__squares--0 {
   left: -6px;
   top: -6px;
 }
@@ -62,4 +63,4 @@
 .tg-header__squares--3 {
   right: -6px;
   bottom: -6px;
-}
+} */
