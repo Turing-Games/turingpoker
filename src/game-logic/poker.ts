@@ -1,6 +1,26 @@
+import combinations from "@tg/utils/combinations";
+
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
 export type Card = { rank: Rank, suit: Suit };
+export function parseCard(card: string): Card {
+    const rank = card[0];
+    const suit = card[1];
+
+    let rankNum: Rank = 1;
+    if (rank == 'A') rankNum = 1;
+    else if (rank == 'T') rankNum = 10;
+    else if (rank == 'J') rankNum = 11;
+    else if (rank == 'Q') rankNum = 12;
+    else if (rank == 'K') rankNum = 13;
+    else rankNum = parseInt(rank) as Rank;
+
+    let suitName: Suit = 'hearts';
+    if (suit == 'c') suitName = 'clubs';
+    else if (suit == 'd') suitName = 'diamonds';
+    else if (suit == 's') suitName = 'spades';
+    return { rank: rankNum, suit: suitName };
+}
 export type Action = {
     type: 'raise'
     amount: number
@@ -18,6 +38,7 @@ export interface IPokerPlayer {
     folded: boolean;
     currentBet: number;
     lastRound: PokerRound | null;
+    potShare: number;
 }
 
 export interface IPokerConfig {
@@ -85,7 +106,7 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
     const out: IPokerGame = {
         state: {
             pot: 0,
-            players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0 })),
+            players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0, potShare: 0 })),
             round: 'pre-flop',
             deck,
             targetBet: config.bigBlind,
@@ -96,10 +117,10 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
         config,
         hands
     }
-    out.state.players[(config.dealerPosition + 1) % players.length].currentBet = 
-        Math.min(config.smallBlind, stacks[(config.dealerPosition + 1) % players.length]);
-    out.state.players[(config.dealerPosition + 2) % players.length].currentBet = 
-        Math.min(config.bigBlind, stacks[(config.dealerPosition + 2) % players.length]);
+    const sb = (config.dealerPosition + 1) % players.length;
+    const bb = (config.dealerPosition + 2) % players.length;
+    out.state.players[sb].currentBet = Math.min(config.smallBlind, stacks[sb]);
+    out.state.players[bb].currentBet = Math.min(config.bigBlind, stacks[bb]);
     return out;
 }
 
@@ -113,7 +134,10 @@ export function whoseTurn(state: IPokerSharedState): { whoseTurn: PlayerID | nul
     const log: string[] = [];
     if (state.round == 'showdown') {
         log.push('Round is over');
-        return null;
+        return {
+            whoseTurn: null,
+            log
+        };
     }
 
     let start = (state.dealerPosition + 1) % state.players.length;
@@ -123,20 +147,24 @@ export function whoseTurn(state: IPokerSharedState): { whoseTurn: PlayerID | nul
         // Use offset from the dealer to find the player whose turn it is
         const player = state.players[(start + i) % state.players.length];
         if (player.folded) {
-            log.push(`Skipping because ${player.id} has folded`);
+            log.push(`Skipping ${player.id}'s turn because they folded`);
             continue;
         }
+        // If a player is all in we still allow them to move, but they can't raise
         if (player.stack == player.currentBet) {
-            log.push(`Skipping because ${player.id} is all in`);
-            continue;
+            log.push(`${player.id} is all in, but not skipping their turn`);
+            //continue;
         }
         if (player.currentBet == state.targetBet && player.lastRound == state.round) {
-            log.push(`Skipping because ${player.id} has already called`);
+            log.push(`Skipping ${player.id}'s turn because they already called`);
             continue;
         }
         return { whoseTurn: player.id, log };
     }
-    return { };
+    return {
+      whoseTurn: null,
+      log,
+    };
 }
 
 /**
@@ -152,7 +180,8 @@ export function whoseTurn(state: IPokerSharedState): { whoseTurn: PlayerID | nul
  * @param state Poker game state. The current round must be 'showdown'
  * @param hands 
  */
-export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): Record<PlayerID, number> {
+export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): { payouts: Record<PlayerID, number>, log: GameLog } {
+    
 }
 
 /**
@@ -161,5 +190,88 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
  * @param move The move to make
  * @returns The new state after the move
  */
-export function step(state: IPokerSharedState, move: Action): IPokerSharedState {
+//export function step(state: IPokerSharedState, move: Action): IPokerSharedState {
+//}
+
+function lexicoCompare(a: number[], b: number[]): number {
+    for (let i = 0; i < a.length; i++) {
+        if (a[i] < b[i]) return -1;
+        if (a[i] > b[i]) return 1;
+    }
+    return 0;
+}
+
+export type Hand = [Card, Card, Card, Card, Card];
+type HandVal = {
+    handRank: number;
+    counts: number[];
+    vals: number[];
+}
+
+function handVal(cards: Hand): HandVal {
+    const hist: [number, number][] = [];
+    for (let i = 0; i <= 14; i++) {
+        hist.push([0, i]);
+    }
+    for (const card of cards) {
+        if (card.rank == 1) hist[14][0]++;
+        else hist[card.rank][0]++;
+    }
+    // reverse sort by count, then by value
+    hist.sort((a, b) => -lexicoCompare(a,b));
+    let counts: number[] = [], vals: number[] = [];
+    for (const [count, val] of hist) {
+        if (count == 0) break;
+        counts.push(count);
+        vals.push(val);
+    }
+
+    // Check for flush
+    const flushSuit = cards[0].suit;
+    const isFlush = cards.every(card => card.suit == flushSuit);
+    // Check for straight
+    let isStraight = false;
+    if (counts.length >= 5) {
+        // vals are in decreasing order
+        isStraight = vals[0] - vals[4] == 4;
+    }
+    // Check for low straight
+    if (counts.length == 5 && vals[0] == 14 && vals[1] == 5) {
+        isStraight = true;
+        vals = [5, 4, 3, 2, 1];
+    }
+
+    // straight flush is highest
+    if (isStraight && isFlush) {
+        return { handRank: 4, counts, vals };
+    }
+    // full house/quad is next
+    if (counts[0] + counts[1] == 5) {
+        return { handRank: 3, counts, vals };
+    }
+    if (isFlush) {
+        return { handRank: 2, counts, vals };
+    }
+    if (isStraight) {
+        return { handRank: 1, counts, vals };
+    }
+    // three/two pair/pair/high is next
+    return { handRank: 0, counts, vals };
+}
+
+export function handCmp(a: Hand, b: Hand): number {
+    const valA = handVal(a), valB = handVal(b);
+    if (valA.handRank != valB.handRank) return valA.handRank - valB.handRank;
+    return lexicoCompare(valA.counts, valB.counts) || lexicoCompare(valA.vals, valB.vals);
+}
+
+export function best5(cards: Card[]): Hand {
+    if (cards.length < 5) throw new Error("Not enough cards to make a hand");
+    let best: Hand = cards.slice(0, 5) as Hand;
+    for (const comb of combinations(cards, 5)) {
+        if (handCmp(comb, best) > 0) {
+            best = comb;
+        }
+    }
+    return best;
 }
