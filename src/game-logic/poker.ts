@@ -38,7 +38,6 @@ export interface IPokerPlayer {
     folded: boolean;
     currentBet: number;
     lastRound: PokerRound | null;
-    potShare: number;
 }
 
 export interface IPokerConfig {
@@ -60,6 +59,7 @@ export interface IPokerSharedState {
     // small blind is (dealerPosition+2)%players.length
     round: PokerRound;
     deck: Card[];
+    done: boolean;
 }
 
 export interface IPokerGame {
@@ -105,8 +105,9 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
 
     const out: IPokerGame = {
         state: {
+            done: false,
             pot: 0,
-            players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0, potShare: 0 })),
+            players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0 })),
             round: 'pre-flop',
             deck,
             targetBet: config.bigBlind,
@@ -130,12 +131,12 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
  * @param state Poker game state
  * @returns the id of the player who has the next turn, or null if the round is over, and any new lines that should be added to a log
  */
-export function whoseTurn(state: IPokerSharedState): { whoseTurn: PlayerID | null, log: GameLog } {
+export function whoseTurn(state: IPokerSharedState): { who: PlayerID | null, log: GameLog } {
     const log: string[] = [];
     if (state.round == 'showdown') {
         log.push('Round is over');
         return {
-            whoseTurn: null,
+            who: null,
             log
         };
     }
@@ -159,10 +160,10 @@ export function whoseTurn(state: IPokerSharedState): { whoseTurn: PlayerID | nul
             log.push(`Skipping ${player.id}'s turn because they already called`);
             continue;
         }
-        return { whoseTurn: player.id, log };
+        return { who: player.id, log };
     }
     return {
-      whoseTurn: null,
+      who: null,
       log,
     };
 }
@@ -179,9 +180,69 @@ export function whoseTurn(state: IPokerSharedState): { whoseTurn: PlayerID | nul
  * chips equal to their stack size to each member of the group, and then remove them.
  * @param state Poker game state. The current round must be 'showdown'
  * @param hands 
+ * @returns A record of player ids to the number of chips they won, and any new lines that should be added to a log. Payouts will be null if the game is not over.
  */
-export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): { payouts: Record<PlayerID, number>, log: GameLog } {
-    
+export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): { 
+    payouts: Record<PlayerID, number> | null, 
+    log: GameLog 
+} {
+    if (state.round == 'showdown') {
+        const out: Record<PlayerID, number> = {};
+        const players = [...state.players];
+        const bestHands: Record<PlayerID, Hand> = {};
+        for (const player of players) {
+            out[player.id] = 0;
+            bestHands[player.id] = best5(hands[player.id].concat(state.deck));
+        }
+        players.sort((a, b) => handCmp(bestHands[a.id], bestHands[b.id]));
+
+        const groups: IPokerPlayer[][] = [];
+        for (let i = 0; i < players.length; i++) {
+            if (i == 0 || handCmp(bestHands[players[i].id], bestHands[players[i - 1].id]) != 0) {
+                groups.push([]);
+            }
+            groups[groups.length - 1].push(players[i]);
+        }
+
+        const potShare: Record<PlayerID, number> = {};
+        for (const player of players) {
+            potShare[player.id] = 0;
+            for (const p of state.players) {
+                potShare[player.id] += Math.min(player.currentBet, p.currentBet);
+            }
+        }
+
+        let pot = state.pot;
+        groups.reverse();
+        for (const group of groups) {
+            group.sort((a, b) => a.stack - b.stack);
+            for (let i = 0; i < group.length; i++) {
+                const amount = Math.min(potShare[group[i].id], pot/(group.length - i));
+                for (let j = i; j < group.length; j++) {
+                    out[group[j].id] += amount;
+                    potShare[group[j].id] -= amount;
+                    pot -= amount;
+                }
+            }
+        }
+
+        return {
+            payouts: out,
+            log: []
+        }
+    }
+    else {
+        // check if all players except for one have folded
+        const remainingPlayers = state.players.filter(p => !p.folded);
+        if (remainingPlayers.length == 1) {
+            const payouts: Record<PlayerID, number> = {};
+            payouts[remainingPlayers[0].id] = state.pot;
+            return { payouts, log: [
+                `${remainingPlayers[0].id} wins the pot because all others folded`
+            ] };
+        }
+    }
+    return { payouts: null, log: [] };
 }
 
 /**
@@ -190,8 +251,64 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
  * @param move The move to make
  * @returns The new state after the move
  */
-//export function step(state: IPokerSharedState, move: Action): IPokerSharedState {
-//}
+export function step(state: IPokerSharedState, move: Action): { nextState: IPokerSharedState, log: GameLog } {
+    let { who, log } = whoseTurn(state);
+    if (who == null && state.round != 'showdown') {
+        // move the round forward
+        if (state.round == 'pre-flop') state.round = 'flop';
+        else if (state.round == 'flop') state.round = 'turn';
+        else if (state.round == 'turn') state.round = 'river';
+        else if (state.round == 'river') {
+            state.round = 'showdown';
+            state.done = true;
+        }
+        log.push(`Moving to ${state.round}`);
+
+        // Find whose turn it is now
+        const { who: who2, log: log2 } = whoseTurn(state);
+        log.push(...log2)
+        who = who2;
+    }
+    if (state.round == 'showdown') {
+        log.push(`Game is over`);
+        return { nextState: state, log };
+    }
+    
+    const player = state.players.find(p => p.id == who);
+    if (player == undefined) {
+        log.push(`Player ${who} not found`);
+        return { nextState: state, log };
+    }
+    if (move.type == 'fold') {
+        player.folded = true;
+        log.push(`Player ${who} folded`);
+
+        // set done to true if all players except one have folded
+        const remainingPlayers = state.players.filter(p => !p.folded);
+        if (remainingPlayers.length == 1) {
+            state.done = true;
+        }
+        return { nextState: state, log };
+    }
+    else if (move.type == 'call' || move.type == 'raise') {
+        let target = state.targetBet;
+        if (move.type == 'raise') {
+            target += move.amount;
+            state.targetBet = target;
+            log.push(`Player ${who} raised ${move.amount}`);
+        }
+        else {
+            log.push(`Player ${who} called ${state.targetBet - player.currentBet}`);
+        }
+
+        const toCall = state.targetBet - player.currentBet;
+        const amount = Math.min(toCall, player.stack);
+        player.stack -= amount;
+        player.currentBet += amount;
+        state.pot += amount;
+        return { nextState: state, log };
+    }
+}
 
 function lexicoCompare(a: number[], b: number[]): number {
     for (let i = 0; i < a.length; i++) {
