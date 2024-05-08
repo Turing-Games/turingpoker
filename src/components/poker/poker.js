@@ -51,6 +51,10 @@ const GameControls = {
           } else {
             alert(`Invalid raise amount. You must raise at least $${minRaiseAmount}.`);
           }
+        },
+        style: {
+          opacity: currentPlayer.stackSize >= minRaiseAmount ? 1 : 0.5,
+          pointerEvents: currentPlayer.stackSize >= minRaiseAmount ? 'auto' : 'none',
         }
       }, "Raise"),
       m("button", {
@@ -169,15 +173,11 @@ export default {
             m("div", { style: { height: 100, width: '100%' } }),
           gameState.gameData.winner?.name &&
           m('div.tg-poker__winner',
-            m("div", [
-              m("div", { stlye: { marginBottom: '24px' } }, `Player #${gameState?.gameData.winner?.id} won with ${gameState?.gameData.winner?.name}`),
-              m("button", {
-                onclick: () => {
-                  gameState.sendAction('next_hand')
-                }
-              }, "Next hand")
-            ]
-            ),
+            m("div", {
+              stlye: {
+                marginBottom: '24px'
+              }
+            }, `Player #${gameState?.gameData.winner?.id} won with ${gameState?.gameData.winner?.name}`),
           )
         ]);
     } else {
