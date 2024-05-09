@@ -39,6 +39,18 @@ export type Action = {
     type: 'fold' | 'call'
 }
 
+export function isAction(action: unknown): action is Action {
+    if (typeof action != 'object' || action == null) return false;
+    if (!('type' in action)) return false;
+    if (typeof action['type'] != 'string') return false;
+    if (action['type'] == 'raise') {
+        if (!('amount' in action)) return false;
+        if (typeof action['amount'] != 'number') return false;
+    }
+    return true;
+
+}
+
 export type PokerRound = 'pre-flop' | 'flop' | 'turn' | 'river' | 'showdown';
 
 export type PlayerID = string;
