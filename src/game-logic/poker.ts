@@ -170,7 +170,7 @@ export function whoseTurn(state: IPokerSharedState): { who: PlayerID | null, log
     for (let i = 0; i < state.players.length; i++) {
         // Use offset from the dealer to find the player whose turn it is
         const player = state.players[(start + i) % state.players.length];
-        if (player.folded) {
+        if (player?.folded) {
             log.push(`Skipping ${player.id}'s turn because they folded`);
             continue;
         }
@@ -186,8 +186,8 @@ export function whoseTurn(state: IPokerSharedState): { who: PlayerID | null, log
         return { who: player.id, log };
     }
     return {
-      who: null,
-      log,
+        who: null,
+        log,
     };
 }
 
@@ -205,9 +205,9 @@ export function whoseTurn(state: IPokerSharedState): { who: PlayerID | null, log
  * @param hands 
  * @returns A record of player ids to the number of chips they won, and any new lines that should be added to a log. Payouts will be null if the game is not over.
  */
-export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): { 
-    payouts: Record<PlayerID, number> | null, 
-    log: GameLog 
+export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): {
+    payouts: Record<PlayerID, number> | null,
+    log: GameLog
 } {
     if (state.round == 'showdown') {
         const out: Record<PlayerID, number> = {};
@@ -240,7 +240,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
         for (const group of groups) {
             group.sort((a, b) => a.stack - b.stack);
             for (let i = 0; i < group.length; i++) {
-                const amount = Math.min(potShare[group[i].id], pot/(group.length - i));
+                const amount = Math.min(potShare[group[i].id], pot / (group.length - i));
                 for (let j = i; j < group.length; j++) {
                     out[group[j].id] += amount;
                     potShare[group[j].id] -= amount;
@@ -256,13 +256,15 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
     }
     else {
         // check if all players except for one have folded
-        const remainingPlayers = state.players.filter(p => !p.folded);
+        const remainingPlayers = state.players.filter(p => !p?.folded);
         if (remainingPlayers.length == 1) {
             const payouts: Record<PlayerID, number> = {};
             payouts[remainingPlayers[0].id] = state.pot;
-            return { payouts, log: [
-                `${remainingPlayers[0].id} wins the pot because all others folded`
-            ] };
+            return {
+                payouts, log: [
+                    `${remainingPlayers[0].id} wins the pot because all others folded`
+                ]
+            };
         }
     }
     return { payouts: null, log: [] };
@@ -278,7 +280,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
  */
 export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: GameLog } {
     if (game.state.done) throw new Error("Game is over");
-    const {state, config, hands, deck} = game;
+    const { state, config, hands, deck } = game;
     let { who, log } = whoseTurn(state);
     let out: { next: IPokerGame, log: GameLog };
 
@@ -292,7 +294,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         log.push(`Player ${who} folded`);
 
         // set done to true if all players except one have folded
-        const remainingPlayers = state.players.filter(p => !p.folded);
+        const remainingPlayers = state.players.filter(p => !p?.folded);
         if (remainingPlayers.length == 1) {
             state.done = true;
         }
@@ -322,7 +324,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
 
     let roundOver = true;
     for (const player of state.players) {
-        if (!player.folded && (player.currentBet != state.targetBet || player.lastRound != state.round)) {
+        if (!player?.folded && (player.currentBet != state.targetBet || player.lastRound != state.round)) {
             roundOver = false;
             break;
         }
@@ -347,7 +349,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         }
         log.push(`Moving to ${state.round}`);
     }
-    
+
     return out;
 }
 
@@ -376,7 +378,7 @@ function handVal(cards: Hand): HandVal {
         else hist[card.rank][0]++;
     }
     // reverse sort by count, then by value
-    hist.sort((a, b) => -lexicoCompare(a,b));
+    hist.sort((a, b) => -lexicoCompare(a, b));
     let counts: number[] = [], vals: number[] = [];
     for (const [count, val] of hist) {
         if (count == 0) break;

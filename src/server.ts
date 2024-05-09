@@ -60,7 +60,12 @@ export default class PartyServer implements Party.Server {
     const playerIndex = this.players.findIndex(player => player.playerId === conn.id);
     if (playerIndex !== -1) {
       // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
-      this.gameState.state.players.find(player => player.id === conn.id).folded = true;
+      this.gameState.state.players.map((player) => {
+        return {
+          ...player,
+          folded: player.id === conn.id
+        }
+      })
       this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== conn.id);
       this.players = this.players.filter(player => player.playerId !== conn.id);
       this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== conn.id);
@@ -135,7 +140,7 @@ export default class PartyServer implements Party.Server {
       return;
     }
 
-    const {who, log} = Poker.whoseTurn(this.gameState.state);
+    const { who, log } = Poker.whoseTurn(this.gameState.state);
     if (who !== playerId) {
       console.log("Player attempted to make action out of turn", playerId);
       return;
@@ -146,21 +151,21 @@ export default class PartyServer implements Party.Server {
       this.endGame();
     }
     this.broadcastGameState();
-  }  
+  }
 
   startGame() {
     this.inGamePlayers = this.inGamePlayers.concat(this.queuedPlayers);
     this.queuedPlayers = [];
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
-    
+
     this.room.broadcast("The game has started!");
     this.broadcastGameState();
   }
 
   endGame() {
     // if game isn't done then give everyone back their bets
-    
+
 
   }
 
