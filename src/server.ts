@@ -1,35 +1,32 @@
+import type * as Party from 'partykit/server';
+import * as Poker from '@tg/game-logic/poker'
 import { getPlayersWithRemainingCall, isBettingRoundComplete } from './utils/poker_utilties';
 
 const Hand = require('pokersolver').Hand;
 
-class PartyServer {
-  constructor(room) {
+export interface IPlayer {
+  playerId: string;
+  status: 'spectating' | 'waiting' | 'ready';
+}
+
+export interface IPartyServerState {
+  gamePhase: 'pending' | 'active'
+}
+
+export default class PartyServer implements Party.Server {
+  public gameState: Poker.IPokerGame | null = null;
+  public gameConfig: Poker.IPokerConfig = {
+    dealerPosition: 0,
+    maxPlayers: 8,
+    bigBlind: 100,
+    smallBlind: 50,
+  };
+  public players: IPlayer[] = [];
+  public serverState: IPartyServerState = {
+    gamePhase: 'pending'
+  };
+  constructor(public readonly room: Party.Room) {
     this.room = room;
-    this.usedCards = new Set();
-    this.suits = ['h', 'd', 'c', 's'];
-    this.ranks = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];
-    this.gameState = {
-      handNumber: 1,
-      gameType: "Texas Hold'em",
-      maxPlayers: 8,
-      bigBlind: 100,
-      smallBlind: 50,
-      dealerPosition: 0,
-      currentPlayer: -1,
-      gamePhase: "pending",
-      communityCards: [],
-      potTotal: 0,
-      bettingRound: {
-        currentBet: 0,
-        totalBets: [],
-        round: 1
-      },
-      lastAction: {},
-      players: [],
-      spectators: [],
-      isLastRound: false,
-      winner: null
-    };
     // this.startBroadcastingGameState();
   }
 
@@ -37,28 +34,20 @@ class PartyServer {
     if (process.env.NODE_ENV !== 'production') {
       console.log("client connected")
     }
-    if (this.gameState.gamePhase === "active" || this.gameState.players.length >= this.gameState.maxPlayers) {
+    if (this.serverState.gamePhase === "active" || this.players.length >= this.gameConfig.maxPlayers) {
       // Add as a spectator if the game is active or player slots are full
-      this.gameState.spectators.push({
+      this.players.push({
         playerId: conn.id,
         status: "spectating"
       });
       conn.send("You are now spectating the game.");
     } else {
       // Add as a player if slots are available and game is not active
-      const newPlayer = {
+      this.players.push({
         playerId: conn.id,
-        stackSize: 5000,
-        currentBet: 0,
-        status: "waiting",
-        cards: [],
-        completedRound: 0
-      };
-      this.gameState.players.push(newPlayer);
+        status: 'waiting'
+      });
       conn.send("Welcome to the game!");
-      if (this.gameState.players.length >= 2 && this.gameState.gamePhase === "pending") {
-        this.startGame();
-      }
     }
     this.broadcastGameState(conn.id);
   }
@@ -382,5 +371,3 @@ class PartyServer {
     return this.gameState.players.filter(p => p.status === 'active')
   }
 }
-
-export default PartyServer;
