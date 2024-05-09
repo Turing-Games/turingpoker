@@ -1,6 +1,5 @@
 import type * as Party from 'partykit/server';
 import * as Poker from '@tg/game-logic/poker'
-import { getPlayersWithRemainingCall, isBettingRoundComplete } from './utils/poker_utilties';
 import { ClientMessage, ServerStateMessage } from './shared';
 
 const Hand = require('pokersolver').Hand;
@@ -39,7 +38,7 @@ export default class PartyServer implements Party.Server {
   }
 
   // Start as soon as two players are in
-  onConnect(conn, ctx) {
+  onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
     if (process.env.NODE_ENV !== 'production') {
       console.log("client connected")
     }
@@ -53,16 +52,16 @@ export default class PartyServer implements Party.Server {
         playerId: conn.id,
       });
     }
-    this.broadcastGameState(conn.id);
+    this.broadcastGameState();
   }
 
 
-  onClose(conn) {
+  onClose(conn: Party.Connection) {
     // Attempt to remove from players list first
     const playerIndex = this.players.findIndex(player => player.playerId === conn.id);
     if (playerIndex !== -1) {
       // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
-      this.gameState.state.players.map((player) => {
+      this.gameState?.state?.players?.map?.((player) => {
         return {
           ...player,
           folded: player.id === conn.id
@@ -80,13 +79,16 @@ export default class PartyServer implements Party.Server {
     this.broadcastGameState();
   }
 
-  onMessage(message, websocket) {
+  onMessage(message: string, websocket: Party.Connection): void {
     try {
-      let data: ClientMessage = message;
+      let data: ClientMessage;
 
       if (typeof message === 'string') {  // Check if the message is string to parse it
         data = JSON.parse(message);
         console.log("Parsed string: ", data);
+      }
+      else {
+        throw new Error("Invalid message type");
       }
       console.log("Action data: ", data);
 
@@ -144,6 +146,10 @@ export default class PartyServer implements Party.Server {
       console.log("Player attempted to make action while not in game", playerId);
       return;
     }
+    if (!this.gameState) {
+      console.log("Player attempted to make action while game is not active", playerId);
+      return;
+    }
 
     const { who, log } = Poker.whoseTurn(this.gameState.state);
     if (who !== playerId) {
@@ -169,13 +175,16 @@ export default class PartyServer implements Party.Server {
   }
 
   endGame() {
+    if (!this.gameState) {
+      return;
+    }
     const payouts = Poker.payout(this.gameState.state, this.gameState.hands).payouts;
     for (const playerId in payouts) {
-      this.stacks[playerId] = this.gameState.state.players.find(player => player.id == playerId).stack + payouts[playerId];
+      this.stacks[playerId] = (this.gameState.state.players.find(player => player.id == playerId)?.stack ?? 0) + payouts[playerId];
     }
   }
 
-  broadcastGameState(newConnectionId = null) {
+  broadcastGameState() {
     for (const player of this.players) {
       const message: ServerStateMessage = {
         gameState: this.gameState?.state ?? null,
