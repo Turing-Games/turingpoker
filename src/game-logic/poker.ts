@@ -21,6 +21,17 @@ export function parseCard(card: string): Card {
     else if (suit == 's') suitName = 'spades';
     return { rank: rankNum, suit: suitName };
 }
+export function formatCard(card: Card): string {
+    let rank: string = '';
+    if (card.rank == 1) rank = 'A';
+    else if (card.rank == 10) rank = 'T';
+    else if (card.rank == 11) rank = 'J';
+    else if (card.rank == 12) rank = 'Q';
+    else if (card.rank == 13) rank = 'K';
+    else rank = card.rank.toString();
+    let suit: string = card.suit[0];
+    return rank + suit;
+}
 export type Action = {
     type: 'raise'
     amount: number
@@ -53,19 +64,20 @@ export interface IPokerSharedState {
     bigBlind: number;
     pot: number;
     targetBet: number;
-    // counterclockwise order
+    // clockwise order
     players: IPokerPlayer[];
-    // so big blind is (dealerPosition+1)%players.length
-    // small blind is (dealerPosition+2)%players.length
+    // so big blind is (dealerPosition-1)%players.length
+    // small blind is (dealerPosition-2)%players.length
     round: PokerRound;
-    deck: Card[];
     done: boolean;
+    cards: Card[];
 }
 
 export interface IPokerGame {
     state: IPokerSharedState;
     config: IPokerConfig;
     hands: Record<PlayerID, [Card, Card]>;
+    deck: Card[];
 }
 
 export type GameLog = string[];
@@ -94,6 +106,7 @@ function dealHands(players: PlayerID[], deck: Card[]): Record<PlayerID, [Card, C
 }
 
 export function createPokerGame(config: IPokerConfig, players: PlayerID[], stacks: number[]): IPokerGame {
+    if (players.length != stacks.length) throw new Error("Number of players and stacks must be equal")
     const deck = shuffleDeck(createDeck());
     const hands = dealHands(players, deck);
     const playerCompletedRound: Record<PlayerID, PokerRound> = {};
@@ -109,19 +122,24 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
             pot: 0,
             players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0 })),
             round: 'pre-flop',
-            deck,
             targetBet: config.bigBlind,
             dealerPosition: config.dealerPosition,
             smallBlind: config.smallBlind,
-            bigBlind: config.bigBlind
+            bigBlind: config.bigBlind,
+            cards: []
         },
+        deck,
         config,
         hands
     }
-    const sb = (config.dealerPosition + 1) % players.length;
-    const bb = (config.dealerPosition + 2) % players.length;
+    const sb = (config.dealerPosition - 1 + players.length) % players.length;
+    const bb = (config.dealerPosition - 2 + players.length) % players.length;
     out.state.players[sb].currentBet = Math.min(config.smallBlind, stacks[sb]);
+    out.state.players[sb].stack -= out.state.players[sb].currentBet;
     out.state.players[bb].currentBet = Math.min(config.bigBlind, stacks[bb]);
+    out.state.players[bb].stack -= out.state.players[bb].currentBet;
+    out.state.pot = config.smallBlind + config.bigBlind;
+
     return out;
 }
 
@@ -141,8 +159,7 @@ export function whoseTurn(state: IPokerSharedState): { who: PlayerID | null, log
         };
     }
 
-    let start = (state.dealerPosition + 1) % state.players.length;
-    if (state.round === 'pre-flop') start = (start + 1) % state.players.length;
+    let start = (state.dealerPosition - 1 + state.players.length) % state.players.length;
 
     for (let i = 0; i < state.players.length; i++) {
         // Use offset from the dealer to find the player whose turn it is
@@ -152,7 +169,7 @@ export function whoseTurn(state: IPokerSharedState): { who: PlayerID | null, log
             continue;
         }
         // If a player is all in we still allow them to move, but they can't raise
-        if (player.stack == player.currentBet) {
+        if (player.stack == 0) {
             log.push(`${player.id} is all in, but not skipping their turn`);
             //continue;
         }
@@ -192,7 +209,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
         const bestHands: Record<PlayerID, Hand> = {};
         for (const player of players) {
             out[player.id] = 0;
-            bestHands[player.id] = best5(hands[player.id].concat(state.deck));
+            bestHands[player.id] = best5(hands[player.id].concat(state.cards));
         }
         players.sort((a, b) => handCmp(bestHands[a.id], bestHands[b.id]));
 
@@ -249,35 +266,20 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
  * Make a move for the player whose id is given by @see whoseTurn. If the move is invalid, return the state unchanged.
  * @param state Poker game state
  * @param move The move to make
+ * @throws If the move is a raise and the amount is negative
+ * @throws If the game is over
  * @returns The new state after the move
  */
-export function step(state: IPokerSharedState, move: Action): { nextState: IPokerSharedState, log: GameLog } {
+export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: GameLog } {
+    if (game.state.done) throw new Error("Game is over");
+    const {state, config, hands, deck} = game;
     let { who, log } = whoseTurn(state);
-    if (who == null && state.round != 'showdown') {
-        // move the round forward
-        if (state.round == 'pre-flop') state.round = 'flop';
-        else if (state.round == 'flop') state.round = 'turn';
-        else if (state.round == 'turn') state.round = 'river';
-        else if (state.round == 'river') {
-            state.round = 'showdown';
-            state.done = true;
-        }
-        log.push(`Moving to ${state.round}`);
+    let out: { next: IPokerGame, log: GameLog };
 
-        // Find whose turn it is now
-        const { who: who2, log: log2 } = whoseTurn(state);
-        log.push(...log2)
-        who = who2;
-    }
-    if (state.round == 'showdown') {
-        log.push(`Game is over`);
-        return { nextState: state, log };
-    }
-    
     const player = state.players.find(p => p.id == who);
     if (player == undefined) {
         log.push(`Player ${who} not found`);
-        return { nextState: state, log };
+        return { next: { state, config, hands, deck }, log };
     }
     if (move.type == 'fold') {
         player.folded = true;
@@ -288,11 +290,12 @@ export function step(state: IPokerSharedState, move: Action): { nextState: IPoke
         if (remainingPlayers.length == 1) {
             state.done = true;
         }
-        return { nextState: state, log };
+        out = { next: { state, config, hands, deck }, log };
     }
     else if (move.type == 'call' || move.type == 'raise') {
         let target = state.targetBet;
         if (move.type == 'raise') {
+            if (move.amount < 0) throw new Error("Raise amount must be non-negative");
             target += move.amount;
             state.targetBet = target;
             log.push(`Player ${who} raised ${move.amount}`);
@@ -301,13 +304,45 @@ export function step(state: IPokerSharedState, move: Action): { nextState: IPoke
             log.push(`Player ${who} called ${state.targetBet - player.currentBet}`);
         }
 
-        const toCall = state.targetBet - player.currentBet;
+        player.lastRound = state.round;
+
+        const toCall = target - player.currentBet;
         const amount = Math.min(toCall, player.stack);
         player.stack -= amount;
         player.currentBet += amount;
         state.pot += amount;
-        return { nextState: state, log };
+        out = { next: { state, config, hands, deck }, log };
     }
+
+    let roundOver = true;
+    for (const player of state.players) {
+        if (!player.folded && (player.currentBet != state.targetBet || player.lastRound != state.round)) {
+            roundOver = false;
+            break;
+        }
+    }
+    if (roundOver) {
+        // move the round forward
+        if (state.round == 'pre-flop') {
+            state.round = 'flop';
+            for (let i = 0; i < 3; i++) state.cards.push(deck.pop())
+        }
+        else if (state.round == 'flop') {
+            state.round = 'turn';
+            state.cards.push(deck.pop())
+        }
+        else if (state.round == 'turn') {
+            state.round = 'river';
+            state.cards.push(deck.pop())
+        }
+        else if (state.round == 'river') {
+            state.round = 'showdown';
+            state.done = true;
+        }
+        log.push(`Moving to ${state.round}`);
+    }
+    
+    return out;
 }
 
 function lexicoCompare(a: number[], b: number[]): number {
