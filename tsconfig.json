@@ -2,7 +2,9 @@
     "compilerOptions": {
         "baseUrl": ".",
         "paths": {
-            "@tg/*": ["src/*"]
-        }
+            "@tg/*": ["src/*"],
+            "@public/*": ["public/*"]
+        },
+        "esModuleInterop": true
     }
 }

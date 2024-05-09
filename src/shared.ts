@@ -1,5 +1,5 @@
 import * as Poker from './game-logic/poker';
-import { IPlayer } from './server';
+import { IPartyServerState, IPlayer } from './server';
 
 export type ClientMessage = {
     type: 'action',
@@ -8,6 +8,10 @@ export type ClientMessage = {
     type: 'start-game'
 } | {
     type: 'spectate'
+} | {
+    type: 'join-game'
+} | {
+    type: 'reset-game'
 }
 
 export type ServerStateMessage = {
@@ -16,4 +20,6 @@ export type ServerStateMessage = {
     inGamePlayers: IPlayer[];
     spectatorPlayers: IPlayer[];
     queuedPlayers: IPlayer[];
+    players: IPlayer[];
+    state: IPartyServerState
 }

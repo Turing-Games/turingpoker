@@ -3,16 +3,16 @@ import combinations from "@tg/utils/combinations";
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
 export type Card = { rank: Rank, suit: Suit };
+
+const cardNames = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
+const cardVals = { A: 1, T: 10, J: 11, Q: 12, K: 13 }
+
 export function parseCard(card: string): Card {
     const rank = card[0];
     const suit = card[1];
 
     let rankNum: Rank = 1;
-    if (rank == 'A') rankNum = 1;
-    else if (rank == 'T') rankNum = 10;
-    else if (rank == 'J') rankNum = 11;
-    else if (rank == 'Q') rankNum = 12;
-    else if (rank == 'K') rankNum = 13;
+    if (rank in cardVals) rankNum = cardVals[rank] as Rank;
     else rankNum = parseInt(rank) as Rank;
 
     let suitName: Suit = 'hearts';
@@ -22,13 +22,7 @@ export function parseCard(card: string): Card {
     return { rank: rankNum, suit: suitName };
 }
 export function formatCard(card: Card): string {
-    let rank: string = '';
-    if (card.rank == 1) rank = 'A';
-    else if (card.rank == 10) rank = 'T';
-    else if (card.rank == 11) rank = 'J';
-    else if (card.rank == 12) rank = 'Q';
-    else if (card.rank == 13) rank = 'K';
-    else rank = card.rank.toString();
+    let rank: string = cardNames[card.rank];
     let suit: string = card.suit[0];
     return rank + suit;
 }

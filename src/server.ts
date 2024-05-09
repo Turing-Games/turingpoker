@@ -11,6 +11,7 @@ export interface IPlayer {
 
 export interface IPartyServerState {
   gamePhase: 'pending' | 'active'
+  lastWinners?: string[]
 }
 
 const defaultStack = 1000;
@@ -59,6 +60,7 @@ export default class PartyServer implements Party.Server {
     const playerIndex = this.players.findIndex(player => player.playerId === conn.id);
     if (playerIndex !== -1) {
       // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
+      this.gameState.state.players.find(player => player.id === conn.id).folded = true;
       this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== conn.id);
       this.players = this.players.filter(player => player.playerId !== conn.id);
       this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== conn.id);
@@ -66,11 +68,6 @@ export default class PartyServer implements Party.Server {
 
       // Remove from stacks
       delete this.stacks[conn.id];
-
-      // If the player was in the game, end the game
-      if (this.inGamePlayers.length === 0) {
-        this.serverState.gamePhase = 'pending';
-      }
     }
 
     this.broadcastGameState();
@@ -86,11 +83,12 @@ export default class PartyServer implements Party.Server {
       }
       console.log("Action data: ", data);
 
+      // TODO: you shouldn't be able to start/reset game unless you are an admin
       if (data.type == "action" && Poker.isAction(data.action)) {
         console.log("Handling action");
         this.handlePlayerAction(websocket.id, data.action);
       }
-      else if (data.type == 'start-game') {
+      else if (data.type == 'join-game') {
         if (this.serverState.gamePhase === 'pending') {
           this.inGamePlayers.push({
             playerId: websocket.id,
@@ -103,12 +101,22 @@ export default class PartyServer implements Party.Server {
         }
         this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== websocket.id);
       }
+      else if (data.type == 'start-game') {
+        this.startGame();
+      }
       else if (data.type == 'spectate') {
         this.spectatorPlayers.push({
           playerId: websocket.id,
         });
         this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== websocket.id);
         this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== websocket.id);
+      }
+      else if (data.type == 'reset-game') {
+        this.serverState.gamePhase = 'pending';
+        this.endGame();
+      }
+      else {
+        console.error("Invalid message type", data);
       }
     } catch (error) {
       console.error(`Error parsing message from ${websocket.id}:`, error);
@@ -134,6 +142,9 @@ export default class PartyServer implements Party.Server {
     }
 
     this.gameState = Poker.step(this.gameState, action).next;
+    if (this.gameState.state.done) {
+      this.endGame();
+    }
     this.broadcastGameState();
   }  
 
@@ -147,14 +158,22 @@ export default class PartyServer implements Party.Server {
     this.broadcastGameState();
   }
 
+  endGame() {
+    // if game isn't done then give everyone back their bets
+    
+
+  }
+
   broadcastGameState(newConnectionId = null) {
     for (const player of this.players) {
       const message: ServerStateMessage = {
-        gameState: this.gameState?.state,
+        gameState: this.gameState?.state ?? null,
         hand: this.gameState?.hands?.[player.playerId] ?? null,
         inGamePlayers: this.inGamePlayers,
         spectatorPlayers: this.spectatorPlayers,
         queuedPlayers: this.queuedPlayers,
+        players: this.players,
+        state: this.serverState
       };
 
       // Send game state; ensure spectators do not receive any cards information

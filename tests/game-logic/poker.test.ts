@@ -140,6 +140,5 @@ describe("Poker logic", () => {
 
         expect(game.state.players[4].stack).toBe(99);
         expect(game.state.players[4].currentBet).toBe(1);
-
     })
 });

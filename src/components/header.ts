@@ -1,5 +1,5 @@
 import m from "mithril";
-import Logo from '../../public/images/logo.png'
+import Logo from '@public/images/logo.png'
 import { getImagePath } from '../utils/string_utilities'
 import loader from "./loader";
 
