@@ -206,7 +206,7 @@ export function whoseTurn(state: IPokerSharedState): { who: PlayerID | null, log
  * @returns A record of player ids to the number of chips they won, and any new lines that should be added to a log. Payouts will be null if the game is not over.
  */
 export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): {
-    payouts: Record<PlayerID, number> | null,
+    payouts: Record<PlayerID, number>,
     log: GameLog
 } {
     if (state.round == 'showdown') {
@@ -267,7 +267,13 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
             };
         }
     }
-    return { payouts: null, log: [] };
+    // here the game isn't done
+    // give everyone their chips back
+    let out: Record<PlayerID, number> = {};
+    for (const player of state.players) {
+        out[player.id] = player.currentBet;
+    }
+    return { payouts: out, log: [`Returning chips to players because the round ended prematurely`] };
 }
 
 /**
