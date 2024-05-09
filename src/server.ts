@@ -14,6 +14,8 @@ export interface IPartyServerState {
   lastWinners?: string[]
 }
 
+const AUTO_START = true;
+
 const defaultStack = 1000;
 export default class PartyServer implements Party.Server {
   public gameState: Poker.IPokerGame | null = null;
@@ -105,6 +107,9 @@ export default class PartyServer implements Party.Server {
           });
         }
         this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== websocket.id);
+        if (AUTO_START && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= 2) {
+          this.startGame();
+        }
       }
       else if (data.type == 'start-game') {
         this.startGame();
@@ -164,9 +169,10 @@ export default class PartyServer implements Party.Server {
   }
 
   endGame() {
-    // if game isn't done then give everyone back their bets
-
-
+    const payouts = Poker.payout(this.gameState.state, this.gameState.hands).payouts;
+    for (const playerId in payouts) {
+      this.stacks[playerId] = this.gameState.state.players.find(player => player.id == playerId).stack + payouts[playerId];
+    }
   }
 
   broadcastGameState(newConnectionId = null) {
