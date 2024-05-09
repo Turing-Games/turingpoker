@@ -13,16 +13,14 @@ export type ClientState = {
   serverState: ServerStateMessage,
   socket: PartySocket | null,
   playerId: string | null,
-  joinedGame: boolean,
   connect: () => void,
   sendMessage: (action: ClientMessage) => void
-} 
+}
 const clientState: ClientState = {
   isConnected: false,
   serverState: null,
   socket: null,
   playerId: null, // This will store the client's player ID
-  joinedGame: false,
 
   connect() {
     this.socket = new PartySocket({
