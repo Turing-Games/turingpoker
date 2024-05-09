@@ -1,9 +1,14 @@
 {
     "compilerOptions": {
         "baseUrl": ".",
+        "target": "ES2015",
         "paths": {
-            "@tg/*": ["src/*"],
-            "@public/*": ["public/*"]
+            "@tg/*": [
+                "src/*"
+            ],
+            "@public/*": [
+                "public/*"
+            ]
         },
         "esModuleInterop": true
     }
