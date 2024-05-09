@@ -62,7 +62,7 @@ export default class PartyServer implements Party.Server {
     const playerIndex = this.players.findIndex(player => player.playerId === conn.id);
     if (playerIndex !== -1) {
       // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
-      this.gameState.state.players.map((player) => {
+      this.gameState?.state?.players?.map?.((player) => {
         return {
           ...player,
           folded: player.id === conn.id
