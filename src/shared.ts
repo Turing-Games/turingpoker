@@ -21,5 +21,6 @@ export type ServerStateMessage = {
     spectatorPlayers: IPlayer[];
     queuedPlayers: IPlayer[];
     players: IPlayer[];
-    state: IPartyServerState
+    state: IPartyServerState;
+    clientId: string;
 }

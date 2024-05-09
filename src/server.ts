@@ -76,6 +76,10 @@ export default class PartyServer implements Party.Server {
       delete this.stacks[conn.id];
     }
 
+    if (this.players.length < 2) {
+      this.endGame();
+    }
+
     this.broadcastGameState();
   }
 
@@ -90,11 +94,10 @@ export default class PartyServer implements Party.Server {
       else {
         throw new Error("Invalid message type");
       }
-      console.log("Action data: ", data);
+      console.log("Action data: ", data, websocket.id);
 
       // TODO: you shouldn't be able to start/reset game unless you are an admin
       if (data.type == "action" && Poker.isAction(data.action)) {
-        console.log("Handling action");
         this.handlePlayerAction(websocket.id, data.action);
       }
       else if (data.type == 'join-game') {
@@ -170,7 +173,6 @@ export default class PartyServer implements Party.Server {
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
 
-    this.room.broadcast("The game has started!");
     this.broadcastGameState();
   }
 
@@ -181,6 +183,11 @@ export default class PartyServer implements Party.Server {
     const payouts = Poker.payout(this.gameState.state, this.gameState.hands).payouts;
     for (const playerId in payouts) {
       this.stacks[playerId] = (this.gameState.state.players.find(player => player.id == playerId)?.stack ?? 0) + payouts[playerId];
+    }
+    this.serverState.gamePhase = 'pending';
+    this.broadcastGameState();
+    if (AUTO_START && this.inGamePlayers.length >= 2) {
+      this.startGame();
     }
   }
 
@@ -193,7 +200,8 @@ export default class PartyServer implements Party.Server {
         spectatorPlayers: this.spectatorPlayers,
         queuedPlayers: this.queuedPlayers,
         players: this.players,
-        state: this.serverState
+        state: this.serverState,
+        clientId: player.playerId
       };
 
       // Send game state; ensure spectators do not receive any cards information

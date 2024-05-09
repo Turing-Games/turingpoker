@@ -2,6 +2,7 @@
 import asyncio
 from websockets.sync.client import connect
 import argparse
+import time
 
 parser = argparse.ArgumentParser(
     prog='Check or Call Bot',
@@ -14,10 +15,15 @@ parser.add_argument('--room', type=str, default='my-new-room', help='The room to
 args = parser.parse_args()
 
 async def main():
-    async with connect(f"ws://{args.host}:{str(args.port)}/party/{args.room}") as ws:
-        await ws.send("check")
-        response = await ws.recv()
+    ws = connect(f"ws://{args.host}:{str(args.port)}/party/{args.room}")
+    print(ws)
+    ws.send('{"type": "join-game"}')
+    while True:
+        response = ws.recv()
         print(response)
+        ws.send('{"type": "action", "action": {"type": "call"}}')
+        time.sleep(1)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
