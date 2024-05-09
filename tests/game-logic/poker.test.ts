@@ -8,9 +8,9 @@ const names = " A23456789TJQK";
 const suits = "cdhs";
 
 // Commented out because it's too slow
-/*describe("Hand evaluation", () => {
-    // generate a fraction of all 2.5M hands, sort, and compare with pokersolver
-    // I've run it with 50% of hands before but we downsample to 2% for CI
+describe("Hand evaluation", () => {
+    // generate a fraction of all 2.5M hands by choosing all 5-card combinations of 36 randomly chosen cards
+    // I've run it on the full set of 2.5M hands, and it works
     test("All hands", () => {
         const cards = [];
         for (let i = 1; i <= 13; i++) {
@@ -18,12 +18,14 @@ const suits = "cdhs";
                 cards.push(names[i] + suits[j]);
             }
         }
-        console.log(cards);
+        while (cards.length > 36) {
+            cards.splice(Math.floor(Math.random() * cards.length), 1);
+        }
         const handsA = [], handsB = [];
         const indexA = [], indexB = [];
         let i = 0;
         for (const hand of combinations(cards, 5)) {
-            if (Math.random() > 0.02) continue;
+            if (Math.random() > 0.1) continue;
             indexA.push(i);
             indexB.push(i);
             i++;
@@ -41,7 +43,7 @@ const suits = "cdhs";
         indexB.sort((a, b) => handCmp(handsB[a], handsB[b]));
         expect(indexA).toEqual(indexB);
     });
-})*/
+})
 
 describe("Poker logic", () => {
     const defaultConfig: poker.IPokerConfig = {
@@ -141,4 +143,65 @@ describe("Poker logic", () => {
         expect(game.state.players[4].stack).toBe(99);
         expect(game.state.players[4].currentBet).toBe(1);
     })
+
+    test("all others folding causes payout to last player standing", () => {
+        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+
+        game = poker.step(game, { type: 'raise', amount: 5 }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        expect(game.state.done).toBeTruthy();
+        expect(poker.payout(game.state, game.hands).payouts).toEqual({ '4': game.state.pot });
+    });
+
+    test("the number of community cards is correct", () => {
+        let game = poker.createPokerGame(defaultConfig, ['0', '1'], [100, 100]);
+        expect(game.state.cards.length).toBe(0);
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        expect(game.state.cards.length).toBe(3);
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        expect(game.state.cards.length).toBe(4);
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        expect(game.state.cards.length).toBe(5);
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        expect(game.state.cards.length).toBe(5);
+        expect(game.state.done).toBeTruthy();
+    });
+
+    test("going to showdown causes payout to best hand", () => {
+        for (let i = 0; i < 1000; i++) {
+            let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+            
+            while (!game.state.done) {
+                // pre-flop, flop, turn, river => raised 4 times
+                game = poker.step(game, { type: 'raise', amount: 5 }).next;
+                game = poker.step(game, { type: 'call' }).next;
+                game = poker.step(game, { type: 'call' }).next;
+                game = poker.step(game, { type: 'call' }).next;
+                game = poker.step(game, { type: 'call' }).next;
+            }
+            expect(game.state.pot).toBe((5*4+2)*5);
+            
+            const payouts = poker.payout(game.state, game.hands).payouts;
+            
+            // find the best hand
+            let best = [];
+            for (let i = 0; i < 5; i++) {
+                let cmpVal = (Number(!best.length) || poker.handCmp(poker.best5(game.hands[i].concat(game.state.cards)), poker.best5(game.hands[best[0]].concat(game.state.cards))));
+                if (cmpVal > 0) best = [];
+                if (cmpVal >= 0) best.push(i);
+            }
+            // all of them should have the same payout, and it should be the pot
+            for (let i = 0; i < 5; i++) {
+                if (!best.includes(i)) expect(payouts[i]).toBe(0);
+                else expect(payouts[i]).toBeCloseTo(game.state.pot / best.length);
+            }
+        }
+    });
 });
