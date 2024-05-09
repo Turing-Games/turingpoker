@@ -19,3 +19,6 @@ REST
 -
 
 Websocket
+
+### DEPLOY TO CLOUDFLARE WORKERS
+CLOUDFLARE_ACCOUNT_ID=<your account id> CLOUDFLARE_API_TOKEN=<your api token> npx partykit deploy --domain partykit.domain.com
