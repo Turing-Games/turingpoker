@@ -5,14 +5,15 @@ export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
 export type Card = { rank: Rank, suit: Suit };
 
 const cardNames = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
-const cardVals = { A: 1, T: 10, J: 11, Q: 12, K: 13 }
+const cardVals = { 'A': 1, 'T': 10, 'J': 11, 'Q': 12, 'K': 13 }
 
 export function parseCard(card: string): Card {
     const rank = card[0];
     const suit = card[1];
 
     let rankNum: Rank = 1;
-    if (rank in cardVals) rankNum = cardVals[rank] as Rank;
+    // Why is this casting bs necessary, 'in' should act as a type guard???
+    if (rank in cardVals) rankNum = cardVals[rank as (keyof typeof cardVals)] as Rank;
     else rankNum = parseInt(rank) as Rank;
 
     let suitName: Suit = 'hearts';
@@ -288,7 +289,10 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
     if (game.state.done) throw new Error("Game is over");
     const { state, config, hands, deck } = game;
     let { who, log } = whoseTurn(state);
-    let out: { next: IPokerGame, log: GameLog };
+    let out: { next: IPokerGame, log: GameLog } = {
+        next: game,
+        log
+    };
 
     const player = state.players.find(p => p.id == who);
     if (player == undefined) {
@@ -339,15 +343,15 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         // move the round forward
         if (state.round == 'pre-flop') {
             state.round = 'flop';
-            for (let i = 0; i < 3; i++) state.cards.push(deck.pop())
+            for (let i = 0; i < 3; i++) state.cards.push(deck.pop() as Card)
         }
         else if (state.round == 'flop') {
             state.round = 'turn';
-            state.cards.push(deck.pop())
+            state.cards.push(deck.pop() as Card)
         }
         else if (state.round == 'turn') {
             state.round = 'river';
-            state.cards.push(deck.pop())
+            state.cards.push(deck.pop() as Card)
         }
         else if (state.round == 'river') {
             state.round = 'showdown';
@@ -435,8 +439,8 @@ export function best5(cards: Card[]): Hand {
     if (cards.length < 5) throw new Error("Not enough cards to make a hand");
     let best: Hand = cards.slice(0, 5) as Hand;
     for (const comb of combinations(cards, 5)) {
-        if (handCmp(comb, best) > 0) {
-            best = comb;
+        if (handCmp(comb as Hand, best) > 0) {
+            best = comb as Hand;
         }
     }
     return best;

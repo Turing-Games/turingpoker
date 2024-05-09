@@ -1,5 +1,7 @@
 {
     "compilerOptions": {
+        "target": "ES2015",
+        "moduleResolution": "NodeNext",
         "baseUrl": ".",
         "paths": {
             "@tg/*": [

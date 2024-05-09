@@ -21,7 +21,7 @@ describe("Hand evaluation", () => {
         while (cards.length > 36) {
             cards.splice(Math.floor(Math.random() * cards.length), 1);
         }
-        const handsA = [], handsB = [];
+        const handsA: any[] = [], handsB: poker.Hand[] = [];
         const indexA = [], indexB = [];
         let i = 0;
         for (const hand of combinations(cards, 5)) {
@@ -30,7 +30,7 @@ describe("Hand evaluation", () => {
             indexB.push(i);
             i++;
             handsA.push(Hand.solve(hand));
-            handsB.push(hand.map(poker.parseCard));
+            handsB.push(hand.map(poker.parseCard) as poker.Hand);
         }
         indexA.sort((u, v) => {
             const a = handsA[u], b = handsA[v];
