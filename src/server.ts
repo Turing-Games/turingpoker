@@ -1,6 +1,6 @@
 import type * as Party from 'partykit/server';
 import * as Poker from '@tg/game-logic/poker'
-import { ClientMessage, ServerStateMessage } from './shared';
+import { ClientMessage, ServerStateMessage, ServerUpdateMessage } from './shared';
 
 const Hand = require('pokersolver').Hand;
 
@@ -33,6 +33,7 @@ export default class PartyServer implements Party.Server {
   public serverState: IPartyServerState = {
     gamePhase: 'pending'
   };
+  public queuedUpdates: ServerUpdateMessage[] = [];
   constructor(public readonly room: Party.Room) {
     this.room = room;
   }
@@ -46,12 +47,14 @@ export default class PartyServer implements Party.Server {
     this.players.push({
       playerId: conn.id,
     });
+
     if (this.serverState.gamePhase === "active" || this.players.length >= this.gameConfig.maxPlayers) {
       // Add as a spectator if the game is active or player slots are full
       this.spectatorPlayers.push({
         playerId: conn.id,
       });
     }
+    
     this.broadcastGameState();
   }
 
@@ -71,13 +74,19 @@ export default class PartyServer implements Party.Server {
       this.players = this.players.filter(player => player.playerId !== conn.id);
       this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== conn.id);
       this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== conn.id);
+      this.queuedUpdates.push({
+        type: 'player-left',
+        player: {
+          playerId: conn.id,
+        }
+      });
 
       // Remove from stacks
       delete this.stacks[conn.id];
     }
 
     if (this.players.length < 2) {
-      this.endGame();
+      this.endGame('fold');
     }
 
     this.broadcastGameState();
@@ -112,6 +121,14 @@ export default class PartyServer implements Party.Server {
           });
         }
         this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== websocket.id);
+
+        this.queuedUpdates.push({
+          type: 'player-joined',
+          player: {
+            playerId: websocket.id,
+          }
+        });
+
         if (AUTO_START && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= 2) {
           this.startGame();
         }
@@ -125,10 +142,16 @@ export default class PartyServer implements Party.Server {
         });
         this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== websocket.id);
         this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== websocket.id);
+        this.queuedUpdates.push({
+          type: 'player-left',
+          player: {
+            playerId: websocket.id,
+          }
+        });
       }
       else if (data.type == 'reset-game') {
         this.serverState.gamePhase = 'pending';
-        this.endGame();
+        this.endGame('system');
       }
       else {
         console.error("Invalid message type", data);
@@ -161,8 +184,13 @@ export default class PartyServer implements Party.Server {
     }
 
     this.gameState = Poker.step(this.gameState, action).next;
+    this.queuedUpdates.push({
+      type: 'action',
+      action,
+      player,
+    });
     if (this.gameState.state.done) {
-      this.endGame();
+      this.endGame(this.gameState?.state?.round === 'showdown' ? 'showdown' : 'fold');
     }
     this.broadcastGameState();
   }
@@ -173,10 +201,15 @@ export default class PartyServer implements Party.Server {
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
 
+    this.queuedUpdates.push({
+      type: 'game-started',
+      players: this.inGamePlayers,
+    });
+
     this.broadcastGameState();
   }
 
-  endGame() {
+  endGame(reason: 'showdown' | 'fold' | 'system') {
     if (!this.gameState) {
       return;
     }
@@ -185,6 +218,11 @@ export default class PartyServer implements Party.Server {
       this.stacks[playerId] = (this.gameState.state.players.find(player => player.id == playerId)?.stack ?? 0) + payouts[playerId];
     }
     this.serverState.gamePhase = 'pending';
+    this.queuedUpdates.push({
+      type: 'game-ended',
+      payouts,
+      reason
+    });
     this.broadcastGameState();
     if (AUTO_START && this.inGamePlayers.length >= 2) {
       this.startGame();
@@ -201,7 +239,8 @@ export default class PartyServer implements Party.Server {
         queuedPlayers: this.queuedPlayers,
         players: this.players,
         state: this.serverState,
-        clientId: player.playerId
+        clientId: player.playerId,
+        lastUpdates: this.queuedUpdates,
       };
 
       // Send game state; ensure spectators do not receive any cards information
@@ -210,5 +249,6 @@ export default class PartyServer implements Party.Server {
         conn.send(JSON.stringify(message));
       }
     }
+    this.queuedUpdates = [];
   }
 }

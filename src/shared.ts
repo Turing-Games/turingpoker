@@ -14,6 +14,26 @@ export type ClientMessage = {
     type: 'reset-game'
 }
 
+export type ServerUpdateMessage = {
+    type: 'game-ended';
+    payouts: { [playerId: string]: number };
+    reason: 'showdown' | 'fold' | 'system';
+} | {
+    type: 'action',
+    action: Poker.Action
+    player: IPlayer
+} | {
+    type: 'player-joined',
+    player: IPlayer
+} | {
+    type: 'player-left',
+    player: IPlayer
+
+} | {
+    type: 'game-started',
+    players: IPlayer[]
+}
+
 export type ServerStateMessage = {
     gameState: Poker.IPokerSharedState | null;
     hand: [Poker.Card, Poker.Card] | null;
@@ -23,4 +43,5 @@ export type ServerStateMessage = {
     players: IPlayer[];
     state: IPartyServerState;
     clientId: string;
+    lastUpdates: ServerUpdateMessage[]
 }
