@@ -76,7 +76,6 @@ const App = {
   view: () => {
     return (
       m.fragment({}, [
-        // header
         m(header, {
           gameType: "No Limit Texas Hold'em",
           players: clientState?.serverState?.inGamePlayers,

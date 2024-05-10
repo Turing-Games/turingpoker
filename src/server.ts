@@ -46,7 +46,7 @@ export default class PartyServer implements Party.Server {
       console.log("client connected")
     }
 
-    if (this.inGamePlayers.length === 0) {
+    if (this.inGamePlayers.length < 2) {
       this.serverState.gamePhase = 'pending'
     }
 
