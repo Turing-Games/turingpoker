@@ -1,3 +1,4 @@
+import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@tg/server";
 import combinations from "@tg/utils/combinations";
 
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
@@ -61,6 +62,8 @@ export interface IPokerConfig {
     smallBlind: number;
     bigBlind: number;
     maxPlayers: number;
+    autoStart: boolean
+    minPlayers: number
 }
 
 export interface IPokerSharedState {
@@ -76,7 +79,6 @@ export interface IPokerSharedState {
     round: PokerRound;
     done: boolean;
     cards: Card[];
-    winners: string[]
 }
 
 export interface IPokerGame {

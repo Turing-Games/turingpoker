@@ -25,4 +25,5 @@ export type ServerStateMessage = {
     winners: string[];
     players: IPlayer[];
     state: IPartyServerState
+    config: Poker.IPokerConfig
 }

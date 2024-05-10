@@ -157,3 +157,8 @@ body {
   animation: spin 2s linear infinite;
   width: 50px;
 }
+
+.tg-poker__winner__buttons {
+  display: flex;
+  gap: 8px;
+}

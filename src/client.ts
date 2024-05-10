@@ -79,7 +79,8 @@ const App = {
         // header
         m(header, {
           gameType: "No Limit Texas Hold'em",
-          players: clientState?.serverState?.players
+          players: clientState?.serverState?.players,
+          playerId: clientState?.playerId
         }),
         m(poker, { clientState })
       ])

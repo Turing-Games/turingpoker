@@ -12,16 +12,20 @@ export interface IPartyServerState {
   gamePhase: 'pending' | 'active'
 }
 
-const AUTO_START = true;
+export const AUTO_START = true;
+export const MIN_PLAYERS_AUTO_START = 2;
+export const MAX_PLAYERS = 8
 
 const defaultStack = 1000;
 export default class PartyServer implements Party.Server {
   public gameState: Poker.IPokerGame | null = null;
   public gameConfig: Poker.IPokerConfig = {
     dealerPosition: 0,
-    maxPlayers: 8,
     bigBlind: 100,
+    maxPlayers: MAX_PLAYERS,
     smallBlind: 50,
+    autoStart: AUTO_START,
+    minPlayers: MIN_PLAYERS_AUTO_START
   };
   public inGamePlayers: IPlayer[] = [];
   public players: IPlayer[] = [];
@@ -108,17 +112,21 @@ export default class PartyServer implements Party.Server {
           });
         }
         this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== websocket.id);
-        if (AUTO_START && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= 2) {
+        if (AUTO_START && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
           this.startGame();
+        } else {
+          this.broadcastGameState();
         }
       }
       else if (data.type == 'start-game') {
         this.startGame();
       }
       else if (data.type == 'leave-game') {
+        this.serverState.gamePhase = 'pending';
         this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== websocket.id);
         this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== websocket.id);
         this.players = this.players.filter(player => player.playerId !== websocket.id);
+        this.endGame();
       }
       else if (data.type == 'spectate') {
         this.spectatorPlayers.push({
@@ -200,7 +208,8 @@ export default class PartyServer implements Party.Server {
         queuedPlayers: this.queuedPlayers,
         players: this.players,
         winners: this.winners,
-        state: this.serverState
+        state: this.serverState,
+        config: this.gameConfig
       };
 
       // Send game state; ensure spectators do not receive any cards information

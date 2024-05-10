@@ -75,19 +75,37 @@ const GameControls = {
 export default {
   view: ({ attrs }) => {
     const clientState: ClientState = attrs.clientState;
-
     console.log(clientState)
     const serverState = clientState.serverState;
     if (!serverState) {
       return
     }
+
+    const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
     const gameState = serverState.gameState;
+    const canGameStart = serverState?.inGamePlayers?.length > 1
+    const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
+    const isPlayerInGame = inGamePlayers.indexOf(clientState?.playerId) !== -1
     if (!gameState) {
-      return m.fragment({}, [m("button", {
-        onclick: () => clientState.sendMessage({ type: 'join-game' })
-      }, "Join Game"), m("button", {
-        onclick: () => clientState.sendMessage({ type: 'start-game' })
-      }, "Start Game")]);
+      return m.fragment({}, [
+        m("button", {
+          onclick: () => clientState.sendMessage({ type: 'join-game' }),
+          style: {
+            pointerEvents: isPlayerInGame ? 'none' : 'auto'
+          },
+        },
+          !isPlayerInGame ?
+            canGameStart ?
+              'Click "Start Game when you are ready' : 'Join Game' :
+            `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...`
+        ),
+        m("button", {
+          onclick: () => clientState.sendMessage({ type: 'start-game' }),
+          style: {
+            pointerEvents: 'none'
+          },
+        }, "Game will auto-start when player minimum has been reached")
+      ]);
     } else {
       if (process.env.NODE_ENV !== 'production') {
         m("button", {
@@ -215,7 +233,7 @@ export default {
                 serverState.spectatorPlayers.concat(serverState.queuedPlayers).map((spectator, index) =>
                   m("div.tg-poker__table__spectators__spectator", [
                     m("p", `Spectator ${index + 1}:`),
-                    m("p", `${getPlayerStatus(spectator.playerId)}}`)
+                    m("p", `${getPlayerStatus(spectator.playerId)}`)
                   ])
                 )
               ]),
@@ -228,7 +246,17 @@ export default {
                 stlye: {
                   marginBottom: '24px'
                 }
-              }, serverState.winners.map((id, i) => m("p", `Player #${id} won`)),
+              }, [
+                serverState.winners.map((id, i) => m("p", `Player #${id} won`)),
+                m("div.tg-poker__winner__buttons", [
+                  m("button", {
+                    onclick: () => clientState.sendMessage({ type: 'join-game' })
+                  }, "New Game"),
+                  m("button", {
+                    onclick: () => clientState.sendMessage({ type: 'leave-game' })
+                  }, "Quit")
+                ])
+              ]
               )
             )
           )
