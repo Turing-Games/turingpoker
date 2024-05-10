@@ -91,9 +91,9 @@ export default {
     }
 
     const currentPlayer = gameState.players?.find(player => player.id === clientState?.playerId)
-    const isCurrentPlayerTurn = currentPlayer?.id === Poker.whoseTurn(gameState).who;
+    const isCurrentPlayerTurn = currentPlayer?.id === Poker.findWhoseTurn(gameState).who;
     const opponents = clientState?.serverState.gameState?.players?.filter(player => player.id !== currentPlayer?.id)
-    const { who: currentTurn } = Poker.whoseTurn(gameState);
+    const { who: currentTurn } = Poker.findWhoseTurn(gameState);
     const getPlayerStatus = (playerId: string) => {
       if (serverState.spectatorPlayers.find(player => player.playerId === playerId)) return 'spectator'
       if (serverState.queuedPlayers.find(player => player.playerId === playerId)) return 'queued'

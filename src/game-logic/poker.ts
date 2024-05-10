@@ -78,6 +78,7 @@ export interface IPokerSharedState {
     round: PokerRound;
     done: boolean;
     cards: Card[];
+    whoseTurn: PlayerID | null;
 }
 
 export interface IPokerGame {
@@ -133,7 +134,8 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
             dealerPosition: config.dealerPosition,
             smallBlind: config.smallBlind,
             bigBlind: config.bigBlind,
-            cards: []
+            cards: [],
+            whoseTurn: players[(config.dealerPosition - 1 + players.length) % players.length]
         },
         deck,
         config,
@@ -156,7 +158,7 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
  * @param state Poker game state
  * @returns the id of the player who has the next turn, or null if the round is over, and any new lines that should be added to a log
  */
-export function whoseTurn(state: IPokerSharedState): { who: PlayerID | null, log: GameLog } {
+export function findWhoseTurn(state: IPokerSharedState): { who: PlayerID | null, log: GameLog } {
     const log: string[] = [];
     if (state.round == 'showdown') {
         log.push('Round is over');
@@ -278,7 +280,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
 }
 
 /**
- * Make a move for the player whose id is given by @see whoseTurn. If the move is invalid, return the state unchanged.
+ * Make a move for the player whose id is given by @see findWhoseTurn. If the move is invalid, return the state unchanged.
  * @param state Poker game state
  * @param move The move to make
  * @throws If the move is a raise and the amount is negative
@@ -288,7 +290,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
 export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: GameLog } {
     if (game.state.done) throw new Error("Game is over");
     const { state, config, hands, deck } = game;
-    let { who, log } = whoseTurn(state);
+    let { who, log } = findWhoseTurn(state);
     let out: { next: IPokerGame, log: GameLog } = {
         next: game,
         log
@@ -360,7 +362,29 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         log.push(`Moving to ${state.round}`);
     }
 
+    const { who: nextTurn, log: nextLog } = findWhoseTurn(state);
+    out.next.state.whoseTurn = nextTurn;
+    out.log.push(...nextLog);
     return out;
+}
+
+/**
+ * Force a player to fold, even if it's not their turn
+ * @param game The game to apply to
+ * @param playerId The id of the player to force to fold
+ * @returns 
+ */
+export function forcedFold(game: IPokerGame, playerId: PlayerID): IPokerGame {
+    const player = game.state.players.find(p => p.id == playerId);
+    if (player == undefined) return game;
+    player.folded = true;
+    game.state.whoseTurn = findWhoseTurn(game.state).who;
+    let remainingPlayers = game.state.players.filter(p => !p.folded);
+    if (remainingPlayers.length == 1) {
+        game.state.done = true;
+    }
+
+    return game;
 }
 
 function lexicoCompare(a: number[], b: number[]): number {
