@@ -180,7 +180,6 @@ export default class PartyServer implements Party.Server {
   }
 
   broadcastGameState() {
-    console.log(this.gameState?.state.whoseTurn);
     for (const player of this.players) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
