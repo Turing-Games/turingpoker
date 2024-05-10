@@ -76,6 +76,7 @@ export interface IPokerSharedState {
     round: PokerRound;
     done: boolean;
     cards: Card[];
+    winners: string[]
 }
 
 export interface IPokerGame {

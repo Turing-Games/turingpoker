@@ -10,7 +10,6 @@ export interface IPlayer {
 
 export interface IPartyServerState {
   gamePhase: 'pending' | 'active'
-  lastWinners?: string[]
 }
 
 const AUTO_START = true;
@@ -28,7 +27,7 @@ export default class PartyServer implements Party.Server {
   public players: IPlayer[] = [];
   public spectatorPlayers: IPlayer[] = [];
   public queuedPlayers: IPlayer[] = [];
-
+  public winners: string[] = []
   public stacks: Record<string, number> = {};
   public serverState: IPartyServerState = {
     gamePhase: 'pending'
@@ -172,6 +171,7 @@ export default class PartyServer implements Party.Server {
   startGame() {
     this.inGamePlayers = this.inGamePlayers.concat(this.queuedPlayers);
     this.queuedPlayers = [];
+    this.winners = []
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
 
@@ -184,6 +184,7 @@ export default class PartyServer implements Party.Server {
       return;
     }
     const payouts = Poker.payout(this.gameState.state, this.gameState.hands).payouts;
+    this.winners = Object.keys(payouts)
     for (const playerId in payouts) {
       this.stacks[playerId] = (this.gameState.state.players.find(player => player.id == playerId)?.stack ?? 0) + payouts[playerId];
     }
@@ -198,6 +199,7 @@ export default class PartyServer implements Party.Server {
         spectatorPlayers: this.spectatorPlayers,
         queuedPlayers: this.queuedPlayers,
         players: this.players,
+        winners: this.winners,
         state: this.serverState
       };
 

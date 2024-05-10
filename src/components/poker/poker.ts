@@ -207,9 +207,15 @@ export default {
                     m(GameControls, {
                       clientState: clientState
                     }) :
-                    // serverState.state.gamePhase == 'done' ?
-                    // m()
-                    m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
+                    gameState.done ?
+                      m('div.tg-poker__winner',
+                        m("div", {
+                          stlye: {
+                            marginBottom: '24px'
+                          }
+                        }, `Player #${gameState?.gameData.winner?.id} won with ${gameState?.gameData.winner?.name}`),
+                      ) :
+                      m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
               ]),
               // spectators
               m("div.tg-poker__table__spectators", [
@@ -223,15 +229,16 @@ export default {
               ]),
             ]) :
             m("div", { style: { height: 100, width: '100%' } }),
-          serverState.state.lastWinners &&
-          m.fragment({}, serverState.state.lastWinners.map((winner, i) =>
-            m('div.tg-poker__winner',
+          serverState.winners &&
+          m('div.tg-poker__winner',
+            m.fragment({}, serverState.winners.map((winner, i) =>
               m("div", {
                 stlye: {
                   marginBottom: '24px'
                 }
               }, `Player #${winner} won`),
-            )))
+            ))
+          )
         ]);
     } else {
       return m("div")
