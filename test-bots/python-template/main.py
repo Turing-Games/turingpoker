@@ -21,7 +21,7 @@ args = parser.parse_args()
 
 class TemplateBot(Bot):
     def act(self, state, hand):
-        time.sleep(0.001)
+        #time.sleep(0.001)
         print('acting', state, hand, self.my_id)
         return {'type': 'call'}
 

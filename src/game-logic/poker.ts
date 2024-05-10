@@ -65,6 +65,7 @@ export interface IPokerPlayer {
     folded: boolean;
     currentBet: number;
     lastRound: PokerRound | null;
+    shouldMove: boolean;
 }
 
 export interface IPokerConfig {
@@ -141,7 +142,7 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
         state: {
             done: false,
             pot: 0,
-            players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0 })),
+            players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0, shouldMove: true })),
             round: 'pre-flop',
             targetBet: config.bigBlind,
             dealerPosition: config.dealerPosition,
@@ -291,7 +292,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
             if (target > oldTarget) {
                 // update everyone's lastRound to the previous round
                 for (const p of state.players) {
-                    p.lastRound = prevRound(state.round);
+                    p.shouldMove = true;
                 }
             }
             state.targetBet = target;
@@ -306,6 +307,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         player.stack -= amount;
         player.currentBet += amount;
         player.lastRound = state.round;
+        player.shouldMove = false;
         state.pot += amount;
         out = { next: { state, config, hands, deck }, log };
     }
@@ -317,7 +319,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
     }
     const nextPlayer = state.players[nextPlayerIndex];
 
-    let roundOver = nextPlayer.lastRound == state.round;
+    let roundOver = !nextPlayer.shouldMove;
     if (roundOver) {
         // move the round forward
         if (state.round == 'pre-flop') {
@@ -342,6 +344,9 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
                 idx = (idx + 1) % state.players.length;
             }
             out.next.state.whoseTurn = out.next.state.players[idx].id;
+        }
+        for (const p of state.players) {
+            p.shouldMove = true;
         }
         log.push(`Moving to ${state.round}`);
     }
@@ -371,7 +376,6 @@ export function forcedFold(game: IPokerGame, playerId: PlayerID): IPokerGame {
 
     return game;
 }
-
 
 function lexicoCompare(a: number[], b: number[]): number {
     for (let i = 0; i < a.length; i++) {
