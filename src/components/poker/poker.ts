@@ -86,7 +86,11 @@ export default {
     const canGameStart = serverState?.inGamePlayers?.length > 1
     const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
     const isPlayerInGame = inGamePlayers.indexOf(clientState?.playerId) !== -1
-    if (!gameState) {
+
+    console.log({ canGameStart })
+    console.log({ isPlayerInGame })
+    console.log(serverState.state.gamePhase)
+    if (!isPlayerInGame || serverState.state.gamePhase == 'pending') {
       return m.fragment({}, [
         m("button", {
           onclick: () => clientState.sendMessage({ type: 'join-game' }),
@@ -108,7 +112,7 @@ export default {
       ]);
     } else {
       if (process.env.NODE_ENV !== 'production') {
-        m("button", {
+        return m("button", {
           style: {
             backgroundColor: 'red',
             position: 'absolute',
@@ -174,11 +178,6 @@ export default {
                   m("div", `${stat.prefix}${stat.value}`)
                 ])
               }),
-              (location.host.includes('localhost') &&
-                m('div', {
-                  onclick: () => clientState.sendMessage({ type: 'reset-game' }),
-                  style: { textAlign: 'center', cursor: 'pointer', background: '#fff', position: 'absolute', top: 0, left: 0, color: '#000' }
-                }, "Reset Game (dev)")),
             ),
             // opponents, filtered out current player
             opponents?.length > 0 &&

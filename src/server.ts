@@ -45,6 +45,11 @@ export default class PartyServer implements Party.Server {
     if (process.env.NODE_ENV !== 'production') {
       console.log("client connected")
     }
+
+    if (this.inGamePlayers.length === 0) {
+      this.serverState.gamePhase = 'pending'
+    }
+
     this.stacks[conn.id] = defaultStack;
     this.players.push({
       playerId: conn.id,
@@ -122,12 +127,11 @@ export default class PartyServer implements Party.Server {
         this.startGame();
       }
       else if (data.type == 'leave-game') {
-        this.serverState.gamePhase = 'pending';
         this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== websocket.id);
         this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== websocket.id);
         this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== websocket.id);
         this.players = this.players.filter(player => player.playerId !== websocket.id);
-        this.endGame();
+        this.broadcastGameState();
       }
       else if (data.type == 'spectate') {
         this.spectatorPlayers.push({
