@@ -6,8 +6,6 @@ from websockets.client import connect
 from . import types, util
 from abc import abstractmethod
 class Bot:
-    already_moved = set()
-
     @abstractmethod
     def act(self, state: types.PokerSharedState, hand: Tuple[types.Card, types.Card]) -> types.Action:
         raise NotImplementedError("Must override act")
@@ -35,11 +33,11 @@ class Bot:
                 state = json.loads(message, object_hook=lambda d: SimpleNamespace(**util.decamilize(d)))
                 for update in state.last_updates:
                     if update.type == types.ServerUpdateMessageType.ACTION.value:
-                        self.opponent_action(update.action, update.player)
+                        if update.player.player_id != state.client_id:
+                            self.opponent_action(update.action, update.player)
                     elif update.type == types.ServerUpdateMessageType.GAME_ENDED.value:
                         self.game_over(update.payouts)
                     elif update.type == types.ServerUpdateMessageType.GAME_STARTED.value:
-                        self.already_moved = set()
                         self.start_game(state.client_id)
                     elif update.type == types.ServerUpdateMessageType.PLAYER_JOINED.value:
                         pass
@@ -47,7 +45,6 @@ class Bot:
                         pass
                 if state.game_state is not None and state.hand is not None:
                     # only move if we haven't moved yet this turn
-                    if state.game_state.whose_turn == state.client_id and (state.game_state.pot, state.game_state.round) not in self.already_moved:
-                        self.already_moved.add((state.game_state.pot, state.game_state.round))
+                    if state.game_state.whose_turn == state.client_id:
                         action = self.act(state.game_state, state.hand)
                         await ws.send(json.dumps({'type': 'action', 'action': util.camelize(action)}))

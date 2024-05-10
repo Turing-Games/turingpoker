@@ -21,8 +21,8 @@ args = parser.parse_args()
 
 class TemplateBot(Bot):
     def act(self, state, hand):
-        time.sleep(0.05)
-        print('acting', state, hand)
+        time.sleep(0.001)
+        print('acting', state, hand, self.my_id)
         return {'type': 'call'}
 
     def opponent_action(self, action, player):
@@ -32,6 +32,7 @@ class TemplateBot(Bot):
         print('game over', payouts)
 
     def start_game(self, my_id):
+        self.my_id = my_id
         print('start game', my_id)
 
 if __name__ == "__main__":
