@@ -9,7 +9,7 @@ const GameControls = {
   view: ({ attrs }) => {
     console.log('test')
     const clientState: ClientState = attrs.clientState
-
+    const serverState = clientState?.serverState
     const gameState = clientState.serverState?.gameState;
 
     if (!clientState.isConnected || !gameState) {
@@ -88,6 +88,12 @@ export default {
       }, "Join Game"), m("button", {
         onclick: () => clientState.sendMessage({ type: 'start-game' })
       }, "Start Game")]);
+    } else {
+      if (process.env.NODE_ENV !== 'production') {
+        m("button", {
+          onclick: () => clientState.sendMessage({ type: 'leave-game' })
+        }, "Leave Game")
+      }
     }
 
     const currentPlayer = gameState.players?.find(player => player.id === clientState?.playerId)
@@ -129,7 +135,7 @@ export default {
     }
 
     if (process.env.NODE_ENV != 'production') {
-      console.log('gameState', gameState)
+      console.log('gameState', attrs)
     }
 
     if (gameState.players.length > 1) {
@@ -159,6 +165,7 @@ export default {
                 let status = getPlayerStatus(opp.id);
                 return m(player, {
                   player: opp,
+                  hand: [],
                   isCurrentPlayerTurn: opp.id === currentTurn,
                   showCards: gameState.round == 'showdown',
                   title: `Player ${index + 2 - playerNumberOffset} (${status}) ${opp.id == currentTurn ? ' - Their Turn' : ''}`,
@@ -186,6 +193,7 @@ export default {
                 // current player
                 m(player, {
                   className: 'tg-poker__player--1',
+                  hand: serverState.hand || [],
                   player: currentPlayer,
                   showCards: true,
                   isCurrentPlayerTurn,

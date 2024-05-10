@@ -4,6 +4,8 @@ import m from "mithril";
 export default {
   view: ({ attrs }) => {
     const player = attrs.player;
+    const hand = attrs.hand
+    console.log({ hand })
 
     return m(`div.tg-poker__player${attrs.className ? '.' + attrs.className : ''}`, [
       m("div.tg-poker__player__details", [
@@ -15,13 +17,13 @@ export default {
       ]),
       m("div", {
         style: { display: 'flex', gap: '6px', margin: '16px 0' }
-      },  attrs.showCards ?
-          player.cards.map((c, i) => {
-            return m(card, { value: c.value })
-          }) :
-          player.cards.map((c, i) => {
-            return m(card, { value: '' })
-          })
+      }, attrs.showCards ?
+        hand.map((c, i) => {
+          return m(card, { value: `${c.suit}_${c.rank}` })
+        }) :
+        hand.map((c, i) => {
+          return m(card, { value: '' })
+        })
 
       ),
     ])

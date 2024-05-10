@@ -12,6 +12,8 @@ export type ClientMessage = {
     type: 'join-game'
 } | {
     type: 'reset-game'
+} | {
+    type: 'leave-game'
 }
 
 export type ServerStateMessage = {

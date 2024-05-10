@@ -124,7 +124,7 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
     }
 
     const out: IPokerGame = {
-        state: {
+        state: { // shared state
             done: false,
             pot: 0,
             players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0 })),

@@ -116,6 +116,11 @@ export default class PartyServer implements Party.Server {
       else if (data.type == 'start-game') {
         this.startGame();
       }
+      else if (data.type == 'leave-game') {
+        this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== websocket.id);
+        this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== websocket.id);
+        this.players = this.players.filter(player => player.playerId !== websocket.id);
+      }
       else if (data.type == 'spectate') {
         this.spectatorPlayers.push({
           playerId: websocket.id,
