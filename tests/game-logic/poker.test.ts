@@ -69,29 +69,30 @@ describe("Poker logic", () => {
         expect(state.players[0].currentBet).toBe(2);
         expect(state.players[1].currentBet).toBe(1);
 
-    })
-    test("folding gets turn skipped in subsequent rounds", () => {
+    });
+
+    test("Folding gets turn skipped in subsequent rounds", () => {
         let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
         
         // player 3 is bb, so 4 should go first
-        expect(poker.whoseTurn(game.state).who).toBe('4');
+        expect(game.state.whoseTurn).toBe('4');
 
         // 4 calls to 2
         game = poker.step(game, { type: 'raise', amount: 5 }).next;
-        expect(poker.whoseTurn(game.state).who).toBe('0');
+        expect(game.state.whoseTurn).toBe('0');
 
         // 0 and 1 fold
         game = poker.step(game, { type: 'fold' }).next;
-        expect(poker.whoseTurn(game.state).who).toBe('1');
+        expect(game.state.whoseTurn).toBe('1');
         game = poker.step(game, { type: 'fold' }).next;
-        expect(poker.whoseTurn(game.state).who).toBe('2');
+        expect(game.state.whoseTurn).toBe('2');
 
         // 2 calls
         expect(game.state.players[2].currentBet).toBe(0);
         game = poker.step(game, { type: 'call' }).next;
         expect(game.state.players[2].currentBet).toBe(7);
         expect(game.state.players[2].stack).toBe(93);
-        expect(poker.whoseTurn(game.state).who).toBe('3');
+        expect(game.state.whoseTurn).toBe('3');
 
         // 3 calls
         expect(game.state.players[3].currentBet).toBe(2);
@@ -101,33 +102,34 @@ describe("Poker logic", () => {
         expect(game.state.players[3].stack).toBe(93);
 
         // 4 checks
-        expect(poker.whoseTurn(game.state).who).toBe('4');
+        expect(game.state.whoseTurn).toBe('4');
         expect(game.state.round).toBe('flop');
         expect(game.state.players[4].currentBet).toBe(7);
         expect(game.state.players[4].stack).toBe(93);
         game = poker.step(game, { type: 'call' }).next;
 
         // now it should be 2's turn, since 0 and 1 folded
-        expect(poker.whoseTurn(game.state).who).toBe('2');
+        expect(game.state.whoseTurn).toBe('2');
         game = poker.step(game, { type: 'call' }).next;
-        expect(poker.whoseTurn(game.state).who).toBe('3');
+        expect(game.state.whoseTurn).toBe('3');
         game = poker.step(game, { type: 'call' }).next;
 
         expect(game.state.round).toBe("turn")
-        expect(poker.whoseTurn(game.state).who).toBe('4');
+        expect(game.state.whoseTurn).toBe('4');
         game = poker.step(game, { type: 'fold' }).next;
-        expect(poker.whoseTurn(game.state).who).toBe('2');
+        expect(game.state.whoseTurn).toBe('2');
         game = poker.step(game, { type: 'call' }).next;
-        expect(poker.whoseTurn(game.state).who).toBe('3');
+        expect(game.state.whoseTurn).toBe('3');
         game = poker.step(game, { type: 'call' }).next;
 
         expect(game.state.round).toBe("river")
-        expect(poker.whoseTurn(game.state).who).toBe('2');
+        expect(game.state.whoseTurn).toBe('2');
         game = poker.step(game, { type: 'fold' }).next;
 
         expect(game.state.done).toBeTruthy();
     });
-    test("small blind calling sets its bet to big blind", () => {
+
+    test("Small blind calling sets its bet to big blind", () => {
         let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
         expect(game.state.players[4].stack).toBe(99);
@@ -137,14 +139,14 @@ describe("Poker logic", () => {
         expect(game.state.players[4].stack).toBe(98);
         expect(game.state.players[4].currentBet).toBe(2);
     })
-    test("small blind folding immediately skips turn in subsequent rounds", () => {
+    test("Small blind folding immediately skips turn in subsequent rounds", () => {
         let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
         expect(game.state.players[4].stack).toBe(99);
         expect(game.state.players[4].currentBet).toBe(1);
     })
 
-    test("all others folding causes payout to last player standing", () => {
+    test("All others folding causes payout to last player standing", () => {
         let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
         game = poker.step(game, { type: 'raise', amount: 5 }).next;
@@ -153,10 +155,10 @@ describe("Poker logic", () => {
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.step(game, { type: 'fold' }).next;
         expect(game.state.done).toBeTruthy();
-        expect(poker.payout(game.state, game.hands).payouts).toEqual({ '4': game.state.pot });
+        expect(poker.payout(game.state, game.hands).payouts).toMatchObject({ '4': game.state.pot });
     });
 
-    test("the number of community cards is correct", () => {
+    test("The number of community cards is correct", () => {
         let game = poker.createPokerGame(defaultConfig, ['0', '1'], [100, 100]);
         expect(game.state.cards.length).toBe(0);
         game = poker.step(game, { type: 'call' }).next;
@@ -174,11 +176,14 @@ describe("Poker logic", () => {
         expect(game.state.done).toBeTruthy();
     });
 
-    test("going to showdown causes payout to best hand", () => {
+    test("Going to showdown causes payout to best hand", () => {
         for (let i = 0; i < 1000; i++) {
             let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
             
+            let iters = 0;
             while (!game.state.done) {
+                // obviously it should never reach 1000 iterations
+                expect(iters++).toBeLessThan(1000);
                 // pre-flop, flop, turn, river => raised 4 times
                 game = poker.step(game, { type: 'raise', amount: 5 }).next;
                 game = poker.step(game, { type: 'call' }).next;
@@ -203,5 +208,52 @@ describe("Poker logic", () => {
                 else expect(payouts[i]).toBeCloseTo(game.state.pot / best.length);
             }
         }
+    }, 10);
+
+    test("Forced fold ends game if only one player remains", () => {
+        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        game = poker.step(game, { type: 'raise', amount: 5 }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.forcedFold(game, '1');
+        expect(game.state.done).toBeTruthy();
+        // the only player left should get the pot
+        expect(poker.payout(game.state, game.hands).payouts).toMatchObject({ '4': game.state.pot });
     });
+
+    test("Forced fold updates whoseTurn", () => {
+        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        game = poker.step(game, { type: 'raise', amount: 5 }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+        game = poker.forcedFold(game, '4');
+        expect(game.state.whoseTurn).toBe('1');
+        expect(game.state.done).toBeTruthy();
+        // the only player left should get the pot
+        expect(poker.payout(game.state, game.hands).payouts).toMatchObject({ '1': game.state.pot });
+    });
+
+    test("Player cannot bet more than they have", () => {
+        let game = poker.createPokerGame(defaultConfig, ['0', '1'], [30, 100]);
+        game = poker.step(game, { type: 'raise', amount: 101 }).next;
+        expect(game.state.players[1].stack).toBe(0);
+        expect(game.state.players[1].currentBet).toBe(100);
+        expect(game.state.targetBet).toBe(100);
+        game = poker.step(game, { type: 'call' }).next;
+        expect(game.state.players[0].stack).toBe(0);
+        expect(game.state.players[0].currentBet).toBe(30);
+    });
+
+    test("Player with 0 chips game proceeds normally", () => {
+        let game = poker.createPokerGame(defaultConfig, ['0', '1'], [0, 100]);
+        expect(game.state.whoseTurn).toBe('1');
+        game = poker.step(game, { type: 'call' }).next;
+        expect(game.state.whoseTurn).toBe('0');
+        game = poker.step(game, { type: 'call' }).next;
+    });
+
 });

@@ -1,6 +1,6 @@
 import type * as Party from 'partykit/server';
 import * as Poker from '@tg/game-logic/poker'
-import { ClientMessage, ServerStateMessage } from './shared';
+import { ClientMessage, ServerStateMessage, ServerUpdateMessage } from './shared';
 
 const Hand = require('pokersolver').Hand;
 
@@ -36,55 +36,23 @@ export default class PartyServer implements Party.Server {
   public serverState: IPartyServerState = {
     gamePhase: 'pending'
   };
-  constructor(public readonly room: Party.Room) {
+  public queuedUpdates: ServerUpdateMessage[] = [];
+  constructor(public readonly room: Party.Room, public readonly autoStart: boolean = true) {
     this.room = room;
   }
 
   // Start as soon as two players are in
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    if (process.env.NODE_ENV !== 'production') {
+    //TODO: we should use a logging library so we can control verbosity
+    /*if (process.env.NODE_ENV !== 'production') {
       console.log("client connected")
-    }
-
-    if (this.inGamePlayers.length < 2) {
-      this.serverState.gamePhase = 'pending'
-    }
-
-    this.stacks[conn.id] = defaultStack;
-    this.players.push({
-      playerId: conn.id,
-    });
-    if (this.serverState.gamePhase === "active" || this.players.length >= this.gameConfig.maxPlayers) {
-      // Add as a spectator if the game is active or player slots are full
-      this.spectatorPlayers.push({
-        playerId: conn.id,
-      });
-    }
-    this.broadcastGameState();
+    }*/
+    this.addPlayer(conn.id);
   }
 
 
   onClose(conn: Party.Connection) {
-    // Attempt to remove from players list first 
-    const playerIndex = this.players.findIndex(player => player.playerId === conn.id);
-    if (playerIndex !== -1) {
-      // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
-      this.gameState?.state?.players?.map?.((player) => {
-        return {
-          ...player,
-          folded: player.id === conn.id
-        }
-      })
-      this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== conn.id);
-      this.players = this.players.filter(player => player.playerId !== conn.id);
-      this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== conn.id);
-      this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== conn.id);
-
-      // Remove from stacks
-      delete this.stacks[conn.id];
-    }
-
-    this.broadcastGameState();
+    this.removePlayer(conn.id);
   }
 
   onMessage(message: string, websocket: Party.Connection): void {
@@ -98,30 +66,14 @@ export default class PartyServer implements Party.Server {
       else {
         throw new Error("Invalid message type");
       }
-      console.log("Action data: ", data);
+      console.log("Action data: ", data, websocket.id);
 
       // TODO: you shouldn't be able to start/reset game unless you are an admin
       if (data.type == "action" && Poker.isAction(data.action)) {
-        console.log("Handling action");
         this.handlePlayerAction(websocket.id, data.action);
       }
       else if (data.type == 'join-game') {
-        if (this.serverState.gamePhase === 'pending') {
-          this.inGamePlayers.push({
-            playerId: websocket.id,
-          });
-        }
-        else {
-          this.queuedPlayers.push({
-            playerId: websocket.id,
-          });
-        }
-        this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== websocket.id);
-        if (AUTO_START && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
-          this.startGame();
-        } else {
-          this.broadcastGameState();
-        }
+        this.playerJoinGame(websocket.id);
       }
       else if (data.type == 'start-game') {
         this.startGame();
@@ -134,15 +86,10 @@ export default class PartyServer implements Party.Server {
         this.broadcastGameState();
       }
       else if (data.type == 'spectate') {
-        this.spectatorPlayers.push({
-          playerId: websocket.id,
-        });
-        this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== websocket.id);
-        this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== websocket.id);
+        this.playerSpectate(websocket.id);
       }
       else if (data.type == 'reset-game') {
-        this.serverState.gamePhase = 'pending';
-        this.endGame();
+        this.endGame('system');
       }
       else {
         console.error("Invalid message type", data);
@@ -168,31 +115,50 @@ export default class PartyServer implements Party.Server {
       return;
     }
 
-    const { who, log } = Poker.whoseTurn(this.gameState.state);
-    if (who !== playerId) {
+    if (this.gameState.state.whoseTurn !== playerId) {
       console.log("Player attempted to make action out of turn", playerId);
       return;
     }
 
     this.gameState = Poker.step(this.gameState, action).next;
+    this.queuedUpdates.push({
+      type: 'action',
+      action,
+      player,
+    });
     if (this.gameState.state.done) {
-      this.endGame();
+      this.endGame(this.gameState?.state?.round === 'showdown' ? 'showdown' : 'fold');
     }
     this.broadcastGameState();
   }
 
   startGame() {
-    this.inGamePlayers = this.inGamePlayers.concat(this.queuedPlayers);
+    if (this.gameState && !this.gameState.state.done) {
+      return;
+    }
+    for (const p of this.queuedPlayers) {
+      this.queuedUpdates.push({
+        type: 'player-joined',
+        player: {
+          playerId: p.playerId,
+        }
+      });
+      this.inGamePlayers.push(p);
+    }
     this.queuedPlayers = [];
     this.winners = []
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
 
-    this.room.broadcast("The game has started!");
+    this.queuedUpdates.push({
+      type: 'game-started',
+      players: this.inGamePlayers,
+    });
+
     this.broadcastGameState();
   }
 
-  endGame() {
+  endGame(reason: 'showdown' | 'fold' | 'system') {
     if (!this.gameState) {
       return;
     }
@@ -201,21 +167,36 @@ export default class PartyServer implements Party.Server {
     for (const playerId in payouts) {
       this.stacks[playerId] = (this.gameState.state.players.find(player => player.id == playerId)?.stack ?? 0) + payouts[playerId];
     }
+    this.serverState.gamePhase = 'pending';
+    this.queuedUpdates.push({
+      type: 'game-ended',
+      payouts,
+      reason
+    });
+    this.gameState = null;
+    this.broadcastGameState();
+    if (this.autoStart && this.inGamePlayers.length >= 2) {
+      this.startGame();
+    }
+  }
+
+  getStateMessage(playerId: string): ServerStateMessage {
+    return {
+      gameState: this.gameState?.state ?? null,
+      hand: this.gameState?.hands?.[playerId] ?? null,
+      inGamePlayers: this.inGamePlayers,
+      spectatorPlayers: this.spectatorPlayers,
+      queuedPlayers: this.queuedPlayers,
+      players: this.players,
+      state: this.serverState,
+      clientId: playerId,
+      lastUpdates: this.queuedUpdates,
+    }
   }
 
   broadcastGameState() {
     for (const player of this.players) {
-      const message: ServerStateMessage = {
-        gameState: this.gameState?.state ?? null,
-        hand: this.gameState?.hands?.[player.playerId] ?? null,
-        inGamePlayers: this.inGamePlayers,
-        spectatorPlayers: this.spectatorPlayers,
-        queuedPlayers: this.queuedPlayers,
-        players: this.players,
-        winners: this.winners,
-        state: this.serverState,
-        config: this.gameConfig
-      };
+      const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
       // Send game state; ensure spectators do not receive any cards information
       const conn = this.room.getConnection(player.playerId);
@@ -223,5 +204,83 @@ export default class PartyServer implements Party.Server {
         conn.send(JSON.stringify(message));
       }
     }
+    this.queuedUpdates = [];
+  }
+
+  playerSpectate(playerId: string) {
+    this.spectatorPlayers.push({
+      playerId
+    });
+    this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== playerId);
+    this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== playerId);
+    this.queuedUpdates.push({
+      type: 'player-left',
+      player: {
+        playerId
+      }
+    });
+    this.broadcastGameState();
+  }
+
+  playerJoinGame(playerId: string) {
+    if (this.serverState.gamePhase === 'pending') {
+      this.inGamePlayers.push({
+        playerId,
+      });
+      this.queuedUpdates.push({
+        type: 'player-joined',
+        player: {
+          playerId,
+        }
+      });
+    }
+    else {
+      this.queuedPlayers.push({
+        playerId,
+      });
+    }
+    this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
+
+    if (this.autoStart && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
+      this.startGame();
+    }
+    this.broadcastGameState();
+  }
+
+  addPlayer(playerId: string) {
+    this.stacks[playerId] = defaultStack;
+    this.players.push({
+      playerId
+    });
+
+    this.playerJoinGame(playerId);
+    this.broadcastGameState();
+  }
+
+  removePlayer(playerId: string) {
+    // Attempt to remove from players list first
+    const playerIndex = this.players.findIndex(player => player.playerId === playerId);
+    if (playerIndex !== -1) {
+      // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
+      if (this.gameState) {
+        this.gameState = Poker.forcedFold(this.gameState, playerId);
+      }
+      this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
+      this.players = this.players.filter(player => player.playerId !== playerId);
+      this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== playerId);
+      this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== playerId);
+      this.queuedUpdates.push({
+        type: 'player-left',
+        player: {
+          playerId
+        }
+      });
+    }
+
+    if (this.players.length < 2) {
+      this.endGame('fold');
+    }
+
+    this.broadcastGameState();
   }
 }
