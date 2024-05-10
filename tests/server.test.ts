@@ -95,4 +95,15 @@ describe('Poker server', () => {
         server.handlePlayerAction('1', { type: 'call' });
         expect(server.gameState?.state.whoseTurn).toBe('3');
     });
+
+    test('Hand is null if player is not in game', () => {
+        (server.autoStart as any) = true;
+        server.onConnect({ id: '1' } as any, {} as any);
+        server.onConnect({ id: '2' } as any, {} as any);
+        server.onConnect({ id: '3' } as any, {} as any);
+
+        expect(server.getStateMessage("1").hand?.length).toBe(2);
+        expect(server.getStateMessage("2").hand?.length).toBe(2);
+        expect(server.getStateMessage("3").hand).toBe(null);
+    })
 })
