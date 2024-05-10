@@ -16,13 +16,16 @@ export default {
     }
 
     const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
+    const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
     const gameState = serverState.gameState;
     const canGameStart = serverState?.inGamePlayers?.length > 1
     const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
-    const isPlayerInGame = inGamePlayers.indexOf(clientState?.playerId) !== -1
+    const isPlayerPlaying = inGamePlayers.indexOf(clientState?.playerId) !== -1
+    const isPlayerSpectating = spectatorPlayers.indexOf(clientState?.playerId) !== -1
 
     console.log({ canGameStart })
-    console.log({ isPlayerInGame })
+    console.log({ isPlayerPlaying })
+    console.log({ isPlayerSpectating })
     console.log(serverState.state.gamePhase)
 
     const currentPlayer = gameState.players?.find(player => player.id === clientState?.playerId)
@@ -67,7 +70,7 @@ export default {
       console.log('gameState', attrs)
     }
 
-    if (inGamePlayers.length > 1) {
+    if (inGamePlayers.length > 1 && (isPlayerPlaying || isPlayerSpectating)) {
       return m("div.tg-poker__table",
         [
           m("div.tg-poker__table__top",
@@ -165,18 +168,27 @@ export default {
               ]
               )
             )
-          )
+          ),
+          m("button", {
+            style: {
+              backgroundColor: 'red',
+              position: 'absolute',
+              top: 0,
+              right: 0
+            },
+            onclick: () => clientState.sendMessage({ type: 'leave-game' })
+          }, "Leave Game")
         ]);
     } else {
-      if (!isPlayerInGame || serverState.state.gamePhase == 'pending') {
+      if (!isPlayerPlaying || serverState.state.gamePhase == 'pending') {
         return m.fragment({}, [
           m("button", {
             onclick: () => clientState.sendMessage({ type: 'join-game' }),
             style: {
-              pointerEvents: isPlayerInGame ? 'none' : 'auto'
+              pointerEvents: isPlayerPlaying ? 'none' : 'auto'
             },
           },
-            !isPlayerInGame ?
+            !isPlayerPlaying ?
               canGameStart ?
                 'Click "Start Game when you are ready' : 'Join Game' :
               `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...`
@@ -188,18 +200,6 @@ export default {
             },
           }, "Game will auto-start when player minimum has been reached")
         ]);
-      } else {
-        if (process.env.NODE_ENV !== 'production') {
-          return m("button", {
-            style: {
-              backgroundColor: 'red',
-              position: 'absolute',
-              top: 0,
-              right: 0
-            },
-            onclick: () => clientState.sendMessage({ type: 'leave-game' })
-          }, "Leave Game")
-        }
       }
     }
   }

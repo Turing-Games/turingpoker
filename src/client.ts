@@ -56,8 +56,6 @@ const clientState: ClientState = {
     });
   },
   sendMessage(message) {
-    console.log(this)
-    console.log('sending message', this.socket)
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       console.log(this.socket)
       this.socket.send(JSON.stringify(message));
