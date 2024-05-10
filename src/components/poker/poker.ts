@@ -18,12 +18,12 @@ export default {
     const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
     const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
     const gameState = serverState.gameState;
-    const canGameStart = serverState?.inGamePlayers?.length > 1
+    const gameHasEnoughPlayers = serverState?.inGamePlayers?.length > 1
     const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
     const isPlayerPlaying = inGamePlayers.indexOf(clientState?.playerId) !== -1
     const isPlayerSpectating = spectatorPlayers.indexOf(clientState?.playerId) !== -1
 
-    console.log({ canGameStart })
+    console.log({ gameHasEnoughPlayers })
     console.log({ isPlayerPlaying })
     console.log({ isPlayerSpectating })
     console.log(serverState.state.gamePhase)
@@ -155,18 +155,7 @@ export default {
                 style: {
                   marginBottom: '24px'
                 }
-              }, [
-                serverState.winners.map((id, i) => m("p", `Player #${id} won`)),
-                m("div.tg-poker__winner__buttons", [
-                  m("button", {
-                    onclick: () => clientState.sendMessage({ type: 'join-game' })
-                  }, "New Game"),
-                  m("button", {
-                    onclick: () => clientState.sendMessage({ type: 'leave-game' })
-                  }, "Quit")
-                ])
-              ]
-              )
+              }, serverState.winners.map((id, i) => m("p", `Player #${id} won`)))
             )
           ),
           // m("button", {
@@ -189,7 +178,7 @@ export default {
             },
           },
             !isPlayerPlaying ?
-              canGameStart ?
+              gameHasEnoughPlayers ?
                 'Click "Start Game when you are ready' : 'Join Game' :
               `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...`
           ),

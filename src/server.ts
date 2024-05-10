@@ -43,10 +43,10 @@ export default class PartyServer implements Party.Server {
 
   // Start as soon as two players are in
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    //TODO: we should use a logging library so we can control verbosity
-    /*if (process.env.NODE_ENV !== 'production') {
-      console.log("client connected")
-    }*/
+    if (this.inGamePlayers.length < 2) {
+      this.serverState.gamePhase = 'pending'
+    }
+
     this.addPlayer(conn.id);
   }
 
@@ -146,7 +146,6 @@ export default class PartyServer implements Party.Server {
       this.inGamePlayers.push(p);
     }
     this.queuedPlayers = [];
-    this.winners = []
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
 
@@ -156,6 +155,11 @@ export default class PartyServer implements Party.Server {
     });
 
     this.broadcastGameState();
+
+    setTimeout(() => {
+      this.winners = []
+      this.broadcastGameState();
+    }, 3000)
   }
 
   endGame(reason: 'showdown' | 'fold' | 'system') {
@@ -192,7 +196,7 @@ export default class PartyServer implements Party.Server {
       state: this.serverState,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
-      winners: []
+      winners: this.winners
     }
   }
 

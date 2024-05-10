@@ -11,7 +11,7 @@ export default {
       m("div.tg-poker__player__details", [
         m("h4", attrs.title),
         m("div", [
-          m("div", `$${player.stackSize}`),
+          m("div", `$${player.stack}`),
           m("div", `Bet: $${player.currentBet}`),
         ])
       ]),
