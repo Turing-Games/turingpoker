@@ -169,15 +169,15 @@ export default {
               )
             )
           ),
-          m("button", {
-            style: {
-              backgroundColor: 'red',
-              position: 'absolute',
-              top: 0,
-              right: 0
-            },
-            onclick: () => clientState.sendMessage({ type: 'leave-game' })
-          }, "Leave Game")
+          // m("button", {
+          //   style: {
+          //     backgroundColor: 'red',
+          //     position: 'absolute',
+          //     top: 0,
+          //     right: 0
+          //   },
+          //   onclick: () => clientState.sendMessage({ type: 'leave-game' })
+          // }, "Leave Game")
         ]);
     } else {
       if (!isPlayerPlaying || serverState.state.gamePhase == 'pending') {
