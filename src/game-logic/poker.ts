@@ -160,7 +160,7 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
     out.state.players[sb].stack -= out.state.players[sb].currentBet;
     out.state.players[bb].currentBet = Math.min(config.bigBlind, stacks[bb]);
     out.state.players[bb].stack -= out.state.players[bb].currentBet;
-    out.state.pot = config.smallBlind + config.bigBlind;
+    out.state.pot = out.state.players[sb].currentBet + out.state.players[bb].currentBet;
 
     return out;
 }
