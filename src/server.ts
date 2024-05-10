@@ -184,7 +184,7 @@ export default class PartyServer implements Party.Server {
       return;
     }
     const payouts = Poker.payout(this.gameState.state, this.gameState.hands).payouts;
-    this.winners = Object.keys(payouts)
+    this.winners = Object.keys(payouts).filter(id => payouts[id] > 0).map(id => id)
     for (const playerId in payouts) {
       this.stacks[playerId] = (this.gameState.state.players.find(player => player.id == playerId)?.stack ?? 0) + payouts[playerId];
     }
