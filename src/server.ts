@@ -57,7 +57,7 @@ export default class PartyServer implements Party.Server {
 
 
   onClose(conn: Party.Connection) {
-    // Attempt to remove from players list first
+    // Attempt to remove from players list first 
     const playerIndex = this.players.findIndex(player => player.playerId === conn.id);
     if (playerIndex !== -1) {
       // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers

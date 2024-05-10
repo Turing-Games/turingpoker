@@ -207,6 +207,8 @@ export default {
                     m(GameControls, {
                       clientState: clientState
                     }) :
+                    // serverState.state.gamePhase == 'done' ?
+                    // m()
                     m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
               ]),
               // spectators
