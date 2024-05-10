@@ -212,12 +212,14 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
     payouts: Record<PlayerID, number>,
     log: GameLog
 } {
+    const out: Record<PlayerID, number> = {};
+    for (const player of state.players) {
+        out[player.id] = 0;
+    }
     if (state.round == 'showdown') {
-        const out: Record<PlayerID, number> = {};
         const players = [...state.players];
         const bestHands: Record<PlayerID, Hand> = {};
         for (const player of players) {
-            out[player.id] = 0;
             bestHands[player.id] = best5(hands[player.id].concat(state.cards));
         }
         players.sort((a, b) => handCmp(bestHands[a.id], bestHands[b.id]));
@@ -261,10 +263,9 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
         // check if all players except for one have folded
         const remainingPlayers = state.players.filter(p => !p?.folded);
         if (remainingPlayers.length == 1) {
-            const payouts: Record<PlayerID, number> = {};
-            payouts[remainingPlayers[0].id] = state.pot;
+            out[remainingPlayers[0].id] = state.pot;
             return {
-                payouts, log: [
+                payouts: out, log: [
                     `${remainingPlayers[0].id} wins the pot because all others folded`
                 ]
             };
@@ -272,7 +273,6 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
     }
     // here the game isn't done
     // give everyone their chips back
-    let out: Record<PlayerID, number> = {};
     for (const player of state.players) {
         out[player.id] = player.currentBet;
     }
