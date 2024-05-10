@@ -28,40 +28,40 @@ export default {
     console.log({ isPlayerSpectating })
     console.log(serverState.state.gamePhase)
 
-    const currentPlayer = gameState.players?.find(player => player.id === clientState?.playerId)
-    const isCurrentPlayerTurn = currentPlayer?.id === Poker.findWhoseTurn(gameState).who;
+    const currentPlayer = gameState?.players.find(player => player.id === clientState?.playerId)
+    const isCurrentPlayerTurn = currentPlayer?.id === gameState?.whoseTurn;
     const opponents = clientState?.serverState.gameState?.players?.filter(player => player.id !== currentPlayer?.id)
-    const { who: currentTurn } = Poker.findWhoseTurn(gameState);
+    const currentTurn = gameState?.whoseTurn
     const getPlayerStatus = (playerId: string) => {
       if (serverState.spectatorPlayers.find(player => player.playerId === playerId)) return 'spectator'
       if (serverState.queuedPlayers.find(player => player.playerId === playerId)) return 'queued'
 
       if (serverState.state.gamePhase == 'pending') return 'waiting'
 
-      if (gameState.players.find(player => player.id === playerId)?.folded)
+      if (gameState?.players.find(player => player.id === playerId)?.folded)
         return 'folded'
 
-      if (gameState.players.find(player => player.id === playerId).currentBet === gameState.targetBet)
+      if (gameState?.players.find(player => player.id === playerId)?.currentBet === gameState?.targetBet)
         return 'checked'
 
-      if (gameState.players.find(player => player.id === playerId).currentBet > gameState.targetBet)
+      if (gameState?.players.find(player => player.id === playerId)?.currentBet > gameState?.targetBet)
         return 'raised'
 
-      if (gameState.players.find(player => player.id === playerId).currentBet < gameState.targetBet)
+      if (gameState?.players.find(player => player.id === playerId)?.currentBet < gameState?.targetBet)
         return 'called'
     }
 
 
     const gameOverview = [
-      { label: 'Current Pot:', value: gameState.pot.toString(), prefix: '$' },
-      { label: 'Current Bet:', value: gameState.targetBet.toString(), prefix: '$' },
-      { label: 'Dealer Position:', value: (gameState.dealerPosition + 1).toString(), prefix: '' }
+      { label: 'Current Pot:', value: gameState?.pot.toString(), prefix: '$' },
+      { label: 'Current Bet:', value: gameState?.targetBet.toString(), prefix: '$' },
+      { label: 'Dealer Position:', value: (gameState?.dealerPosition + 1).toString(), prefix: '' }
     ]
 
     if (process.env.NODE_ENV != 'production') {
       gameOverview.push({
         label: 'Betting Round',
-        value: gameState.round,
+        value: gameState?.round,
         prefix: ''
       })
     }
@@ -94,7 +94,7 @@ export default {
                   player: opp,
                   hand: [],
                   isCurrentPlayerTurn: opp.id === currentTurn,
-                  showCards: gameState.round == 'showdown',
+                  showCards: gameState?.round == 'showdown',
                   title: `Player ${index + 2 - playerNumberOffset} (${status}) ${opp.id == currentTurn ? ' - Their Turn' : ''}`,
                   className: ''
                 })
@@ -104,7 +104,7 @@ export default {
           // center of table / deck / dealer cards
           m("div.tg-poker__table__dealer", {},
             m(card),
-            gameState.cards.map((data, i) => {
+            gameState?.cards.map((data, i) => {
               console.log(Poker.formatCard(data))
               return m(card, {
                 style: {
@@ -152,7 +152,7 @@ export default {
           m('div.tg-poker__winner',
             m.fragment({},
               m("div", {
-                stlye: {
+                style: {
                   marginBottom: '24px'
                 }
               }, [

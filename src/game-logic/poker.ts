@@ -111,7 +111,7 @@ function shuffleDeck(deck: Card[]): Card[] {
     const arr = new BigUint64Array(shuffledDeck.length);
     const nums = crypto.getRandomValues(arr);
     for (let i = shuffledDeck.length - 1; i > 0; i--) {
-        const j = Number(arr[i]%BigInt(i));
+        const j = Number(arr[i] % BigInt(i));
         [shuffledDeck[i], shuffledDeck[j]] = [shuffledDeck[j], shuffledDeck[i]];
     }
     return shuffledDeck;
@@ -250,7 +250,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
 }
 
 /**
- * Make a move for the player whose id is given by @see findWhoseTurn. If the move is invalid, return the state unchanged.
+ * Make a move for the player whose id is given by @see gameState.whoseTurn. If the move is invalid, return the state unchanged.
  * @param state Poker game state
  * @param move The move to make
  * @throws If the move is a raise and the amount is negative
@@ -288,7 +288,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         if (move.type == 'raise') {
             if (move.amount < 0) throw new Error("Raise amount must be non-negative");
             let oldTarget = target;
-            target = Math.max(target, Math.min(move.amount+target, player.stack + player.currentBet));
+            target = Math.max(target, Math.min(move.amount + target, player.stack + player.currentBet));
             if (target > oldTarget) {
                 // update everyone's lastRound to the previous round
                 for (const p of state.players) {

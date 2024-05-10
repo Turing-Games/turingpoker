@@ -188,9 +188,11 @@ export default class PartyServer implements Party.Server {
       spectatorPlayers: this.spectatorPlayers,
       queuedPlayers: this.queuedPlayers,
       players: this.players,
+      config: this.gameConfig,
       state: this.serverState,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
+      winners: []
     }
   }
 
@@ -223,7 +225,9 @@ export default class PartyServer implements Party.Server {
   }
 
   playerJoinGame(playerId: string) {
+    console.log('playerjoingame')
     if (this.serverState.gamePhase === 'pending') {
+      console.log('pushed')
       this.inGamePlayers.push({
         playerId,
       });
@@ -233,18 +237,20 @@ export default class PartyServer implements Party.Server {
           playerId,
         }
       });
-    }
-    else {
+    } else {
       this.queuedPlayers.push({
         playerId,
       });
     }
+    console.log('this.inGamePlayers')
+    console.log(this.inGamePlayers)
     this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
 
     if (this.autoStart && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
       this.startGame();
+    } else {
+      this.broadcastGameState();
     }
-    this.broadcastGameState();
   }
 
   addPlayer(playerId: string) {

@@ -15,7 +15,7 @@ export const GameControls = {
     // Retrieve the current bet and minimum raise amount
     const currentBet = gameState.targetBet;
     const minRaiseAmount = gameState.bigBlind;
-    const currentPlayer = gameState.players?.find(player => player.id === clientState?.playerId)
+    const currentPlayer = gameState?.players?.find(player => player.id === clientState?.playerId)
     console.log({ currentPlayer })
     const isPlayerEvenWithBet = currentPlayer.currentBet >= currentBet
 
