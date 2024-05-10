@@ -1,5 +1,4 @@
 import PartyServer from "@tg/server"
-import WebSocket from "ws"
 describe('Poker server', () => {
     let server: PartyServer;
     let send = jest.fn();
