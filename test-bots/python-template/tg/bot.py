@@ -39,6 +39,7 @@ class Bot:
                     elif update.type == types.ServerUpdateMessageType.GAME_ENDED.value:
                         self.game_over(update.payouts)
                     elif update.type == types.ServerUpdateMessageType.GAME_STARTED.value:
+                        self.already_moved = set()
                         self.start_game(state.client_id)
                     elif update.type == types.ServerUpdateMessageType.PLAYER_JOINED.value:
                         pass
