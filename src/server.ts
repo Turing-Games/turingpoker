@@ -185,6 +185,8 @@ export default class PartyServer implements Party.Server {
   }
 
   getStateMessage(playerId: string): ServerStateMessage {
+    const isSpectator = this.spectatorPlayers.map(s => s.playerId).indexOf(playerId) !== -1
+    console.log({ isSpectator })
     return {
       gameState: this.gameState?.state ?? null,
       hand: this.gameState?.hands?.[playerId] ?? null,
@@ -196,7 +198,8 @@ export default class PartyServer implements Party.Server {
       state: this.serverState,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
-      winners: this.winners
+      winners: this.winners,
+      hands: isSpectator ? this?.gameState?.hands : []
     }
   }
 
@@ -229,7 +232,6 @@ export default class PartyServer implements Party.Server {
   }
 
   playerJoinGame(playerId: string) {
-    console.log('playerjoingame')
     if (this.serverState.gamePhase === 'pending') {
       console.log('pushed')
       this.inGamePlayers.push({
@@ -246,8 +248,6 @@ export default class PartyServer implements Party.Server {
         playerId,
       });
     }
-    console.log('this.inGamePlayers')
-    console.log(this.inGamePlayers)
     this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
 
     if (this.autoStart && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {

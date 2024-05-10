@@ -48,4 +48,5 @@ export type ServerStateMessage = {
     clientId: string;
     lastUpdates: ServerUpdateMessage[]
     config: Poker.IPokerConfig
+    hands: Record<Poker.PlayerID, [Poker.Card, Poker.Card]>[]
 }

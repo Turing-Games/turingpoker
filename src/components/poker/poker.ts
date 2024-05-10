@@ -94,7 +94,7 @@ export default {
                   player: opp,
                   hand: [],
                   isCurrentPlayerTurn: opp.id === currentTurn,
-                  showCards: gameState?.round == 'showdown',
+                  showCards: gameState?.round == 'showdown' || isPlayerSpectating,
                   title: `Player ${index + 2 - playerNumberOffset} (${status}) ${opp.id == currentTurn ? ' - Their Turn' : ''}`,
                   className: ''
                 })
@@ -179,9 +179,15 @@ export default {
           },
             !isPlayerPlaying ?
               gameHasEnoughPlayers ?
-                'Click "Start Game when you are ready' : 'Join Game' :
+                '' : 'Join Game' :
               `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...`
           ),
+          m("button", {
+            onclick: () => clientState.sendMessage({ type: 'spectate' }),
+            style: {
+              pointerEvents: isPlayerPlaying ? 'none' : 'auto'
+            },
+          }, "Spectate"),
           m("button", {
             onclick: () => clientState.sendMessage({ type: 'start-game' }),
             style: {

@@ -4,7 +4,7 @@ import m from "mithril";
 export default {
   view: ({ attrs }) => {
     const player = attrs.player;
-    const hand = attrs.hand
+    const hand = attrs.hand || attrs.hands[player.id]
     console.log({ player })
 
     return m(`div.tg-poker__player${attrs.className ? '.' + attrs.className : ''}`, [
