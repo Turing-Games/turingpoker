@@ -81,18 +81,25 @@ class ActionType(Enum):
     CALL = 'call'
 
 @dataclass
-class Action:
+class Action(dict):
     type: ActionType
     amount: Optional[int] = None
 
 @dataclass
-class ClientMessage:
+class ClientMessage(dict):
     type: str
     action: Optional[Action] = None
 
+class ServerUpdateMessageType(Enum):
+    GAME_STARTED = 'game-started'
+    PLAYER_JOINED = 'player-joined'
+    PLAYER_LEFT = 'player-left'
+    ACTION = 'action'
+    GAME_ENDED = 'game-ended'
+
 @dataclass
 class ServerUpdateMessage:
-    type: str
+    type: ServerUpdateMessageType
     action: Optional[Action] = None
     player: Optional[PokerPlayer] = None
     players: Optional[List[PokerPlayer]] = None
@@ -102,11 +109,11 @@ class ServerUpdateMessage:
 
 @dataclass
 class ServerStateMessage:
+    client_id: str
     game_state: Optional[PokerSharedState] = None
     hand: Optional[Tuple[Card, Card]] = None
     in_game_players: List[PokerPlayer] = field(default_factory=list)
     spectator_players: List[PokerPlayer] = field(default_factory=list)
     queued_players: List[PokerPlayer] = field(default_factory=list)
     players: List[PokerPlayer] = field(default_factory=list)
-    client_id: str
     last_updates: List[ServerUpdateMessage] = field(default_factory=list)

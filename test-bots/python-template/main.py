@@ -1,8 +1,10 @@
-
+#!/usr/bin/env python3
 import asyncio
 from websockets.sync.client import connect
 import argparse
 import time
+
+from tg.bot import Bot
 
 parser = argparse.ArgumentParser(
     prog='Template bot',
@@ -17,17 +19,21 @@ parser.add_argument('--room', type=str, default='my-new-room',
 
 args = parser.parse_args()
 
-
-async def main():
-    ws = connect(f"ws://{args.host}:{str(args.port)}/party/{args.room}")
-    print(ws)
-    ws.send('{"type": "join-game"}')
-    while True:
-        response = ws.recv()
-        print(response)
-        ws.send('{"type": "action", "action": {"type": "call"}}')
+class TemplateBot(Bot):
+    def act(self, state, hand):
         time.sleep(1)
+        print('acting', state, hand)
+        return {'type': 'call'}
 
+    def opponent_action(self, action, player):
+        print('opponent action?', action, player)
+
+    def game_over(self, payouts):
+        print('game over', payouts)
+
+    def start_game(self, my_id):
+        print('start game', my_id)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    bot = TemplateBot(args.host, args.port, args.room)
+    asyncio.run(bot.start())

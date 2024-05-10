@@ -123,7 +123,15 @@ export default class PartyServer implements Party.Server {
     if (this.gameState && !this.gameState.state.done) {
       return;
     }
-    this.inGamePlayers = this.inGamePlayers.concat(this.queuedPlayers);
+    for (const p of this.queuedPlayers) {
+      this.queuedUpdates.push({
+        type: 'player-joined',
+        player: {
+          playerId: p.playerId,
+        }
+      });
+      this.inGamePlayers.push(p);
+    }
     this.queuedPlayers = [];
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
@@ -172,6 +180,7 @@ export default class PartyServer implements Party.Server {
   }
 
   broadcastGameState() {
+    console.log(this.gameState?.state.whoseTurn);
     for (const player of this.players) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
@@ -204,6 +213,12 @@ export default class PartyServer implements Party.Server {
       this.inGamePlayers.push({
         playerId,
       });
+      this.queuedUpdates.push({
+        type: 'player-joined',
+        player: {
+          playerId,
+        }
+      });
     }
     else {
       this.queuedPlayers.push({
@@ -211,13 +226,6 @@ export default class PartyServer implements Party.Server {
       });
     }
     this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
-
-    this.queuedUpdates.push({
-      type: 'player-joined',
-      player: {
-        playerId,
-      }
-    });
 
     if (this.autoStart && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= 2) {
       this.startGame();
