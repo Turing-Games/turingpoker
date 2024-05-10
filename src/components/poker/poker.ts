@@ -109,6 +109,12 @@ export default {
     } else {
       if (process.env.NODE_ENV !== 'production') {
         m("button", {
+          style: {
+            backgroundColor: 'red',
+            position: 'absolute',
+            top: 0,
+            right: 0
+          },
           onclick: () => clientState.sendMessage({ type: 'leave-game' })
         }, "Leave Game")
       }

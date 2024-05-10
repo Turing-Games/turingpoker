@@ -125,6 +125,7 @@ export default class PartyServer implements Party.Server {
         this.serverState.gamePhase = 'pending';
         this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== websocket.id);
         this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== websocket.id);
+        this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== websocket.id);
         this.players = this.players.filter(player => player.playerId !== websocket.id);
         this.endGame();
       }
