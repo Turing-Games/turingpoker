@@ -23,9 +23,7 @@ export function parseCard(card: string): Card {
     return { rank: rankNum, suit: suitName };
 }
 export function formatCard(card: Card): string {
-    let rank: string = cardNames[card.rank];
-    let suit: string = card.suit[0];
-    return rank + suit;
+    return `${card.suit}_${card.rank}`;
 }
 export type Action = {
     type: 'raise'

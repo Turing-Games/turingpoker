@@ -178,6 +178,7 @@ export default {
           m("div.tg-poker__table__dealer", {},
             m(card),
             gameState.cards.map((data, i) => {
+              console.log(Poker.formatCard(data))
               return m(card, {
                 style: {
                   transform: `translateX(-${78 * (i + 1)}px)`

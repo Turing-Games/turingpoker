@@ -5,7 +5,6 @@ export default {
   view: ({ attrs }) => {
     const player = attrs.player;
     const hand = attrs.hand
-    console.log({ hand })
 
     return m(`div.tg-poker__player${attrs.className ? '.' + attrs.className : ''}`, [
       m("div.tg-poker__player__details", [
