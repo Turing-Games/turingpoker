@@ -157,24 +157,27 @@ export default {
     } else {
       if (!isPlayerInGame && !isPlayerSpectating) {
         return m.fragment({}, [
+          // join game
           m("button", {
             onclick: () => clientState.sendMessage({ type: 'join-game' }),
             style: {
-              pointerEvents: isPlayerInGame ? 'none' : 'auto'
+              pointerEvents: isPlayerInGame ? 'none' : 'auto',
+              display: serverState.state.gamePhase === 'active' ? 'none' : 'block'
             },
-          },
-            remainingPlayersToJoin === 0 ?
-              'Game is full' :
-              isPlayerInGame ?
-                `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...` :
-                'Join Game'
-          ),
+          }, "Join Game"),
+          // spectate
           m("button", {
             onclick: () => clientState.sendMessage({ type: 'spectate' }),
             style: {
               pointerEvents: isPlayerInGame ? 'none' : 'auto'
             },
-          }, "Spectate")
+          }, "Spectate"),
+          // ui message
+          m("button",
+            remainingPlayersToJoin === 0 ?
+              'Game has started' :
+              `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...`
+          )
         ]);
       }
     }

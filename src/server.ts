@@ -232,7 +232,6 @@ export default class PartyServer implements Party.Server {
 
   playerJoinGame(playerId: string) {
     if (this.serverState.gamePhase === 'pending') {
-      console.log('pushed')
       this.inGamePlayers.push({
         playerId,
       });
