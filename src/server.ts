@@ -261,7 +261,7 @@ export default class PartyServer implements Party.Server {
       playerId
     });
 
-    this.playerJoinGame(playerId);
+    this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
     this.broadcastGameState();
   }
 
