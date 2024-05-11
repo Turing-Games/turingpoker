@@ -3,7 +3,6 @@ import m from "mithril";
 
 export const GameControls = {
   view: ({ attrs }) => {
-    console.log('test')
     const clientState: ClientState = attrs.clientState
     const serverState = clientState?.serverState
     const gameState = clientState.serverState?.gameState;
