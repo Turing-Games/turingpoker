@@ -20,13 +20,8 @@ export default {
     const gameState = serverState.gameState;
     const gameHasEnoughPlayers = serverState?.inGamePlayers?.length > 1
     const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
-    const isPlayerPlaying = inGamePlayers.indexOf(clientState?.playerId) !== -1
+    const isPlayerInGame = inGamePlayers.indexOf(clientState?.playerId) !== -1
     const isPlayerSpectating = spectatorPlayers.indexOf(clientState?.playerId) !== -1
-
-    console.log({ gameHasEnoughPlayers })
-    console.log({ isPlayerPlaying })
-    console.log({ isPlayerSpectating })
-    console.log(serverState.state.gamePhase)
 
     const currentPlayer = gameState?.players.find(player => player.id === clientState?.playerId)
     const isCurrentPlayerTurn = currentPlayer?.id === gameState?.whoseTurn;
@@ -70,7 +65,8 @@ export default {
       console.log('gameState', attrs)
     }
 
-    if (inGamePlayers.length > 1 && (isPlayerPlaying || isPlayerSpectating)) {
+    // show game table
+    if (inGamePlayers.length > 1 && (isPlayerInGame || isPlayerSpectating)) {
       return m("div.tg-poker__table",
         [
           m("div.tg-poker__table__top",
@@ -105,7 +101,6 @@ export default {
           m("div.tg-poker__table__dealer", {},
             m(card),
             gameState?.cards.map((data, i) => {
-              console.log(Poker.formatCard(data))
               return m(card, {
                 style: {
                   transform: `translateX(-${78 * (i + 1)}px)`
@@ -158,42 +153,28 @@ export default {
               }, serverState.winners.map((id, i) => m("p", `Player #${id} won`)))
             )
           ),
-          // m("button", {
-          //   style: {
-          //     backgroundColor: 'red',
-          //     position: 'absolute',
-          //     top: 0,
-          //     right: 0
-          //   },
-          //   onclick: () => clientState.sendMessage({ type: 'leave-game' })
-          // }, "Leave Game")
         ]);
     } else {
-      if (!isPlayerPlaying || serverState.state.gamePhase == 'pending') {
+      if (!isPlayerInGame && !isPlayerSpectating) {
         return m.fragment({}, [
           m("button", {
             onclick: () => clientState.sendMessage({ type: 'join-game' }),
             style: {
-              pointerEvents: isPlayerPlaying ? 'none' : 'auto'
+              pointerEvents: isPlayerInGame ? 'none' : 'auto'
             },
           },
-            !isPlayerPlaying ?
-              gameHasEnoughPlayers ?
-                '' : 'Join Game' :
-              `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...`
+            remainingPlayersToJoin === 0 ?
+              'Game is full' :
+              isPlayerInGame ?
+                `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...` :
+                'Join Game'
           ),
           m("button", {
             onclick: () => clientState.sendMessage({ type: 'spectate' }),
             style: {
-              pointerEvents: isPlayerPlaying ? 'none' : 'auto'
+              pointerEvents: isPlayerInGame ? 'none' : 'auto'
             },
-          }, "Spectate"),
-          m("button", {
-            onclick: () => clientState.sendMessage({ type: 'start-game' }),
-            style: {
-              pointerEvents: 'none'
-            },
-          }, "Game will auto-start when player minimum has been reached")
+          }, "Spectate")
         ]);
       }
     }

@@ -31,7 +31,6 @@ const clientState: ClientState = {
     this.socket.addEventListener("open", () => {
       clientState.isConnected = true;
       clientState.playerId = this.socket.id; // some issue here with properly setting this and using it for proper rendering logic
-      console.log("Connected with ID:", clientState.playerId);
       m.redraw();
     });
 
@@ -47,7 +46,6 @@ const clientState: ClientState = {
 
     this.socket.addEventListener("close", () => {
       clientState.isConnected = false;
-      console.log("WebSocket closed");
       m.redraw();
     });
 

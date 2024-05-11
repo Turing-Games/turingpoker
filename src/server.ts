@@ -61,7 +61,6 @@ export default class PartyServer implements Party.Server {
 
       if (typeof message === 'string') {  // Check if the message is string to parse it
         data = JSON.parse(message);
-        console.log("Parsed string: ", data);
       }
       else {
         throw new Error("Invalid message type");
