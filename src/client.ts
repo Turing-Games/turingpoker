@@ -5,7 +5,7 @@ import poker from "./components/poker/poker";
 import m from "mithril";
 import admin from "./components/poker/admin";
 import connect from "./components/connect";
-import { ServerStateMessage, ClientMessage } from "./shared";
+import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "./shared";
 import * as Poker from "@tg/game-logic/poker";
 
 export type ClientState = {
@@ -13,6 +13,7 @@ export type ClientState = {
   serverState: ServerStateMessage,
   socket: PartySocket | null,
   playerId: string | null,
+  updateLog: ServerUpdateMessage[],
   connect: () => void,
   sendMessage: (action: ClientMessage) => void
 }
@@ -21,7 +22,7 @@ const clientState: ClientState = {
   serverState: null,
   socket: null,
   playerId: null, // This will store the client's player ID
-
+  updateLog: [],
   connect() {
     this.socket = new PartySocket({
       host: PARTYKIT_HOST,
@@ -38,6 +39,9 @@ const clientState: ClientState = {
       try {
         const data: ServerStateMessage = JSON.parse(event.data);
         clientState.serverState = data;
+        for (const updates of data.lastUpdates) {
+          clientState.updateLog.push(updates)
+        }
       } catch {
         clientState.serverState = null;
       }

@@ -5,6 +5,7 @@ import player from "./player";
 import m from "mithril";
 import * as Poker from '@tg/game-logic/poker'
 import { GameControls } from "./game_controls";
+import gamelog from "./gamelog";
 
 export default {
   view: ({ attrs }) => {
@@ -67,93 +68,117 @@ export default {
 
     // show game table
     if (inGamePlayers.length > 1 && (isPlayerInGame || isPlayerSpectating)) {
-      return m("div.tg-poker__table",
-        [
-          m("div.tg-poker__table__top",
-            // game overview data
-            m("div.tg-poker__overview",
-              gameOverview.map((stat, i) => {
-                return m("div", { style: { color: "#5cc133" } }, [
-                  m("div", stat.label),
-                  m("div", `${stat.prefix}${stat.value}`)
-                ])
-              }),
-            ),
-            // opponents, filtered out current player
-            opponents?.length > 0 &&
-            m("div.opponents",
+      return m("div.tg-poker__table", [
+        m(gamelog, { gameLog: clientState.updateLog }),
+        m(
+          "div.tg-poker__table__top",
+          // game overview data
+          m(
+            "div.tg-poker__overview",
+            gameOverview.map((stat, i) => {
+              return m("div", { style: { color: "#5cc133" } }, [
+                m("div", stat.label),
+                m("div", `${stat.prefix}${stat.value}`),
+              ]);
+            })
+          ),
+          // opponents, filtered out current player
+          opponents?.length > 0 &&
+            m(
+              "div.opponents",
               opponents.map((opp, index) => {
                 // starts at 1 if spectator is viewing
-                const playerNumberOffset = !currentPlayer ? 1 : 0
+                const playerNumberOffset = !currentPlayer ? 1 : 0;
                 let status = getPlayerStatus(opp.id);
                 return m(player, {
                   player: opp,
                   hand: [],
                   isCurrentPlayerTurn: opp.id === currentTurn,
-                  showCards: gameState?.round == 'showdown' || isPlayerSpectating,
-                  title: `Player ${index + 2 - playerNumberOffset} (${status}) ${opp.id == currentTurn ? ' - Their Turn' : ''}`,
-                  className: ''
-                })
+                  showCards:
+                    gameState?.round == "showdown" || isPlayerSpectating,
+                  title: `Player ${
+                    index + 2 - playerNumberOffset
+                  } (${status}) ${
+                    opp.id == currentTurn ? " - Their Turn" : ""
+                  }`,
+                  className: "",
+                });
               })
-            ),
-          ),
-          // center of table / deck / dealer cards
-          m("div.tg-poker__table__dealer", {},
-            m(card),
-            gameState?.cards.map((data, i) => {
-              return m(card, {
-                style: {
-                  transform: `translateX(-${78 * (i + 1)}px)`
-                },
-                value: Poker.formatCard(data)
-              })
-            })
-          ),
-          // bottom
-          currentPlayer ? // else theyre a spectator
-            m("div.tg-poker__table__bottom", [
-              m("div", { style: { margin: '12px' } }, [
+            )
+        ),
+        // center of table / deck / dealer cards
+        m(
+          "div.tg-poker__table__dealer",
+          {},
+          m(card),
+          gameState?.cards.map((data, i) => {
+            return m(card, {
+              style: {
+                transform: `translateX(-${78 * (i + 1)}px)`,
+              },
+              value: Poker.formatCard(data),
+            });
+          })
+        ),
+        // bottom
+        currentPlayer // else theyre a spectator
+          ? m("div.tg-poker__table__bottom", [
+              m("div", { style: { margin: "12px" } }, [
                 // current player
                 m(player, {
-                  className: 'tg-poker__player--1',
+                  className: "tg-poker__player--1",
                   hand: serverState.hand || [],
                   player: currentPlayer,
                   showCards: true,
                   isCurrentPlayerTurn,
-                  title: `You (${getPlayerStatus(currentPlayer.id)}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
+                  title: `You (${getPlayerStatus(currentPlayer.id)}) ${
+                    isCurrentPlayerTurn ? " - Your Turn" : ""
+                  }`,
                 }),
                 // controls
-                serverState.state.gamePhase == 'pending' ?
-                  m("p", "Waiting for players to join...") :
-                  isCurrentPlayerTurn ?
-                    m(GameControls, {
-                      clientState: clientState
-                    }) :
-                    m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
+                serverState.state.gamePhase == "pending"
+                  ? m("p", "Waiting for players to join...")
+                  : isCurrentPlayerTurn
+                  ? m(GameControls, {
+                      clientState: clientState,
+                    })
+                  : m(
+                      "p",
+                      { style: { height: "40px" } },
+                      "Waiting for your turn..."
+                    ),
               ]),
               // spectators
               m("div.tg-poker__table__spectators", [
                 m("h4", "Spectators"),
-                serverState.spectatorPlayers.concat(serverState.queuedPlayers).map((spectator, index) =>
-                  m("div.tg-poker__table__spectators__spectator", [
-                    m("p", `Spectator ${index + 1}:`),
-                    m("p", `${getPlayerStatus(spectator.playerId)}`)
-                  ])
-                )
+                serverState.spectatorPlayers
+                  .concat(serverState.queuedPlayers)
+                  .map((spectator, index) =>
+                    m("div.tg-poker__table__spectators__spectator", [
+                      m("p", `Spectator ${index + 1}:`),
+                      m("p", `${getPlayerStatus(spectator.playerId)}`),
+                    ])
+                  ),
               ]),
-            ]) :
-            m("div", { style: { height: 100, width: '100%' } }),
-          serverState.winners.length > 0 &&
-          m('div.tg-poker__winner',
-            m.fragment({},
-              m("div", {
-                style: {
-                  marginBottom: '24px'
-                }
-              }, serverState.winners.map((id, i) => m("p", `Player #${id} won`)))
+            ])
+          : m("div", { style: { height: 100, width: "100%" } }),
+        serverState.winners.length > 0 &&
+          m(
+            "div.tg-poker__winner",
+            m.fragment(
+              {},
+              m(
+                "div",
+                {
+                  style: {
+                    marginBottom: "24px",
+                  },
+                },
+                serverState.winners.map((id, i) => m("p", `Player #${id} won`))
+              )
             )
           ),
-        ]);
+      ]);
     } else {
       if (!isPlayerInGame && !isPlayerSpectating) {
         return m.fragment({}, [
