@@ -22,3 +22,7 @@ Websocket
 
 ### DEPLOY TO CLOUDFLARE WORKERS
 CLOUDFLARE_ACCOUNT_ID=<your account id> CLOUDFLARE_API_TOKEN=<your api token> npx partykit deploy --domain partykit.domain.com
+
+
+###LICENSE 
+Turing Poker uses the CC-BY-NC-SA-4.0 license, allowing anyone to copy, share, or modify this code for non-commercial usage. 
