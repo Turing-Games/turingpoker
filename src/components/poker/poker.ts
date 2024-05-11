@@ -15,15 +15,6 @@ export default {
       return
     }
 
-    const pokerPlayerTablePosition = [
-      { bottom: 0, left: 0, right: 0, },
-      { top: 0, left: 0 },
-      { top: 0, left: 0, right: 0 },
-      { top: 0, right: 0 },
-      { top: 0, bottom: 0, right: 0 },
-      { bottom: 0, right: 0 },
-    ]
-
     const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
     const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
     const gameState = serverState.gameState;
@@ -90,6 +81,22 @@ export default {
               }),
             ),
           ),
+          // players around table
+          m("div.opponents",
+            opponents?.map((opp, index) => {
+              // starts at 1 if spectator is viewing
+              const playerNumberOffset = !currentPlayer ? 1 : 0
+              let status = getPlayerStatus(opp.id);
+              return m(player, {
+                player: opp,
+                hand: [],
+                isCurrentPlayerTurn: opp.id === currentTurn,
+                showCards: gameState?.round == 'showdown' || isPlayerSpectating,
+                title: `Player ${index + 2 - playerNumberOffset} (${status})`,
+                className: ''
+              })
+            })
+          ),
           // center of table / deck / dealer cards
           m("div.tg-poker__table__dealer", {},
             // deck
@@ -103,22 +110,6 @@ export default {
                       transform: `translateX(-${78 * (i + 1)}px)`
                     },
                     value: Poker.formatCard(data)
-                  })
-                })
-              ),
-              m("div.tg-poker__dealer-grid",
-                // players around table
-                opponents?.map((opp, index) => {
-                  // starts at 1 if spectator is viewing
-                  const playerNumberOffset = !currentPlayer ? 1 : 0
-                  let status = getPlayerStatus(opp.id);
-                  return m(player, {
-                    player: opp,
-                    hand: [],
-                    isCurrentPlayerTurn: opp.id === currentTurn,
-                    showCards: gameState?.round == 'showdown' || isPlayerSpectating,
-                    title: `Player ${index + 2 - playerNumberOffset} (${status})`,
-                    className: ''
                   })
                 })
               )

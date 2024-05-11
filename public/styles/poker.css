@@ -125,18 +125,17 @@ body {
   height: 400px;
   margin: 0 auto;
   max-width: 800px;
-  padding: 40px;
   position: relative;
   width: 100%;
-}
-
-.tg-poker__player {
-  /* position: absolute; */
 }
 
 .tg-poker__dealer-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  position: absolute;
+  width: 100%;
+  height: 100%;
 }
 
 /* dealer cards */
@@ -190,3 +189,11 @@ body {
   display: flex;
   gap: 8px;
 }
+
+.opponents {
+  display: flex;
+  gap: 16px;
+
+}
+
+.opponents>div {}
