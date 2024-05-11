@@ -5,11 +5,11 @@ import player from "./player";
 import m from "mithril";
 import * as Poker from '@tg/game-logic/poker'
 import { GameControls } from "./game_controls";
+import gamelog from "./gamelog";
 
 export default {
   view: ({ attrs }) => {
     const clientState: ClientState = attrs.clientState;
-    console.log(clientState)
     const serverState = clientState.serverState;
     if (!serverState) {
       return
@@ -27,7 +27,7 @@ export default {
     const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
     const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
     const gameState = serverState.gameState;
-    const gameHasEnoughPlayers = serverState?.inGamePlayers?.length > serverState.config.minPlayers
+    const gameHasEnoughPlayers = serverState?.inGamePlayers?.length >= serverState.config.minPlayers
     const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
     const isPlayerInGame = inGamePlayers.indexOf(clientState?.playerId) !== -1
     const isPlayerSpectating = spectatorPlayers.indexOf(clientState?.playerId) !== -1
@@ -75,12 +75,10 @@ export default {
     }
 
     // show game table
-    console.log({ gameHasEnoughPlayers })
-    console.log(isPlayerInGame)
-    console.log(isPlayerSpectating)
     if (gameHasEnoughPlayers && (isPlayerInGame || isPlayerSpectating)) {
       return m("div.tg-poker__table",
         [
+          m(gamelog, { gameLog: clientState.updateLog }),
           m("div.tg-poker__table__top",
             // game overview data
             m("div.tg-poker__overview",
@@ -132,7 +130,7 @@ export default {
               m("div", [
                 // current player
                 m(player, {
-                  className: 'tg-poker__player--1',
+                  className: "tg-poker__player--1",
                   hand: serverState.hand || [],
                   player: currentPlayer,
                   showCards: true,
@@ -140,34 +138,46 @@ export default {
                   title: `You (${getPlayerStatus(currentPlayer.id)})`
                 }),
                 // controls
-                serverState.state.gamePhase == 'pending' ?
-                  m("p", "Waiting for players to join...") :
-                  isCurrentPlayerTurn ?
-                    m(GameControls, {
-                      clientState: clientState
-                    }) :
-                    m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
+                serverState.state.gamePhase == "pending"
+                  ? m("p", "Waiting for players to join...")
+                  : isCurrentPlayerTurn
+                    ? m(GameControls, {
+                      clientState: clientState,
+                    })
+                    : m(
+                      "p",
+                      { style: { height: "40px" } },
+                      "Waiting for your turn..."
+                    ),
               ]),
               // spectators
               m("div.tg-poker__table__spectators", [
                 m("h4", "Spectators"),
-                serverState.spectatorPlayers.concat(serverState.queuedPlayers).map((spectator, index) =>
-                  m("div.tg-poker__table__spectators__spectator", [
-                    m("p", `Spectator ${index + 1}:`),
-                    m("p", `${getPlayerStatus(spectator.playerId)}`)
-                  ])
-                )
+                serverState.spectatorPlayers
+                  .concat(serverState.queuedPlayers)
+                  .map((spectator, index) =>
+                    m("div.tg-poker__table__spectators__spectator", [
+                      m("p", `Spectator ${index + 1}:`),
+                      m("p", `${getPlayerStatus(spectator.playerId)}`),
+                    ])
+                  ),
               ]),
-            ]) :
-            m("div", { style: { height: 100, width: '100%' } }),
+            ])
+            : m("div", { style: { height: 100, width: "100%" } }),
           serverState.winners.length > 0 &&
-          m('div.tg-poker__winner',
-            m.fragment({},
-              m("div", {
-                style: {
-                  marginBottom: '24px'
-                }
-              }, serverState.winners.map((id, i) => m("p", `Player #${id} won`)))
+          m(
+            "div.tg-poker__winner",
+            m.fragment(
+              {},
+              m(
+                "div",
+                {
+                  style: {
+                    marginBottom: "24px",
+                  },
+                },
+                serverState.winners.map((id, i) => m("p", `Player #${id} won`))
+              )
             )
           ),
         ]);

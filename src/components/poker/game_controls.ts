@@ -15,7 +15,6 @@ export const GameControls = {
     const currentBet = gameState.targetBet;
     const minRaiseAmount = gameState.bigBlind;
     const currentPlayer = gameState?.players?.find(player => player.id === clientState?.playerId)
-    console.log({ currentPlayer })
     const isPlayerEvenWithBet = currentPlayer.currentBet >= currentBet
 
     // Render game controls if it's the current player's turn

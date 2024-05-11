@@ -49,19 +49,7 @@ export default {
         })
       ]
       ),
-      process.env.NODE_ENV !== 'production' &&
-      m("div", {
-        style: {
-          border: '1px solid #fff',
-          color: '#fff',
-          padding: '12px',
-          position: 'absolute',
-          top: 0,
-          left: 0
-        }
-      },
-        `Player Id: ${vnode.attrs.playerId}`),
-      players?.length < 2 &&
+      players?.length < vnode.attrs.minPlayers &&
       m("div", [
         m(loader, { style: { margin: '24px 0' } }),
         m("p", "Waiting for players to join...")

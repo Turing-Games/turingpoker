@@ -23,6 +23,25 @@ body {
   color: rgb(92, 193, 51);
 }
 
+.tg-poker__gamelog {
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  color: #fff;
+  height: 232px;
+  overflow-y: auto;
+  padding: 12px;
+  position: absolute;
+  right: 0;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tg-poker__gamelog_log {
+  display: flex;
+}
+
 .tg-poker__table {
   display: flex;
   flex-direction: column;
