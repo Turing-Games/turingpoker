@@ -7,6 +7,7 @@ interface Props {
   hands?: any;
   className?: string;
   style?: React.CSSProperties;
+  isCurrentPlayerTurn: boolean;
   title: string;
   showCards: boolean;
 }
