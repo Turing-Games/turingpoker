@@ -6,6 +6,7 @@
   "serve": {
     "path": "public",
     "build": {
+      "entry": "party/src/client.tsx",
       "loader": {
         // configure loaders, defaults to {}
         ".png": "file", // see https://esbuild.github.io/content-types/ for more info
