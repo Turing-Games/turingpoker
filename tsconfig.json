@@ -9,7 +9,7 @@
         ], // List of library files to be included in the compilation
         "paths": {
             "@tg/*": [
-                "src/*"
+                "party/src/*"
             ],
             "@public/*": [
                 "public/*"
