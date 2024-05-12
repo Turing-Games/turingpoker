@@ -43,7 +43,6 @@ export type ServerStateMessage = {
     spectatorPlayers: IPlayer[];
     queuedPlayers: IPlayer[];
     winners: string[];
-    players: IPlayer[];
     state: IPartyServerState;
     clientId: string;
     lastUpdates: ServerUpdateMessage[]

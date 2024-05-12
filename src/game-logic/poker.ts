@@ -214,7 +214,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
         let pot = state.pot;
         groups.reverse();
         for (const group of groups) {
-            group.sort((a, b) => a.stack - b.stack);
+            group.sort((a, b) => potShare[a.id] - potShare[b.id]);
             for (let i = 0; i < group.length; i++) {
                 const amount = Math.min(potShare[group[i].id], pot / (group.length - i));
                 for (let j = i; j < group.length; j++) {
