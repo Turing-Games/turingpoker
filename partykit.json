@@ -1,12 +1,12 @@
 {
   "$schema": "https://www.partykit.io/schema.json",
-  "name": "clean-pass",
+  "name": "turinggames-poker",
   "main": "src/server.ts",
   "compatibilityDate": "2024-04-08",
   "serve": {
     "path": "public",
     "build": {
-      "entry": "src/Client.tsx",
+      "entry": "src/client.tsx",
       "loader": {
         // configure loaders, defaults to {}
         ".png": "file", // see https://esbuild.github.io/content-types/ for more info

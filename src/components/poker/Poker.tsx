@@ -2,11 +2,10 @@ import React from "react";
 import { ClientState } from "@tg/client";
 import card from "../Card";
 import CardLoader from "../Loader";
-import player from "./player";
+import Player from "./Player";
 import * as Poker from '@tg/game-logic/poker'
 import GameControls from "./GameControls";
 import GameLog from "./GameLog";
-import Player from "./player";
 import Card from "../Card";
 
 interface Props {

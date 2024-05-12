@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { createRoot } from 'react-dom/client';
 import PartySocket from "partysocket";
 import Header from "./components/Header";
-import Poker from "./components/poker/poker";
-import Admin from "./components/poker/admin";
+import Poker from "./components/poker/Poker";
 
 import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "./shared";
-import * as Poker from "@tg/game-logic/poker";
+import * as PokerLogic from "@tg/game-logic/poker";
 
 export type ClientState = {
   isConnected: boolean;
@@ -98,3 +98,7 @@ const App: React.FC = () => {
     </React.Fragment>
   );
 };
+
+const node = document.getElementById('app')
+const root = createRoot(node);
+root.render(<App />)
