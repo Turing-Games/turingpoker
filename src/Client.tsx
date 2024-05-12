@@ -86,9 +86,9 @@ const App: React.FC = () => {
     <React.Fragment>
       <Header
         gameType="No Limit Texas Hold'em"
-        players={clientState.serverState?.inGamePlayers}
+        players={clientState.serverState?.inGamePlayers || []}
         playerId={clientState.playerId}
-        minPlayers={clientState.serverState?.config?.minPlayers}
+        minPlayers={clientState.serverState?.config?.minPlayers || 2}
       />
       <Poker clientState={clientState} />
     </React.Fragment>

@@ -14,6 +14,7 @@ interface Props {
 }
 
 const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState }) => {
+
   const serverState = clientState.serverState;
   if (!serverState) {
     return null;
@@ -30,7 +31,7 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
 
   const currentPlayer = gameState?.players.find(player => player.id === clientState?.playerId)
   const isCurrentPlayerTurn = currentPlayer?.id === gameState?.whoseTurn;
-  const opponents = clientState?.serverState.gameState?.players?.filter(player => player.id !== currentPlayer?.id)
+  const opponents = serverState.gameState?.players?.filter(player => player.id !== currentPlayer?.id)
   const currentTurn = gameState?.whoseTurn
   const getPlayerStatus = (playerId: string) => {
     if (serverState.spectatorPlayers.find(player => player.playerId === playerId)) return 'spectator'

@@ -4,8 +4,9 @@ import Loader from "./Loader";
 import { IPlayer } from "@tg/server";
 
 export default function Header(props: {
-  players: IPlayer[],
-  gameType: string,
+  players: IPlayer[]
+  gameType: string
+  playerId: string | null
   minPlayers: number
 }) {
   const { players, gameType, minPlayers } = props;
