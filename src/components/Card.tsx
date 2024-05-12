@@ -1,8 +1,8 @@
-import m from "mithril";
+import React from 'react'
 import { getImagePath } from '../utils/string_utilities'
-//TODO: rename all these files to something simpler and then use dynamic imports to get rid of this bs
+//TODO: rename all these files to something simpler and then use dynamic imports to get rid of this
 // all card svgs
-import clubs2 from '@public/images/cards/svg-cards/2_of_clubs.svg'
+import clubs2 from '../../public/images/cards/svg-cards/2_of_clubs.svg'
 import diamonds2 from '@public/images/cards/svg-cards/2_of_diamonds.svg'
 import hearts2 from '@public/images/cards/svg-cards/2_of_hearts.svg'
 import spades2 from '@public/images/cards/svg-cards/2_of_spades.svg'
@@ -111,12 +111,18 @@ const cardMap = {
   'spades_1': spadesAce
 };
 
-export default {
-  view: (vnode) => {
-    return m('img', {
-      src: getImagePath(cardMap[vnode.attrs.value]) || getImagePath(cardBack),
-      style: { ...vnode.attrs.style },
-      className: "card"
-    })
-  }
-} 
+function Card(props) {
+
+  const { value, style } = props;
+
+  return (
+    <img
+      src={cardMap[value] || cardMap.cardBack}
+      alt={`Card ${value}`}
+      style={{ ...style }}
+      className={"card"}
+    />
+  );
+}
+
+export default Card;
