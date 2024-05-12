@@ -26,7 +26,7 @@ export default function Header(props: {
           <img src={Logo} alt="Logo" />
         </div>
         {
-          Array(4).fill('_').map((el, i) => (
+          Array(4).fill('_').map((_, i) => (
             <div className={`tg-header__squares tg-header__squares--${i}`} key={i} > </div>
           ))}
       </div>
@@ -34,7 +34,7 @@ export default function Header(props: {
         players?.length < minPlayers && (
           <div>
             <Loader style={{ margin: '24px 0' }} />
-            < p > Waiting for players to join...</p>
+            <p> Waiting for players to join...</p>
           </div>
         )
       }

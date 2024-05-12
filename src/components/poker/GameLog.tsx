@@ -15,10 +15,6 @@ function describeAction(action: Poker.Action): string {
     }
 }
 
-function signChar(amount: number): string {
-    return amount > 0 ? "+" : "-";
-}
-
 function describePayouts(payouts: Record<string, number>): string {
     return Object.entries(payouts).map(([player, amount]) => `${player}: ${amount}`).join(", ");
 }
