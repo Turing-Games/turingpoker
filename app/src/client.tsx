@@ -4,7 +4,7 @@ import PartySocket from "partysocket";
 import Header from "./components/Header";
 import Poker from "./components/poker/Poker";
 
-import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "./shared";
+import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "../../party/src/shared";
 import * as PokerLogic from "@tg/game-logic/poker";
 
 export type ClientState = {
@@ -15,7 +15,7 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-const App: React.FC = () => {
+export const Client: React.FC = () => {
   const [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
     serverState: null,
@@ -94,7 +94,3 @@ const App: React.FC = () => {
     </React.Fragment>
   );
 };
-
-const node = document.getElementById('app')
-const root = createRoot(node);
-root.render(<p>PartyKit Server running...</p>)

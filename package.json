@@ -5,18 +5,19 @@
   "scripts": {
     "test": "jest",
     "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" --kill-others",
-    "dev:hono": "wrangler dev app/src/index.ts",
-    "deploy:hono": "wrangler deploy --minify app/src/index.ts",
+    "dev:hono": "wrangler dev app/src/index.tsx",
+    "deploy:hono": "wrangler deploy --minify app/src/index.tsx",
     "dev:partykit": "partykit dev --live"
   },
   "dependencies": {
-    "hono": "^4.3.4",
     "@types/node": "^20.12.11",
+    "hono": "^4.3.4",
     "partysocket": "^1.0.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240403.0",
     "@types/jest": "^29.5.12",
     "@types/react": "^18.3.2",
     "@types/react-dom": "^18.3.0",
@@ -27,8 +28,6 @@
     "pokersolver": "^2.1.4",
     "ts-jest": "^29.1.2",
     "typescript": "^5.4.5",
-    "vite": "^5.2.11",
-    "@cloudflare/workers-types": "^4.20240403.0",
     "wrangler": "^3.47.0"
   }
 }
