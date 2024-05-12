@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "target": "ES2015",
+        "moduleResolution": "NodeNext",
+        "baseUrl": ".",
+        "paths": {
+            "@tg/*": [
+                "src/*"
+            ],
+            "@public/*": [
+                "public/*"
+            ]
+        },
+        "esModuleInterop": true,
+        "strict": true
+    }
+}

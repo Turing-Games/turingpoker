@@ -5,40 +5,47 @@ import poker from "./components/poker/poker";
 import m from "mithril";
 import admin from "./components/poker/admin";
 import connect from "./components/connect";
+import { ServerStateMessage, ClientMessage } from "./shared";
+import * as Poker from "@tg/game-logic/poker";
 
-const gameState = {
+export type ClientState = {
+  isConnected: boolean,
+  serverState: ServerStateMessage,
+  socket: PartySocket | null,
+  playerId: string | null,
+  connect: () => void,
+  sendMessage: (action: ClientMessage) => void
+}
+const clientState: ClientState = {
   isConnected: false,
-  gameData: null,
+  serverState: null,
   socket: null,
   playerId: null, // This will store the client's player ID
-  joinedGame: false,
 
-  connect: () => {
+  connect() {
     this.socket = new PartySocket({
       host: PARTYKIT_HOST,
       room: "my-new-room"
     });
 
     this.socket.addEventListener("open", () => {
-      gameState.isConnected = true;
-      gameState.playerId = this.socket.id; // some issue here with properly setting this and using it for proper rendering logic
-      console.log("Connected with ID:", gameState.playerId);
+      clientState.isConnected = true;
+      clientState.playerId = this.socket.id; // some issue here with properly setting this and using it for proper rendering logic
       m.redraw();
     });
 
     this.socket.addEventListener("message", (event) => {
       try {
-        const data = JSON.parse(event.data);
-        gameState.gameData = data;
+        const data: ServerStateMessage = JSON.parse(event.data);
+        clientState.serverState = data;
       } catch {
-        gameState.gameData = event.data; // Handle plain text messages
+        clientState.serverState = null;
       }
       m.redraw();
     });
 
     this.socket.addEventListener("close", () => {
-      gameState.isConnected = false;
-      console.log("WebSocket closed");
+      clientState.isConnected = false;
       m.redraw();
     });
 
@@ -46,9 +53,10 @@ const gameState = {
       console.error("WebSocket error:", event);
     });
   },
-  sendAction: (action, amount = 0) => {
+  sendMessage(message) {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify({ action, amount }));
+      console.log(this.socket)
+      this.socket.send(JSON.stringify(message));
     } else {
       console.error("WebSocket is not initialized or not open.");
     }
@@ -60,16 +68,16 @@ const adminState = {
 }
 
 const App = {
-  oninit: gameState.connect,
+  oninit: () => clientState.connect(),
   view: () => {
     return (
-      m.fragment([
-        // header
+      m.fragment({}, [
         m(header, {
-          gameType: gameState?.gameData?.gameType,
-          players: gameState?.gameData?.players
+          gameType: "No Limit Texas Hold'em",
+          players: clientState?.serverState?.inGamePlayers,
+          playerId: clientState?.playerId
         }),
-        m(poker, { gameState })
+        m(poker, { clientState })
       ])
     )
   }

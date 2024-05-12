@@ -1,6 +1,6 @@
 import m from "mithril";
 import { getImagePath } from '../utils/string_utilities'
-import cardBack from '../../public/images/cards/turing-card-back.png'
+import cardBack from '@public/images/cards/turing-card-back.png'
 
 export default {
   view: (vnode) => {

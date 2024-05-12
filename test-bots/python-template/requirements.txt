@@ -1,0 +1,2 @@
+treys==0.1.8
+websockets==12.0

@@ -170,3 +170,5 @@ dist
 
 .partykit
 .DS_Store
+
+**/__pycache__
