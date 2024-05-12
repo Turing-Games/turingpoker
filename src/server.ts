@@ -129,11 +129,25 @@ export default class PartyServer implements Party.Server {
     this.broadcastGameState();
   }
 
+  processQueuedPlayers() {
+    for (const p of this.queuedPlayers) {
+      this.queuedUpdates.push({
+        type: "player-joined",
+        player: {
+          playerId: p.playerId,
+        },
+      });
+      this.inGamePlayers.push(p);
+    }
+    this.queuedPlayers = [];
+  }
+
+
   startGame() {
     if (this.gameState && !this.gameState.state.done) {
       return;
     }
-    this.queuedPlayers = [];
+    this.processQueuedPlayers();
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
 
@@ -154,16 +168,7 @@ export default class PartyServer implements Party.Server {
     if (!this.gameState) {
       return;
     }
-
-    for (const p of this.queuedPlayers) {
-      this.queuedUpdates.push({
-        type: "player-joined",
-        player: {
-          playerId: p.playerId,
-        },
-      });
-      this.inGamePlayers.push(p);
-    }
+    this.processQueuedPlayers();
 
     const payouts = Poker.payout(this.gameState.state, this.gameState.hands).payouts;
     this.winners = Object.keys(payouts).filter(id => payouts[id] > 0).map(id => id)
@@ -185,7 +190,6 @@ export default class PartyServer implements Party.Server {
 
   getStateMessage(playerId: string): ServerStateMessage {
     const isSpectator = this.spectatorPlayers.map(s => s.playerId).indexOf(playerId) !== -1
-    console.log({ isSpectator })
     return {
       gameState: this.gameState?.state ?? null,
       hand: this.gameState?.hands?.[playerId] ?? null,
@@ -197,7 +201,6 @@ export default class PartyServer implements Party.Server {
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
       winners: this.winners,
-      hands: isSpectator ? this?.gameState?.hands : []
     }
   }
 
