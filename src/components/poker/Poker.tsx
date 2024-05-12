@@ -7,6 +7,7 @@ import * as Poker from '@tg/game-logic/poker'
 import GameControls from "./GameControls";
 import GameLog from "./GameLog";
 import Card from "../Card";
+import { sendMessage } from "@tg/utils/websocket";
 
 interface Props {
   clientState: ClientState;
@@ -18,6 +19,7 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
     return null;
   }
 
+  const socket = clientState.socket
   const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
   const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
   const gameState = serverState.gameState;
@@ -162,7 +164,7 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
       return (
         <>
           <button
-            onClick={() => clientState.sendMessage({ type: 'join-game' })}
+            onClick={() => sendMessage(socket, { type: 'join-game' })}
             style={{
               pointerEvents: isPlayerInGame ? 'none' : 'auto',
               display: serverState.state.gamePhase === 'active' ? 'none' : 'block'
@@ -171,7 +173,7 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
             Join Game
           </button>
           <button
-            onClick={() => clientState.sendMessage({ type: 'spectate' })}
+            onClick={() => sendMessage(socket, { type: 'spectate' })}
             style={{ pointerEvents: isPlayerInGame ? 'none' : 'auto' }}
           >
             Spectate

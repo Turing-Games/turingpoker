@@ -1,5 +1,6 @@
 import React from "react";
 import { ClientState } from "@tg/client";
+import { sendMessage } from "@tg/utils/websocket";
 
 function GameControls({ clientState }: { clientState: ClientState }) {
   const serverState = clientState?.serverState;
@@ -14,12 +15,13 @@ function GameControls({ clientState }: { clientState: ClientState }) {
   const minRaiseAmount = gameState.bigBlind;
   const currentPlayer = gameState?.players?.find(player => player.id === clientState?.playerId);
   const isPlayerEvenWithBet = currentPlayer.currentBet >= currentBet;
+  const socket = clientState.socket
 
   // Function to handle raising
   const handleRaise = () => {
     const amount = prompt(`Enter amount to raise (minimum: $${minRaiseAmount}):`, minRaiseAmount.toString());
     if (amount && parseInt(amount, 10) >= minRaiseAmount) {
-      clientState.sendMessage({ type: "action", action: { type: "raise", amount: parseInt(amount, 10) } });
+      sendMessage(socket, { type: "action", action: { type: "raise", amount: parseInt(amount, 10) } });
     } else {
       alert(`Invalid raise amount. You must raise at least $${minRaiseAmount}.`);
     }
@@ -32,7 +34,7 @@ function GameControls({ clientState }: { clientState: ClientState }) {
       <button
         onClick={() => {
           if (!isPlayerEvenWithBet) {
-            clientState.sendMessage({ type: "action", action: { type: "call" } });
+            sendMessage(socket, { type: "action", action: { type: "call" } });
           }
         }}
         style={{
@@ -46,7 +48,7 @@ function GameControls({ clientState }: { clientState: ClientState }) {
       <button
         onClick={() => {
           if (currentBet === 0 || isPlayerEvenWithBet) {
-            clientState.sendMessage({ type: "action", action: { type: "call" } });
+            sendMessage(socket, { type: "action", action: { type: "call" } });
           }
         }}
         style={{
@@ -67,10 +69,10 @@ function GameControls({ clientState }: { clientState: ClientState }) {
         Raise
       </button>
       {/* Fold button */}
-      <button onClick={() => clientState.sendMessage({ type: "action", action: { type: "fold" } })}>
+      <button onClick={() => sendMessage(socket, { type: "action", action: { type: "fold" } })}>
         Fold
       </button>
-    </div>
+    </div >
   );
 }
 

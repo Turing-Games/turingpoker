@@ -13,8 +13,6 @@ export type ClientState = {
   socket: PartySocket | null;
   playerId: string | null;
   updateLog: ServerUpdateMessage[];
-  connect: () => void;
-  sendMessage: (action: ClientMessage) => void;
 };
 
 const App: React.FC = () => {
@@ -24,8 +22,6 @@ const App: React.FC = () => {
     socket: null,
     playerId: null,
     updateLog: [],
-    connect: () => { },
-    sendMessage: () => { },
   });
 
   useEffect(() => {
