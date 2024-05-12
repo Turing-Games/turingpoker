@@ -174,3 +174,13 @@ dist
 **/__pycache__
 
 .vscode
+
+# hono
+node_modules
+dist
+.wrangler
+.dev.vars
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+bun.lockb
