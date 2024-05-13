@@ -1,5 +1,5 @@
 import React from "react";
-import { ClientState } from "@tg/client";
+import { ClientState } from "@tg/Client";
 import { sendMessage } from "@tg/utils/websocket";
 
 function GameControls({ clientState }: { clientState: ClientState }) {
