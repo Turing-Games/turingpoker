@@ -79,7 +79,6 @@ const PokerTable = ({ clientState }: Props) => {
   // show game table
   return (
     <div className="tg-poker__table">
-      <GameLog gameLog={clientState.updateLog} />
       <div className="tg-poker__table__top">
         <div className="tg-poker__overview">
           {gameOverview.map((stat, i) => (
@@ -170,6 +169,7 @@ const PokerTable = ({ clientState }: Props) => {
             </div>
           ))}
       </div>
+      <GameLog gameLog={clientState.updateLog} />
     </div>
   );
 };

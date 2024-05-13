@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { ServerUpdateMessage } from "@tg/shared";
 import * as Poker from '@tg/game-logic/poker';
 
@@ -41,8 +41,14 @@ interface GameLogProps {
 }
 
 function GameLog({ gameLog }: GameLogProps): JSX.Element {
+    const ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.scrollTop = ref.current.scrollHeight;
+        }
+    }, [gameLog]);
     return (
-        <div className="tg-poker__gamelog">
+        <div className="tg-poker__gamelog" ref={ref}>
             <h4>Game Log</h4>
             {gameLog.map((log, index) => (
                 <div className="tg-poker__gamelog__log" key={index}>
