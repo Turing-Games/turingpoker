@@ -12,10 +12,7 @@ export type ClientMessage = {
     type: 'join-game'
 } | {
     type: 'reset-game'
-} | {
-    type: 'leave-game'
 }
-
 export type ServerUpdateMessage = {
     type: 'game-ended';
     payouts: { [playerId: string]: number };
@@ -42,7 +39,6 @@ export type ServerStateMessage = {
     inGamePlayers: IPlayer[];
     spectatorPlayers: IPlayer[];
     queuedPlayers: IPlayer[];
-    winners: string[];
     state: IPartyServerState;
     clientId: string;
     lastUpdates: ServerUpdateMessage[]

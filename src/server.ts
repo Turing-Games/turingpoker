@@ -11,7 +11,7 @@ export interface IPartyServerState {
 }
 
 export const AUTO_START = true;
-export const MIN_PLAYERS_AUTO_START = 3;
+export const MIN_PLAYERS_AUTO_START = 2;
 export const MAX_PLAYERS = 8
 
 const defaultStack = 1000;
@@ -28,7 +28,6 @@ export default class PartyServer implements Party.Server {
   public inGamePlayers: IPlayer[] = [];
   public spectatorPlayers: IPlayer[] = [];
   public queuedPlayers: IPlayer[] = [];
-  public winners: string[] = []
   public stacks: Record<string, number> = {};
   public serverState: IPartyServerState = {
     gamePhase: 'pending'
@@ -46,7 +45,7 @@ export default class PartyServer implements Party.Server {
       this.timeoutLoopInterval = setInterval(() => {
         // check if anyone should be disconnected
         for (const player of this.inGamePlayers) {
-          if (this.lastActed[player.playerId] && Date.now() - this.lastActed[player.playerId] > 300000) {
+          if (this.serverState.gamePhase == 'active' && this.lastActed[player.playerId] && Date.now() - this.lastActed[player.playerId] > 3000) {
             this.playerSpectate(player.playerId);
           }
         }
@@ -89,12 +88,6 @@ export default class PartyServer implements Party.Server {
       }
       else if (data.type == 'start-game') {
         this.startGame();
-      }
-      else if (data.type == 'leave-game') {
-        this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== websocket.id);
-        this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== websocket.id);
-        this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== websocket.id);
-        this.broadcastGameState();
       }
       else if (data.type == 'spectate') {
         this.playerSpectate(websocket.id);
@@ -161,6 +154,9 @@ export default class PartyServer implements Party.Server {
     if (this.gameState && !this.gameState.state.done) {
       return;
     }
+    for (const player of this.inGamePlayers.concat(this.queuedPlayers)) {
+      this.lastActed[player.playerId] = Date.now();
+    }
     this.processQueuedPlayers();
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
     this.serverState.gamePhase = 'active';
@@ -173,7 +169,6 @@ export default class PartyServer implements Party.Server {
     this.broadcastGameState();
 
     setTimeout(() => {
-      this.winners = []
       this.broadcastGameState();
     }, 3000)
   }
@@ -185,7 +180,6 @@ export default class PartyServer implements Party.Server {
     this.processQueuedPlayers();
 
     const payouts = Poker.payout(this.gameState.state, this.gameState.hands).payouts;
-    this.winners = Object.keys(payouts).filter(id => payouts[id] > 0).map(id => id)
     for (const playerId in payouts) {
       this.stacks[playerId] = (this.gameState.state.players.find(player => player.id == playerId)?.stack ?? 0) + payouts[playerId];
     }
@@ -214,7 +208,6 @@ export default class PartyServer implements Party.Server {
       state: this.serverState,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
-      winners: this.winners,
     }
   }
 
