@@ -13,7 +13,7 @@ export interface IPartyServerState {
 }
 
 export const AUTO_START = true;
-export const MIN_PLAYERS_AUTO_START = 2;
+export const MIN_PLAYERS_AUTO_START = 3;
 export const MAX_PLAYERS = 8
 
 const defaultStack = 1000;

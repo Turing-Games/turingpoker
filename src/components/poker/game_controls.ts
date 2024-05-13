@@ -3,7 +3,6 @@ import m from "mithril";
 
 export const GameControls = {
   view: ({ attrs }) => {
-    console.log('test')
     const clientState: ClientState = attrs.clientState
     const serverState = clientState?.serverState
     const gameState = clientState.serverState?.gameState;
@@ -16,7 +15,6 @@ export const GameControls = {
     const currentBet = gameState.targetBet;
     const minRaiseAmount = gameState.bigBlind;
     const currentPlayer = gameState?.players?.find(player => player.id === clientState?.playerId)
-    console.log({ currentPlayer })
     const isPlayerEvenWithBet = currentPlayer.currentBet >= currentBet
 
     // Render game controls if it's the current player's turn

@@ -23,6 +23,25 @@ body {
   color: rgb(92, 193, 51);
 }
 
+.tg-poker__gamelog {
+  background: rgba(0, 0, 0, 0.4);
+  top: 0;
+  color: #fff;
+  height: 232px;
+  overflow-y: auto;
+  padding: 12px;
+  position: absolute;
+  right: 0;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tg-poker__gamelog_log {
+  display: flex;
+}
+
 .tg-poker__table {
   display: flex;
   flex-direction: column;
@@ -59,14 +78,12 @@ body {
   padding: 12px;
   position: absolute;
   right: 0;
-  width: 250px;
+  width: 200px;
 }
 
 .tg-poker__table__spectators__spectator {
   display: flex;
 }
-
-.tg-poker__player {}
 
 .tg-poker__player .tg-poker__player__details {
   background: #000;
@@ -101,31 +118,41 @@ body {
 
 .tg-poker__table__dealer {
   align-items: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   gap: 8px;
+  height: 400px;
   margin: 0 auto;
-  max-width: 600px;
+  max-width: 800px;
   position: relative;
   width: 100%;
 }
 
+.tg-poker__dealer-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(5, 1fr);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
 /* dealer cards */
 .tg-poker__table__dealer>img {
-
-  /* width: 140px; */
+  height: auto;
+  width: 60px;
 }
 
 .tg-poker__table__dealer>img:not(:nth-child(1)) {
   animation: slideRight 0.3s linear forwards;
 }
 
-.opponents {
-  display: flex;
-  gap: 16px;
-  margin: 0 12px;
+.card {
+  height: 60px;
 }
 
-.Card {
+.dealer__card {
   height: 140px;
 }
 
@@ -162,3 +189,11 @@ body {
   display: flex;
   gap: 8px;
 }
+
+.opponents {
+  display: flex;
+  gap: 16px;
+
+}
+
+.opponents>div {}

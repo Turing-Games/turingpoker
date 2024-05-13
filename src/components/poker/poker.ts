@@ -5,11 +5,11 @@ import player from "./player";
 import m from "mithril";
 import * as Poker from '@tg/game-logic/poker'
 import { GameControls } from "./game_controls";
+import gamelog from "./gamelog";
 
 export default {
   view: ({ attrs }) => {
     const clientState: ClientState = attrs.clientState;
-    console.log(clientState)
     const serverState = clientState.serverState;
     if (!serverState) {
       return
@@ -18,7 +18,7 @@ export default {
     const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
     const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
     const gameState = serverState.gameState;
-    const gameHasEnoughPlayers = serverState?.inGamePlayers?.length > 1
+    const gameHasEnoughPlayers = serverState?.inGamePlayers?.length >= serverState.config.minPlayers
     const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
     const isPlayerInGame = inGamePlayers.indexOf(clientState?.playerId) !== -1
     const isPlayerSpectating = spectatorPlayers.indexOf(clientState?.playerId) !== -1
@@ -66,9 +66,10 @@ export default {
     }
 
     // show game table
-    if (inGamePlayers.length > 1 && (isPlayerInGame || isPlayerSpectating)) {
+    if (gameHasEnoughPlayers && (isPlayerInGame || isPlayerSpectating)) {
       return m("div.tg-poker__table",
         [
+          m(gamelog, { gameLog: clientState.updateLog }),
           m("div.tg-poker__table__top",
             // game overview data
             m("div.tg-poker__overview",
@@ -79,78 +80,95 @@ export default {
                 ])
               }),
             ),
-            // opponents, filtered out current player
-            opponents?.length > 0 &&
-            m("div.opponents",
-              opponents.map((opp, index) => {
-                // starts at 1 if spectator is viewing
-                const playerNumberOffset = !currentPlayer ? 1 : 0
-                let status = getPlayerStatus(opp.id);
-                return m(player, {
-                  player: opp,
-                  hand: [],
-                  isCurrentPlayerTurn: opp.id === currentTurn,
-                  showCards: gameState?.round == 'showdown' || isPlayerSpectating,
-                  title: `Player ${index + 2 - playerNumberOffset} (${status}) ${opp.id == currentTurn ? ' - Their Turn' : ''}`,
-                  className: ''
-                })
+          ),
+          // players around table
+          m("div.opponents",
+            opponents?.map((opp, index) => {
+              // starts at 1 if spectator is viewing
+              const playerNumberOffset = !currentPlayer ? 1 : 0
+              let status = getPlayerStatus(opp.id);
+              return m(player, {
+                player: opp,
+                hand: [],
+                isCurrentPlayerTurn: opp.id === currentTurn,
+                showCards: gameState?.round == 'showdown' || isPlayerSpectating,
+                title: `Player ${index + 2 - playerNumberOffset} (${status})`,
+                className: ''
               })
-            ),
+            })
           ),
           // center of table / deck / dealer cards
           m("div.tg-poker__table__dealer", {},
+            // deck
             m(card),
-            gameState?.cards.map((data, i) => {
-              return m(card, {
-                style: {
-                  transform: `translateX(-${78 * (i + 1)}px)`
-                },
-                value: Poker.formatCard(data)
-              })
-            })
+            [
+              // cards
+              m("div",
+                gameState?.cards.map((data, i) => {
+                  return m(card, {
+                    style: {
+                      transform: `translateX(-${78 * (i + 1)}px)`
+                    },
+                    value: Poker.formatCard(data)
+                  })
+                })
+              )
+            ]
           ),
           // bottom
           currentPlayer ? // else theyre a spectator
             m("div.tg-poker__table__bottom", [
-              m("div", { style: { margin: '12px' } }, [
+              m("div", [
                 // current player
                 m(player, {
-                  className: 'tg-poker__player--1',
+                  className: "tg-poker__player--1",
                   hand: serverState.hand || [],
                   player: currentPlayer,
                   showCards: true,
                   isCurrentPlayerTurn,
-                  title: `You (${getPlayerStatus(currentPlayer.id)}) ${isCurrentPlayerTurn ? ' - Your Turn' : ''}`
+                  title: `You (${getPlayerStatus(currentPlayer.id)})`
                 }),
                 // controls
-                serverState.state.gamePhase == 'pending' ?
-                  m("p", "Waiting for players to join...") :
-                  isCurrentPlayerTurn ?
-                    m(GameControls, {
-                      clientState: clientState
-                    }) :
-                    m("p", { style: { height: '40px' } }, "Waiting for your turn..."),
+                serverState.state.gamePhase == "pending"
+                  ? m("p", "Waiting for players to join...")
+                  : isCurrentPlayerTurn
+                    ? m(GameControls, {
+                      clientState: clientState,
+                    })
+                    : m(
+                      "p",
+                      { style: { height: "40px" } },
+                      "Waiting for your turn..."
+                    ),
               ]),
               // spectators
               m("div.tg-poker__table__spectators", [
                 m("h4", "Spectators"),
-                serverState.spectatorPlayers.concat(serverState.queuedPlayers).map((spectator, index) =>
-                  m("div.tg-poker__table__spectators__spectator", [
-                    m("p", `Spectator ${index + 1}:`),
-                    m("p", `${getPlayerStatus(spectator.playerId)}`)
-                  ])
-                )
+                serverState.spectatorPlayers
+                  .concat(serverState.queuedPlayers)
+                  .map((spectator, index) =>
+                    m("div.tg-poker__table__spectators__spectator", [
+                      m("p", `Spectator ${index + 1}:`),
+                      m("p", `${getPlayerStatus(spectator.playerId)}`),
+                    ])
+                  ),
               ]),
-            ]) :
-            m("div", { style: { height: 100, width: '100%' } }),
+            ])
+            : m("div", { style: { height: 100, width: "100%" } }),
           serverState.winners.length > 0 &&
-          m('div.tg-poker__winner',
-            m.fragment({},
-              m("div", {
-                style: {
-                  marginBottom: '24px'
-                }
-              }, serverState.winners.map((id, i) => m("p", `Player #${id} won`)))
+          m(
+            "div.tg-poker__winner",
+            m.fragment(
+              {},
+              m(
+                "div",
+                {
+                  style: {
+                    marginBottom: "24px",
+                  },
+                },
+                serverState.winners.map((id, i) => m("p", `Player #${id} won`))
+              )
             )
           ),
         ]);

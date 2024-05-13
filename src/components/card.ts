@@ -116,7 +116,7 @@ export default {
     return m('img', {
       src: getImagePath(cardMap[vnode.attrs.value]) || getImagePath(cardBack),
       style: { ...vnode.attrs.style },
-      className: "Card"
+      className: "card"
     })
   }
 } 
