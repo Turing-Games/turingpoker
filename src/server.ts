@@ -45,7 +45,7 @@ export default class PartyServer implements Party.Server {
       this.timeoutLoopInterval = setInterval(() => {
         // check if anyone should be disconnected
         for (const player of this.inGamePlayers) {
-          if (this.serverState.gamePhase == 'active' && this.lastActed[player.playerId] && Date.now() - this.lastActed[player.playerId] > 3000) {
+          if (this.serverState.gamePhase == 'active' && this.lastActed[player.playerId] && Date.now() - this.lastActed[player.playerId] > 300000) {
             this.playerSpectate(player.playerId);
           }
         }
