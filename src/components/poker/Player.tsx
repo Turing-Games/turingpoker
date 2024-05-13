@@ -1,7 +1,7 @@
 import React from "react";
 import Card from "../Card";
 
-interface Props {
+interface PlayerProps {
   player: any;
   hand: any[];
   hands?: any;
@@ -12,7 +12,7 @@ interface Props {
   showCards: boolean;
 }
 
-const Player: React.FC<Props> = ({ player, hand, hands, className, style, title, showCards }) => {
+const Player = ({ player, hand, hands, className, style, title, showCards }: PlayerProps) => {
   const handToRender = hand || (hands && hands[player.id]) || [];
 
   return (

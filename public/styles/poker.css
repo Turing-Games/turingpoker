@@ -19,7 +19,6 @@
 }
 
 body {
-  background-image: url("../images/felt.jpg");
   color: rgb(92, 193, 51);
 }
 
@@ -129,7 +128,7 @@ body {
 .tg-poker__table__dealer {
   align-items: center;
   border-radius: 50%;
-  background: rgba(0, 0, 0, 0.7);
+  background: radial-gradient(rgba(0, 100, 0, 0.5), rgba(0, 100, 0, 0.8));
   display: flex;
   gap: 8px;
   height: 400px;
@@ -203,6 +202,18 @@ body {
 .opponents {
   display: flex;
   gap: 16px;
+
+}
+
+.tg-poker__table__player-container {
+  width: 200px;
+  height: 150px;
+  position: absolute;
+  /* no idea why the second dimension is positive */
+  transform: translate(-50%, 50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
 }
 

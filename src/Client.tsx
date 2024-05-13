@@ -96,5 +96,5 @@ const App: React.FC = () => {
 };
 
 const node = document.getElementById('app')
-const root = createRoot(node);
+const root = createRoot(node!);
 root.render(<App />)

@@ -13,26 +13,24 @@ interface Props {
   clientState: ClientState;
 }
 
-const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState }) => {
-
+const PokerTable = ({ clientState }: Props) => {
   const serverState = clientState.serverState;
   if (!serverState) {
     return null;
   }
 
   const socket = clientState.socket
-  const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
   const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
   const gameState = serverState.gameState;
   const gameHasEnoughPlayers = serverState?.inGamePlayers?.length >= serverState.config.minPlayers
   const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
-  const isPlayerInGame = inGamePlayers.indexOf(clientState?.playerId) !== -1
-  const isPlayerSpectating = spectatorPlayers.indexOf(clientState?.playerId) !== -1
-  const isPlayerQueued = serverState.queuedPlayers.indexOf(clientState?.playerId) !== -1
+  const inGamePlayers = serverState.gameState?.players
+  const isPlayerInGame = !!inGamePlayers?.find(p => p.id == clientState?.playerId)
+  const isPlayerSpectating = !!serverState.spectatorPlayers?.find(p => p.playerId == clientState?.playerId)
+  const isPlayerQueued = !!serverState.queuedPlayers?.find(p => p.playerId == clientState?.playerId)
 
   const currentPlayer = gameState?.players.find(player => player.id === clientState?.playerId)
   const isCurrentPlayerTurn = currentPlayer?.id === gameState?.whoseTurn;
-  const opponents = serverState.gameState?.players?.filter(player => player.id !== currentPlayer?.id)
   const currentTurn = gameState?.whoseTurn
   const getPlayerStatus = (playerId: string) => {
     if (serverState.spectatorPlayers.find(player => player.playerId === playerId)) return 'spectator'
@@ -72,6 +70,12 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
     console.log('gameState', gameState)
   }
 
+  const hands: Record<string, Poker.Card[]> = {};
+  for (const player of gameState?.players ?? []) {
+    hands[player.id] = [];
+  }
+  hands[serverState.clientId] = serverState.hand ?? [];
+
   // show game table
   return (
     <div className="tg-poker__table">
@@ -86,33 +90,51 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
           ))}
         </div>
       </div>
-      <div className="opponents">
-        {opponents?.map((opp, index) => {
-          const playerNumberOffset = !currentPlayer ? 1 : 0;
-          let status = getPlayerStatus(opp.id);
-          return (
-            <Player
-              key={index}
-              player={opp}
-              hand={[]}
-              isCurrentPlayerTurn={opp.id === currentTurn}
-              showCards={gameState?.round == "showdown" || isPlayerSpectating}
-              title={`Player ${index + 2 - playerNumberOffset} (${status})`}
-              className=""
-            />
-          );
-        })}
-      </div>
-      <div className="tg-poker__table__dealer">
-        <Card />
-        <div>
-          {gameState?.cards.map((data, i) => (
-            <Card
-              key={i}
-              style={{ transform: `translateX(-${78 * (i + 1)}px)` }}
-              value={Poker.formatCard(data)}
-            />
-          ))}
+      <div style={{
+        position: 'relative',
+        flex: 1,
+      }}>
+        <div className="tg-poker__table__dealer" style={{
+          position: 'absolute',
+          transform: 'translate(-50%, -50%)',
+          left: '50%',
+          top: '50%'
+        }}>
+          <div className="opponents" style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+          }}>
+            {inGamePlayers?.map((opp, index) => {
+              const playerNumberOffset = !currentPlayer ? 1 : 0;
+              return (
+                <div className="tg-poker__table__player-container" style={{
+                  left: -Math.cos((index / (inGamePlayers.length)) * Math.PI * 2) * 50 + 50 + '%',
+                  bottom: -Math.sin((index / (inGamePlayers.length)) * Math.PI * 2) * 50 + 50 + '%',
+                }}>
+                  <Player
+                    key={index}
+                    player={opp}
+                    hand={hands[opp.id]}
+                    isCurrentPlayerTurn={opp.id === currentTurn}
+                    showCards={gameState?.round == "showdown" || isPlayerSpectating}
+                    title={`Player ${index + 1}`}
+                    className=""
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <Card />
+          <div>
+            {gameState?.cards.map((data, i) => (
+              <Card
+                key={i}
+                style={{ transform: `translateX(-${78 * (i + 1)}px)` }}
+                value={Poker.formatCard(data)}
+              />
+            ))}
+          </div>
         </div>
       </div>
       <div className="tg-poker__table__bottom">
