@@ -6,16 +6,20 @@ function GameControls({ clientState }: { clientState: ClientState }) {
   const serverState = clientState?.serverState;
   const gameState = serverState?.gameState;
 
-  if (!clientState.isConnected || !gameState) {
+  if (!clientState.isConnected) {
     return <p>Waiting for the game to start or connect...</p>;
   }
+  console.log(gameState);
 
   // Retrieve the current bet and minimum raise amount
-  const currentBet = gameState.targetBet;
-  const minRaiseAmount = gameState.bigBlind;
+  const currentBet = gameState?.targetBet;
+  const minRaiseAmount = gameState?.bigBlind;
   const currentPlayer = gameState?.players?.find(player => player.id === clientState?.playerId);
-  const isPlayerEvenWithBet = currentPlayer.currentBet >= currentBet;
+  const isPlayerEvenWithBet = currentPlayer?.currentBet >= currentBet;
   const socket = clientState.socket
+  const isPlayerSpectating = !!serverState.spectatorPlayers?.find(p => p.playerId === clientState?.playerId)
+  const isPlayerInGame = !!serverState.inGamePlayers?.find(p => p.playerId === clientState?.playerId)
+  console.log(isPlayerInGame, isPlayerSpectating, currentPlayer, gameState?.whoseTurn)
 
   // Function to handle raising
   const handleRaise = () => {
@@ -30,49 +34,91 @@ function GameControls({ clientState }: { clientState: ClientState }) {
   // Render game controls
   return (
     <div className="tg-poker__controls">
-      {/* Call button */}
-      <button
-        onClick={() => {
-          if (!isPlayerEvenWithBet) {
-            sendMessage(socket, { type: "action", action: { type: "call" } });
-          }
-        }}
+      <div
         style={{
-          pointerEvents: isPlayerEvenWithBet ? 'none' : 'auto',
-          opacity: isPlayerEvenWithBet ? 0.5 : 1
+          flexDirection: "column",
+          display: "flex",
+          gap: "8px",
         }}
       >
-        Call
-      </button>
-      {/* Check button */}
-      <button
-        onClick={() => {
-          if (currentBet === 0 || isPlayerEvenWithBet) {
-            sendMessage(socket, { type: "action", action: { type: "call" } });
-          }
-        }}
-        style={{
-          pointerEvents: !isPlayerEvenWithBet ? 'none' : 'auto',
-          opacity: !isPlayerEvenWithBet ? 0.5 : 1
-        }}
-      >
-        Check
-      </button>
-      {/* Raise button */}
-      <button
-        onClick={handleRaise}
-        style={{
-          opacity: currentPlayer.stack >= minRaiseAmount ? 1 : 0.5,
-          pointerEvents: currentPlayer.stack >= minRaiseAmount ? 'auto' : 'none',
-        }}
-      >
-        Raise
-      </button>
-      {/* Fold button */}
-      <button onClick={() => sendMessage(socket, { type: "action", action: { type: "fold" } })}>
-        Fold
-      </button>
-    </div >
+        {/* Call button */}
+        {isPlayerInGame && (
+          <div
+            style={{
+              flexDirection: "row",
+              display: "flex",
+              gap: "8px",
+            }}
+          >
+            <button
+              onClick={() => {
+                if (!isPlayerEvenWithBet) {
+                  sendMessage(socket, {
+                    type: "action",
+                    action: { type: "call" },
+                  });
+                }
+              }}
+              disabled={gameState?.whoseTurn !== currentPlayer?.id || isPlayerEvenWithBet}
+            >
+              Call
+            </button>
+            {/* Check button */}
+            <button
+              disabled={gameState?.whoseTurn !== currentPlayer?.id || !isPlayerEvenWithBet}
+              onClick={() => {
+                if (currentBet === 0 || isPlayerEvenWithBet) {
+                  sendMessage(socket, {
+                    type: "action",
+                    action: { type: "call" },
+                  });
+                }
+              }}
+            >
+              Check
+            </button>
+            {/* Raise button */}
+            <button
+              disabled={gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < minRaiseAmount}
+              onClick={handleRaise}
+            >
+              Raise
+            </button>
+            {/* Fold button */}
+            <button
+              disabled={gameState?.whoseTurn !== currentPlayer?.id}
+              onClick={() =>
+                sendMessage(socket, {
+                  type: "action",
+                  action: { type: "fold" },
+                })
+              }
+            >
+              Fold
+            </button>
+          </div>
+        )}
+
+        <button
+          style={{
+            width: "100%",
+          }}
+          onClick={() => {
+            if (isPlayerSpectating) {
+              sendMessage(socket, { type: "join-game" });
+            } else {
+              sendMessage(socket, { type: "spectate" });
+            }
+          }}
+        >
+          {isPlayerSpectating
+            ? "Join game"
+            : isPlayerInGame
+            ? "Leave game"
+            : "Queued to join game"}
+        </button>
+      </div>
+    </div>
   );
 }
 

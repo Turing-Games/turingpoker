@@ -137,7 +137,9 @@ const PokerTable = ({ clientState }: Props) => {
                     hand={hands[opp.id]}
                     isCurrentPlayerTurn={opp.id === currentTurn}
                     showCards
-                    title={`Player ${index + 1}${clientState.playerId === opp.id ? " (You)" : ""}`}
+                    title={`Player ${index + 1}${
+                      clientState.playerId === opp.id ? " (You)" : ""
+                    }`}
                     className=""
                   />
                 </div>
@@ -152,43 +154,9 @@ const PokerTable = ({ clientState }: Props) => {
           </div>
         </div>
       </div>
-      <div className="tg-poker__table__bottom">
-        {currentPlayer ? (
-          <div>
-            {serverState.state.gamePhase === "pending" ? (
-              <p>Waiting for players to join...</p>
-            ) : isCurrentPlayerTurn ? (
-              <GameControls clientState={clientState} />
-            ) : (
-              <p style={{ height: "40px" }}>Waiting for your turn...</p>
-            )}
-          </div>
-        ) : (
-          <div style={{ height: 100, width: "100%" }} />
-        )}
 
-        <div className="tg-poker__table__controlpanel">
-          <div className="tg-poker__table__join">
-            <button
-              style={{
-                width: "100%",
-              }}
-              onClick={() => {
-                if (isPlayerSpectating) {
-                  sendMessage(socket, { type: "join-game" });
-                } else {
-                  sendMessage(socket, { type: "spectate" });
-                }
-              }}
-            >
-              {isPlayerSpectating
-                ? "Join game"
-                : isPlayerInGame
-                ? "Leave game"
-                : "Queued to join game"}
-            </button>
-          </div>
-        </div>
+      <div className="tg-poker__table__controlpanel">
+        <GameControls clientState={clientState} />
       </div>
 
       <div className="tg-poker__table__spectators">
