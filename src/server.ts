@@ -2,8 +2,6 @@ import type * as Party from 'partykit/server';
 import * as Poker from '@tg/game-logic/poker'
 import { ClientMessage, ServerStateMessage, ServerUpdateMessage } from './shared';
 
-const Hand = require('pokersolver').Hand;
-
 export interface IPlayer {
   playerId: string;
 }
