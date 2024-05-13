@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { createRoot } from 'react-dom/client';
 import PartySocket from "partysocket";
 import Header from "./components/Header";
 import Poker from "./components/poker/Poker";
 
-import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "../../party/src/shared";
-import * as PokerLogic from "@tg/game-logic/poker";
+import { ClientMessage, ServerStateMessage, ServerUpdateMessage } from "../../party/src/shared";
 
 export type ClientState = {
   isConnected: boolean;
@@ -13,34 +11,32 @@ export type ClientState = {
   socket: PartySocket | null;
   playerId: string | null;
   updateLog: ServerUpdateMessage[];
+  connect: () => void,
+  sendMessage: (action: ClientMessage) => void;
 };
 
-export const Client: React.FC = () => {
-  const [clientState, setClientState] = useState<ClientState>({
+export class Client: React.FC = () => {
+
+  const clientState: ClientState = {
     isConnected: false,
     serverState: null,
     socket: null,
     playerId: null,
     updateLog: [],
-  });
-
-  useEffect(() => {
-    const connectSocket = () => {
-      const socket = new PartySocket({
+    connect() {
+      this.socket = new PartySocket({
         host: PARTYKIT_HOST,
         room: "my-new-room"
       });
 
-      socket.addEventListener("open", () => {
-        setClientState((prevState) => ({
-          ...prevState,
+      this.socket.addEventListener("open", () => {
+        this.isConnected = true,
           isConnected: true,
-          playerId: socket.id,
-          socket: socket,
-        }));
+            playerId: socket.id,
+              socket: socket,
       });
 
-      socket.addEventListener("message", (event) => {
+      this.socket.addEventListener("message", (event) => {
         try {
           const data: ServerStateMessage = JSON.parse(event.data);
           setClientState((prevState) => ({
@@ -56,16 +52,35 @@ export const Client: React.FC = () => {
         }
       });
 
-      socket.addEventListener("close", () => {
+      this.socket.addEventListener("close", () => {
         setClientState((prevState) => ({
           ...prevState,
           isConnected: false,
         }));
       });
 
-      socket.addEventListener("error", (event) => {
+      this.socket.addEventListener("error", (event) => {
         console.error("WebSocket error:", event);
       });
+    },
+    sendMessage(message) {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        console.log(this.socket)
+        this.socket.send(JSON.stringify(message));
+      } else {
+        console.error("WebSocket is not initialized or not open.");
+      }
+    }
+  }
+
+  useEffect(() => {
+    const connectSocket = () => {
+      const socket = new PartySocket({
+        host: PARTYKIT_HOST,
+        room: "my-new-room"
+      });
+
+
 
       setClientState((prevState) => ({
         ...prevState,
@@ -90,7 +105,7 @@ export const Client: React.FC = () => {
         playerId={clientState.playerId}
         minPlayers={clientState.serverState?.config?.minPlayers || 2}
       />
-      <Poker clientState={clientState} />
+      {/* <Poker clientState={clientState} /> */}
     </React.Fragment>
   );
 };

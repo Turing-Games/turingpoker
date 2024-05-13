@@ -1,6 +1,6 @@
 import React from "react";
-import { ClientState } from "@tg/client";
-import { sendMessage } from "@tg/utils/websocket";
+import { ClientState } from "../../client";
+import { sendMessage } from "../../../../party/src/utils/websocket";
 
 function GameControls({ clientState }: { clientState: ClientState }) {
   const serverState = clientState?.serverState;

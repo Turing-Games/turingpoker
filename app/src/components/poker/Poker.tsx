@@ -7,7 +7,7 @@ import * as Poker from '@tg/game-logic/poker'
 import GameControls from "./GameControls";
 import GameLog from "./GameLog";
 import Card from "../Card";
-import { sendMessage } from "@tg/utils/websocket";
+import { sendMessage } from "../../../../party/src/utils/websocket";
 
 interface Props {
   clientState: ClientState;
@@ -104,15 +104,15 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
           })}
         </div>
         <div className="tg-poker__table__dealer">
-          <Card />
+          {/* <Card /> */}
           <div>
-            {gameState?.cards.map((data, i) => (
+            {/* {gameState?.cards.map((data, i) => (
               <Card
                 key={i}
                 style={{ transform: `translateX(-${78 * (i + 1)}px)` }}
                 value={Poker.formatCard(data)}
               />
-            ))}
+            ))} */}
           </div>
         </div>
         <div className="tg-poker__table__bottom">
