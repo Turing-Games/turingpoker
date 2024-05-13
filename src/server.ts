@@ -25,7 +25,7 @@ export default class PartyServer implements Party.Server {
     maxPlayers: MAX_PLAYERS,
     smallBlind: 50,
     autoStart: AUTO_START,
-    minPlayers: MIN_PLAYERS_AUTO_START
+    minPlayers: MIN_PLAYERS_AUTO_START,
   };
   public inGamePlayers: IPlayer[] = [];
   public spectatorPlayers: IPlayer[] = [];
@@ -35,9 +35,24 @@ export default class PartyServer implements Party.Server {
   public serverState: IPartyServerState = {
     gamePhase: 'pending'
   };
+  public lastActed: Record<string, number> = {};
+
+  public timeoutLoopInterval: NodeJS.Timeout | null = null;
+
   public queuedUpdates: ServerUpdateMessage[] = [];
   constructor(public readonly room: Party.Room, public readonly autoStart: boolean = true) {
     this.room = room;
+  }
+
+  onStart(): void | Promise<void> {
+      this.timeoutLoopInterval = setInterval(() => {
+        // check if anyone should be disconnected
+        for (const player of this.inGamePlayers) {
+          if (this.lastActed[player.playerId] && Date.now() - this.lastActed[player.playerId] > 300000) {
+            this.playerSpectate(player.playerId);
+          }
+        }
+      }, 1000);
   }
 
   // Start as soon as two players are in
@@ -58,6 +73,7 @@ export default class PartyServer implements Party.Server {
     try {
       let data: ClientMessage;
 
+      this.lastActed[websocket.id] = Date.now();
       if (typeof message === 'string') {  // Check if the message is string to parse it
         data = JSON.parse(message);
       }
@@ -218,9 +234,7 @@ export default class PartyServer implements Party.Server {
   }
 
   playerSpectate(playerId: string) {
-    this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== playerId);
-    this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== playerId);
-    this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
+    this.removePlayer(playerId);
     this.spectatorPlayers.push({
       playerId
     });
