@@ -1,10 +1,11 @@
 import React from "react";
 import Card from "../Card";
+import * as Poker from "@tg/game-logic/poker";
 
 interface PlayerProps {
-  player: any;
-  hand: any[];
-  hands?: any;
+  player: Poker.IPokerPlayer;
+  hand: Poker.Card[];
+  hands?: Record<string, Poker.Card[]>;
   className?: string;
   style?: React.CSSProperties;
   isCurrentPlayerTurn: boolean;
@@ -22,10 +23,11 @@ const Player = ({ player, hand, hands, className, style, title, showCards }: Pla
         <div>{`Bet: $${player.currentBet}`}</div>
       </div>
       <div style={{ display: 'flex', gap: '6px', margin: '16px 0' }}>
-        {showCards ? (
-          handToRender.map((c, i) => <Card key={i} value={`${c.suit}_${c.rank}`} />)
-        ) : (
-          handToRender.map((c, i) => <Card key={i} value="" />)
+        {showCards && (
+          handToRender.length ? handToRender.map((c, i) => <Card key={i} value={Poker.formatCard(c)} />) : <>
+            <Card />
+            <Card />
+          </>
         )}
       </div>
     </div>

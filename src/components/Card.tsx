@@ -111,17 +111,22 @@ const cardMap = {
 };
 
 function Card(props) {
-
   const { value, style } = props;
 
   return (
-    <img
-      src={cardMap[value] || cardMap.cardBack}
-      alt={`Card ${value}`}
-      style={{ ...style }}
-      className={"card"}
-    />
-  );
+    <div style={{
+      width: '78px',
+      height: '108px',
+      background: value ? 'white' : 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,0,0,1) 100%)',
+      position: 'relative',
+      borderRadius: '8px',
+      ...style
+    }}>
+      {value}
+
+
+    </div>
+  )
 }
 
 export default Card;

@@ -90,49 +90,64 @@ const PokerTable = ({ clientState }: Props) => {
           ))}
         </div>
       </div>
-      <div style={{
-        position: 'relative',
-        flex: 1,
-      }}>
-        <div className="tg-poker__table__dealer" style={{
-          position: 'absolute',
-          transform: 'translate(-50%, -50%)',
-          left: '50%',
-          top: '50%'
-        }}>
-          <div className="opponents" style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-          }}>
+      <div
+        style={{
+          position: "relative",
+          flex: 1,
+        }}
+      >
+        <div
+          className="tg-poker__table__dealer"
+          style={{
+            position: "absolute",
+            transform: "translate(-50%, -50%)",
+            left: "50%",
+            top: "50%",
+          }}
+        >
+          <div
+            className="opponents"
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "100%",
+            }}
+          >
             {inGamePlayers?.map((opp, index) => {
               const playerNumberOffset = !currentPlayer ? 1 : 0;
               return (
-                <div className="tg-poker__table__player-container" style={{
-                  left: -Math.cos((index / (inGamePlayers.length)) * Math.PI * 2) * 50 + 50 + '%',
-                  bottom: -Math.sin((index / (inGamePlayers.length)) * Math.PI * 2) * 50 + 50 + '%',
-                }}>
+                <div
+                  className="tg-poker__table__player-container"
+                  style={{
+                    left:
+                      -Math.cos((index / inGamePlayers.length) * Math.PI * 2) *
+                        50 +
+                      50 +
+                      "%",
+                    bottom:
+                      -Math.sin((index / inGamePlayers.length) * Math.PI * 2) *
+                        50 +
+                      50 +
+                      "%",
+                  }}
+                >
                   <Player
                     key={index}
                     player={opp}
                     hand={hands[opp.id]}
                     isCurrentPlayerTurn={opp.id === currentTurn}
-                    showCards={gameState?.round == "showdown" || isPlayerSpectating}
-                    title={`Player ${index + 1}`}
+                    showCards
+                    title={`Player ${index + 1}${clientState.playerId === opp.id ? " (You)" : ""}`}
                     className=""
                   />
                 </div>
               );
             })}
           </div>
-          <Card />
-          <div>
+          <div className="tg-poker__table__dealer__cards">
+            <Card />
             {gameState?.cards.map((data, i) => (
-              <Card
-                key={i}
-                style={{ transform: `translateX(-${78 * (i + 1)}px)` }}
-                value={Poker.formatCard(data)}
-              />
+              <Card key={i} value={Poker.formatCard(data)} />
             ))}
           </div>
         </div>
@@ -140,14 +155,6 @@ const PokerTable = ({ clientState }: Props) => {
       <div className="tg-poker__table__bottom">
         {currentPlayer ? (
           <div>
-            <Player
-              className="tg-poker__player--1"
-              hand={serverState.hand || []}
-              player={currentPlayer}
-              showCards={true}
-              isCurrentPlayerTurn={isCurrentPlayerTurn}
-              title={`You (${getPlayerStatus(currentPlayer.id)})`}
-            />
             {serverState.state.gamePhase === "pending" ? (
               <p>Waiting for players to join...</p>
             ) : isCurrentPlayerTurn ? (
@@ -160,40 +167,40 @@ const PokerTable = ({ clientState }: Props) => {
           <div style={{ height: 100, width: "100%" }} />
         )}
 
-        <div className="tg-poker__table__join">
-          <button
-            style ={{
-              width: "100%",
-            }}
-            onClick={() => {
-              if (isPlayerSpectating) {
-                sendMessage(socket, { type: "join-game" });
-              } else {
-                sendMessage(socket, { type: "spectate" });
-              }
-            }}
-          >
-            {isPlayerSpectating
-              ? "Join game"
-              : isPlayerInGame
-              ? "Leave game"
-              : "Queued to join game"}
-          </button>
+        <div className="tg-poker__table__controlpanel">
+          <div className="tg-poker__table__join">
+            <button
+              style={{
+                width: "100%",
+              }}
+              onClick={() => {
+                if (isPlayerSpectating) {
+                  sendMessage(socket, { type: "join-game" });
+                } else {
+                  sendMessage(socket, { type: "spectate" });
+                }
+              }}
+            >
+              {isPlayerSpectating
+                ? "Join game"
+                : isPlayerInGame
+                ? "Leave game"
+                : "Queued to join game"}
+            </button>
+          </div>
         </div>
-        <div className="tg-poker__table__spectators">
-          <h4>Spectators</h4>
-          {serverState.spectatorPlayers
-            .concat(serverState.queuedPlayers)
-            .map((spectator, index) => (
-              <div
-                key={index}
-                className="tg-poker__table__spectators__spectator"
-              >
-                <p>{`Spectator ${index + 1}:`}</p>
-                <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
-              </div>
-            ))}
-        </div>
+      </div>
+
+      <div className="tg-poker__table__spectators">
+        <h4>Spectators</h4>
+        {serverState.spectatorPlayers
+          .concat(serverState.queuedPlayers)
+          .map((spectator, index) => (
+            <div key={index} className="tg-poker__table__spectators__spectator">
+              <p>{`Spectator ${index + 1}:`}</p>
+              <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
+            </div>
+          ))}
       </div>
     </div>
   );
