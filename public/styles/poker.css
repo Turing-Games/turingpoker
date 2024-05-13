@@ -81,6 +81,16 @@ body {
   width: 200px;
 }
 
+.tg-poker__table__join {
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  padding: 8px;
+  position: absolute;
+  bottom: 0;
+  right: 200px;
+  width: 200px;
+}
+
 .tg-poker__table__spectators__spectator {
   display: flex;
 }

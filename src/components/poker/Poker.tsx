@@ -86,19 +86,6 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
           ))}
         </div>
       </div>
-      <div className="tg-poker__table__join">
-        <button onClick={() => {
-          if (isPlayerSpectating) {
-            sendMessage(socket, { type: 'join-game' })
-          } else {
-            sendMessage(socket, { type: 'leave-game' })
-          }
-        }}>
-          {isPlayerSpectating ?
-            'Join game' :
-            (isPlayerInGame ? 'Leave the game' : 'Queued to join game')}
-        </button>
-      </div>
       <div className="opponents">
         {opponents?.map((opp, index) => {
           const playerNumberOffset = !currentPlayer ? 1 : 0;
@@ -109,7 +96,7 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
               player={opp}
               hand={[]}
               isCurrentPlayerTurn={opp.id === currentTurn}
-              showCards={gameState?.round == 'showdown' || isPlayerSpectating}
+              showCards={gameState?.round == "showdown" || isPlayerSpectating}
               title={`Player ${index + 2 - playerNumberOffset} (${status})`}
               className=""
             />
@@ -150,27 +137,42 @@ const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState
         ) : (
           <div style={{ height: 100, width: "100%" }} />
         )}
+
+        <div className="tg-poker__table__join">
+          <button
+            style ={{
+              width: "100%",
+            }}
+            onClick={() => {
+              if (isPlayerSpectating) {
+                sendMessage(socket, { type: "join-game" });
+              } else {
+                sendMessage(socket, { type: "spectate" });
+              }
+            }}
+          >
+            {isPlayerSpectating
+              ? "Join game"
+              : isPlayerInGame
+              ? "Leave game"
+              : "Queued to join game"}
+          </button>
+        </div>
         <div className="tg-poker__table__spectators">
           <h4>Spectators</h4>
           {serverState.spectatorPlayers
             .concat(serverState.queuedPlayers)
             .map((spectator, index) => (
-              <div key={index} className="tg-poker__table__spectators__spectator">
+              <div
+                key={index}
+                className="tg-poker__table__spectators__spectator"
+              >
                 <p>{`Spectator ${index + 1}:`}</p>
                 <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
               </div>
             ))}
         </div>
       </div>
-      {serverState.winners.length > 0 && (
-        <div className="tg-poker__winner">
-          {serverState.winners.map((id, i) => (
-            <div key={i} style={{ marginBottom: "24px" }}>
-              <p>{`Player #${id} won`}</p>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 };
