@@ -86,14 +86,14 @@ const PokerTable = ({ clientState }: Props) => {
   return (
     <div className="tg-poker__table">
       <div className="tg-poker__table__top">
-        <div className="tg-poker__overview">
-          {gameOverview.map((stat, i) => (
-            <div key={i} style={{ color: "#5cc133" }}>
-              <div>{stat.label}</div>
-              <div>{`${stat.prefix}${stat.value}`}</div>
-            </div>
-          ))}
-        </div>
+          <div className="tg-poker__overview">
+            {gameOverview.map((stat, i) => (
+              <div key={i} style={{ color: "#5cc133" }}>
+                <div>{stat.label}</div>
+                <div>{`${stat.prefix}${stat.value}`}</div>
+              </div>
+            ))}
+          </div>
       </div>
       <div
         style={{

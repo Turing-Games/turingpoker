@@ -65,7 +65,6 @@ body {
   margin: 0 auto 20px auto;
   max-width: 500px;
   padding: 8px;
-  height: 25vh;
 }
 
 .tg-poker__table__bottom {
@@ -170,6 +169,10 @@ body {
 
 .tg-poker__table__dealer>img:not(:nth-child(1)) {
   animation: slideRight 0.3s linear forwards;
+}
+
+.tg-poker__table__top {
+  height: 25vh;
 }
 
 .tg-poker__winner {
