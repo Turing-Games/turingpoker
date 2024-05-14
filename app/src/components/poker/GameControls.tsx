@@ -13,7 +13,7 @@ function GameControls({ clientState }: { clientState: ClientState }) {
   // Retrieve the current bet and minimum raise amount
   const currentBet = gameState?.targetBet;
   const minRaiseAmount = gameState?.bigBlind;
-  const currentPlayer = gameState?.players?.find(player => player.id === clientState?.playerId);
+  const currentPlayer = gameState?.players.find(player => player.id === clientState?.playerId);
   const isPlayerEvenWithBet = currentPlayer?.currentBet >= currentBet;
   const socket = clientState.socket
   const isPlayerSpectating = !!serverState.spectatorPlayers?.find(p => p.playerId === clientState?.playerId)
@@ -36,7 +36,9 @@ function GameControls({ clientState }: { clientState: ClientState }) {
       <div
         style={{
           flexDirection: "column",
+          width: "100%",
           display: "flex",
+          alignItems: 'stretch',
           gap: "8px",
         }}
       >
@@ -46,6 +48,7 @@ function GameControls({ clientState }: { clientState: ClientState }) {
             style={{
               flexDirection: "row",
               display: "flex",
+              justifyContent: "space-between",
               gap: "8px",
             }}
           >
@@ -58,13 +61,13 @@ function GameControls({ clientState }: { clientState: ClientState }) {
                   });
                 }
               }}
-              disabled={gameState?.whoseTurn !== currentPlayer?.id || isPlayerEvenWithBet}
+              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || isPlayerEvenWithBet}
             >
               Call
             </button>
             {/* Check button */}
             <button
-              disabled={gameState?.whoseTurn !== currentPlayer?.id || !isPlayerEvenWithBet}
+              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || !isPlayerEvenWithBet}
               onClick={() => {
                 if (currentBet === 0 || isPlayerEvenWithBet) {
                   sendMessage(socket, {
@@ -78,14 +81,14 @@ function GameControls({ clientState }: { clientState: ClientState }) {
             </button>
             {/* Raise button */}
             <button
-              disabled={gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < minRaiseAmount}
+              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < minRaiseAmount}
               onClick={handleRaise}
             >
               Raise
             </button>
             {/* Fold button */}
             <button
-              disabled={gameState?.whoseTurn !== currentPlayer?.id}
+              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id}
               onClick={() =>
                 sendMessage(socket, {
                   type: "action",
@@ -99,9 +102,6 @@ function GameControls({ clientState }: { clientState: ClientState }) {
         )}
 
         <button
-          style={{
-            width: "100%",
-          }}
           onClick={() => {
             if (isPlayerSpectating) {
               sendMessage(socket, { type: "join-game" });

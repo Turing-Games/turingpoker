@@ -30,14 +30,6 @@ export default function Header(props: {
             <div className={`tg-header__squares tg-header__squares--${i}`} key={i} > </div>
           ))}
       </div>
-      {
-        players?.length < minPlayers && (
-          <div>
-            <Loader style={{ margin: '24px 0' }} />
-            <p> Waiting for players to join...</p>
-          </div>
-        )
-      }
     </div>
   );
 }

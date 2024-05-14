@@ -77,6 +77,11 @@ const PokerTable = ({ clientState }: Props) => {
 
 
   console.log('num players', inGamePlayers?.length)
+  const placeholderCards = [];
+  while (placeholderCards.length + (gameState?.cards.length ?? 0) < 5) {
+    placeholderCards.push(<Card style={{ opacity: '0' }} />);
+  }
+
   // show game table
   return (
     <div className="tg-poker__table">
@@ -92,18 +97,14 @@ const PokerTable = ({ clientState }: Props) => {
       </div>
       <div
         style={{
-          position: "relative",
           flex: 1,
+          flexDirection: "column",
+          display: "flex",
+          alignItems: 'center',
+          marginTop: '32px',
         }}
       >
-        <div
-          className="tg-poker__table__dealer"
-          style={{
-            position: "absolute",
-            transform: "translate(-50%, 0%)",
-            left: "50%",
-          }}
-        >
+        <div className="tg-poker__table__dealer" >
           <div
             className="opponents"
             style={{
@@ -120,9 +121,9 @@ const PokerTable = ({ clientState }: Props) => {
                   className="tg-poker__table__player-container"
                   style={{
                     left:
-                      -Math.cos(angle) * 50 + 50 + "%",
+                      -Math.cos(angle) * 65 + 50 + "%",
                     bottom:
-                      -Math.sin(angle) * 50 + 50 + "%",
+                      -Math.sin(angle) * 65 + 50 + "%",
                   }}
                 >
                   <Player
@@ -144,12 +145,12 @@ const PokerTable = ({ clientState }: Props) => {
             {gameState?.cards.map((data, i) => (
               <Card key={i} value={data} />
             ))}
+            {placeholderCards}
           </div>
         </div>
-      </div>
-
-      <div className="tg-poker__table__controlpanel">
-        <GameControls clientState={clientState} />
+        <div className="tg-poker__table__controlpanel">
+          <GameControls clientState={clientState} />
+        </div>
       </div>
 
       <div className="tg-poker__table__players terminal_text">

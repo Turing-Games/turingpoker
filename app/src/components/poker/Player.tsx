@@ -23,7 +23,7 @@ const Player = ({ player, hand, hands, className, style, title, showCards }: Pla
         <div>{`Bet: $${player.currentBet.toFixed(2)}`}</div>
       </div>
       <div style={{ display: 'flex', gap: '6px', margin: '16px 0',
-        flexDirection: 'row', justifyContent: 'space-between',
+        flexDirection: 'row', justifyContent: 'center',
         width: '100%',
        }}>
         {showCards && (
