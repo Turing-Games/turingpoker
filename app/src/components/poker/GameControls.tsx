@@ -1,4 +1,3 @@
-import React from "react";
 import { ClientState } from "../../client";
 import { sendMessage } from "../../../../party/src/utils/websocket";
 

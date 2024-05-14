@@ -1,4 +1,4 @@
-import React from "react";
+import { FC } from "hono/jsx";
 import Card from "../Card";
 
 interface Props {
@@ -6,13 +6,13 @@ interface Props {
   hand: any[];
   hands?: any;
   className?: string;
-  style?: React.CSSProperties;
+  style?: any;
   isCurrentPlayerTurn: boolean;
   title: string;
   showCards: boolean;
 }
 
-const Player: React.FC<Props> = ({ player, hand, hands, className, style, title, showCards }) => {
+const Player: FC = ({ player, hand, hands, className, style, title, showCards }) => {
   const handToRender = hand || (hands && hands[player.id]) || [];
 
   return (

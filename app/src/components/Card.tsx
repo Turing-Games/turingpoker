@@ -1,4 +1,3 @@
-// import React from 'react'
 // //TODO: rename all these files to something simpler and then use dynamic imports to get rid of this
 // // all card svgs
 import clubs2 from '../../public/images/cards/svg-cards/2_of_clubs.svg'

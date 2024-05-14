@@ -1,4 +1,3 @@
-import React from "react";
 // import Logo from '../../public/images/logo.png'
 import Loader from "./Loader";
 import { IPlayer } from "@tg/game";

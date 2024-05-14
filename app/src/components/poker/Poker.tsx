@@ -1,4 +1,3 @@
-import React from "react";
 import { ClientState } from "@tg/client";
 import card from "../Card";
 import CardLoader from "../Loader";
@@ -8,12 +7,13 @@ import GameControls from "./GameControls";
 import GameLog from "./GameLog";
 import Card from "../Card";
 import { sendMessage } from "../../../../party/src/utils/websocket";
+import { FC } from "hono/jsx";
 
 interface Props {
   clientState: ClientState;
 }
 
-const PokerTable: React.FC<Props> = ({ clientState }: { clientState: ClientState }) => {
+const PokerTable: FC = ({ clientState }: { clientState: ClientState }) => {
 
   const serverState = clientState.serverState;
   if (!serverState) {

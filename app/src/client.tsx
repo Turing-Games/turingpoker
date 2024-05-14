@@ -1,4 +1,3 @@
-import React from 'react'
 import { useState, useEffect } from 'hono/jsx'
 import PartySocket from "partysocket";
 import Header from "./components/Header";
@@ -83,7 +82,7 @@ export default function Client() {
   }, []);
 
   return (
-    <React.Fragment>
+    <div>
       <Header
         gameType="No Limit Texas Hold'em"
         players={clientState.serverState?.inGamePlayers || []}
@@ -91,6 +90,6 @@ export default function Client() {
         minPlayers={clientState.serverState?.config?.minPlayers || 2}
       />
       <Poker clientState={clientState} />
-    </React.Fragment>
+    </div>
   );
 };

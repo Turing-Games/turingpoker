@@ -1,11 +1,9 @@
 import { Hono } from 'hono'
 import { renderer } from './renderer'
-import { serveStatic } from '@hono/node-server/serve-static'
 
 const app = new Hono()
 
 app.get('*', renderer)
-app.use('/static/*', serveStatic({ root: '/' }))
 
 app.get('/hello', (c) => {
   return c.json({

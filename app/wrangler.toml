@@ -1,6 +1,6 @@
 name = "my-app"
 pages_build_output_dir = "./dist"
-node_compat = true
+# node_compat = true
 
 # [vars]
 # MY_VAR = "my-variable"
