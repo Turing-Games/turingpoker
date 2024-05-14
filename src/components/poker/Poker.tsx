@@ -76,6 +76,8 @@ const PokerTable = ({ clientState }: Props) => {
   }
   hands[serverState.clientId] = serverState.hand ?? [];
 
+
+  console.log('num players', inGamePlayers?.length)
   // show game table
   return (
     <div className="tg-poker__table">
@@ -114,20 +116,15 @@ const PokerTable = ({ clientState }: Props) => {
           >
             {inGamePlayers?.map((opp, index) => {
               const playerNumberOffset = !currentPlayer ? 1 : 0;
+              const angle = (index / inGamePlayers.length) * Math.PI * 2;
               return (
                 <div
                   className="tg-poker__table__player-container"
                   style={{
                     left:
-                      -Math.cos((index / inGamePlayers.length) * Math.PI * 2) *
-                        50 +
-                      50 +
-                      "%",
+                      -Math.cos(angle) * 50 + 50 + "%",
                     bottom:
-                      -Math.sin((index / inGamePlayers.length) * Math.PI * 2) *
-                        50 +
-                      50 +
-                      "%",
+                      -Math.sin(angle) * 50 + 50 + "%",
                   }}
                 >
                   <Player
@@ -139,7 +136,6 @@ const PokerTable = ({ clientState }: Props) => {
                     title={`Player ${index + 1}${
                       clientState.playerId === opp.id ? " (You)" : ""
                     }`}
-                    className=""
                   />
                 </div>
               );
@@ -158,13 +154,20 @@ const PokerTable = ({ clientState }: Props) => {
         <GameControls clientState={clientState} />
       </div>
 
-      <div className="tg-poker__table__spectators">
-        <h4>Spectators</h4>
+      <div className="tg-poker__table__players">
+        <h4>Players</h4>
         {serverState.spectatorPlayers
           .concat(serverState.queuedPlayers)
           .map((spectator, index) => (
-            <div key={index} className="tg-poker__table__spectators__spectator">
+            <div key={index} className="tg-poker__table__players__player">
               <p>{`Spectator ${index + 1}:`}</p>
+              <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
+            </div>
+          ))}
+        {serverState.inGamePlayers
+          .map((spectator, index) => (
+            <div key={index} className="tg-poker__table__players__player">
+              <p>{`Player ${index + 1}:`}</p>
               <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
             </div>
           ))}

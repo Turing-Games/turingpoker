@@ -120,6 +120,7 @@ function Card(props) {
       background: value ? 'white' : 'radial-gradient(circle, rgba(255,255,255,1) 0%, rgba(255,0,0,1) 100%)',
       position: 'relative',
       borderRadius: '8px',
+      border: '1px solid black',
       ...style
     }}>
       {value}

@@ -50,7 +50,7 @@ function GameLog({ gameLog }: GameLogProps): JSX.Element {
     return (
         <div className="tg-poker__gamelog" ref={ref}>
             <h4>Game Log</h4>
-            {gameLog.map((log, index) => (
+            {gameLog.slice(-500).map((log, index) => (
                 <div className="tg-poker__gamelog__log" key={index}>
                     <p>{getLogMessage(log)}</p>
                 </div>

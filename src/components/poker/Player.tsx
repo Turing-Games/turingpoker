@@ -22,7 +22,10 @@ const Player = ({ player, hand, hands, className, style, title, showCards }: Pla
         <h4>{`${title} - $${player.stack}`}</h4>
         <div>{`Bet: $${player.currentBet}`}</div>
       </div>
-      <div style={{ display: 'flex', gap: '6px', margin: '16px 0' }}>
+      <div style={{ display: 'flex', gap: '6px', margin: '16px 0',
+        flexDirection: 'row', justifyContent: 'space-between',
+        width: '100%',
+       }}>
         {showCards && (
           handToRender.length ? handToRender.map((c, i) => <Card key={i} value={Poker.formatCard(c)} />) : <>
             <Card />
