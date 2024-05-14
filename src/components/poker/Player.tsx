@@ -19,8 +19,8 @@ const Player = ({ player, hand, hands, className, style, title, showCards }: Pla
   return (
     <div className={`tg-poker__player${className ? '.' + className : ''}`} style={style}>
       <div className="tg-poker__player__details">
-        <h4>{`${title} - $${player.stack}`}</h4>
-        <div>{`Bet: $${player.currentBet}`}</div>
+        <h4>{`${title} - $${player.stack.toFixed(2)}`}</h4>
+        <div>{`Bet: $${player.currentBet.toFixed(2)}`}</div>
       </div>
       <div style={{ display: 'flex', gap: '6px', margin: '16px 0',
         flexDirection: 'row', justifyContent: 'space-between',

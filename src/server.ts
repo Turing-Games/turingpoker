@@ -154,8 +154,12 @@ export default class PartyServer implements Party.Server {
     if (this.gameState && !this.gameState.state.done) {
       return;
     }
+    // if anyone has zero chips just reset them to 1000
     for (const player of this.inGamePlayers.concat(this.queuedPlayers)) {
       this.lastActed[player.playerId] = Date.now();
+      if (this.stacks[player.playerId] <= 0) {
+        this.stacks[player.playerId] = defaultStack;
+      }
     }
     this.processQueuedPlayers();
     this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));

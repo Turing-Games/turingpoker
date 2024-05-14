@@ -20,7 +20,7 @@ parser.add_argument('--host', type=str, default='localhost',
                     help='The host to connect to the server on')
 parser.add_argument('--room', type=str, default='my-new-room',
                     help='The room to connect to')
-parser.add_argument('--simulations', type=int, default=10000)
+parser.add_argument('--simulations', type=int, default=1000)
 
 args = parser.parse_args()
 
@@ -42,7 +42,7 @@ def card_name(card: pokerTypes.Card):
 
 class KellyCriterion(Bot):
     def act(self, state, hand):
-        # time.sleep(0.001)
+        time.sleep(1)
         prob = self.win_prob(state, hand)
         me = None
         for player in state.players:

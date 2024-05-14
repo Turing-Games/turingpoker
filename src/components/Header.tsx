@@ -22,7 +22,7 @@ export default function Header(props: {
           <h2>{gameType ? `Table: ${gameType}` : 'Welcome!'}</h2>
           <p>Turing Games</p>
         </div>
-        < div className='tg-header__logo' style={{ right: '12px' }}>
+        <div className='tg-header__logo' style={{ right: '12px' }}>
           <img src={Logo} alt="Logo" />
         </div>
         {

@@ -53,8 +53,8 @@ const PokerTable = ({ clientState }: Props) => {
 
 
   const gameOverview = [
-    { label: 'Current Pot:', value: gameState?.pot.toString(), prefix: '$' },
-    { label: 'Current Bet:', value: gameState?.targetBet.toString(), prefix: '$' },
+    { label: 'Current Pot:', value: gameState?.pot.toFixed(2), prefix: '$' },
+    { label: 'Current Bet:', value: gameState?.targetBet.toFixed(2), prefix: '$' },
     { label: 'Dealer Position:', value: (gameState?.dealerPosition + 1).toString(), prefix: '' }
   ]
 
@@ -154,8 +154,8 @@ const PokerTable = ({ clientState }: Props) => {
         <GameControls clientState={clientState} />
       </div>
 
-      <div className="tg-poker__table__players">
-        <h4>Players</h4>
+      <div className="tg-poker__table__players terminal_text">
+        <h4 className="terminal_text">Players</h4>
         {serverState.spectatorPlayers
           .concat(serverState.queuedPlayers)
           .map((spectator, index) => (
