@@ -14,9 +14,6 @@
       "vite/client"
     ],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx/dom"
-  },
-  "include": [
-    "src/client.tsx"
-  ]
+    "jsxImportSource": "hono/jsx"
+  }
 }
