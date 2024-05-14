@@ -1,17 +1,21 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev src/index.tsx",
+    "build": "vite build --mode client && vite build",
+    "dev": "vite",
+    "dev:wrangler": "wrangler dev src/index.tsx",
     "deploy": "wrangler deploy --minify src/index.ts"
   },
   "dependencies": {
-    "hono": "^4.3.6"
+    "hono": "^4.3.6",
+    "partysocket": "^1.0.1"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240403.0",
     "@hono/vite-cloudflare-pages": "^0.4.0",
     "@hono/vite-dev-server": "^0.12.1",
     "vite": "^5.2.11",
+    "vite-tsconfig-paths": "^4.3.2",
     "wrangler": "^3.47.0"
   }
 }

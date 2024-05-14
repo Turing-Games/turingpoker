@@ -1,11 +1,33 @@
 import { Hono } from 'hono'
-import { renderer } from './renderer'
+import { jsx } from 'hono/jsx'
 import { serveStatic } from '@hono/node-server/serve-static'
+import { jsxRenderer } from 'hono/jsx-renderer';
 
 const app = new Hono()
 
-app.get('*', renderer)
-// app.use('/static/*', serveStatic({ root: '/' }))
+app.get(
+  "*",
+  jsxRenderer(({ children, title }: any) => {
+    return <body>{children}</body>;
+  })
+);
+
+app.get("/", (c) => {
+  return c.render(
+    <html>
+      <head>
+        {import.meta.env.PROD ? (
+          <script type="module" src="/static/client.js"></script>
+        ) : (
+          <script type="module" src="/src/client.tsx"></script>
+        )}
+      </head>
+      <body>
+        <div id="root"></div>
+      </body>
+    </html>
+  );
+});
 
 
 // app.get('/hello', (c) => {

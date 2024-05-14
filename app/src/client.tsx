@@ -3,8 +3,12 @@ import PartySocket from "partysocket";
 import Header from "./components/Header";
 import Poker from "./components/poker/Poker";
 
+import { render } from "hono/jsx/dom";
+
 import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "../../party/src/shared";
 import * as PokerLogic from "@tg/game-logic/poker";
+
+import '@static/styles/styles.css'
 
 export type ClientState = {
   isConnected: boolean;
@@ -25,8 +29,9 @@ export default function Client() {
 
   useEffect(() => {
     const connectSocket = () => {
+      console.log(import.meta.env.VITE_PARTYKIT_HOST)
       const socket = new PartySocket({
-        host: PARTYKIT_HOST,
+        host: import.meta.env.PARTYKIT_HOST,
         room: "my-new-room"
       });
 
@@ -93,3 +98,7 @@ export default function Client() {
     </div>
   );
 };
+
+
+const root = document.getElementById("root");
+render(<Client />, root!);

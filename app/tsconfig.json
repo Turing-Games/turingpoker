@@ -5,6 +5,11 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
+    "paths": {
+      "@static/*": ["static/*"],
+      "@tg/*": ["src/*"],
+    },
+    "baseUrl": ".",
     "lib": [
       "ESNext",
       "DOM"
@@ -14,6 +19,6 @@
       "vite/client"
     ],
     "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx/dom"
+    "jsxImportSource": "hono/jsx"
   }
 }
