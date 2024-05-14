@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "hono/jsx";
 import { ServerUpdateMessage } from "@tg/shared";
 import * as Poker from '@tg/game-logic/poker';
 
@@ -40,11 +41,17 @@ interface GameLogProps {
 }
 
 function GameLog({ gameLog }: GameLogProps): JSX.Element {
+    const ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (ref.current) {
+            ref.current.scrollTop = ref.current.scrollHeight;
+        }
+    }, [gameLog]);
     return (
-        <div className="tg-poker__gamelog">
-            <h4>Game Log</h4>
-            {gameLog.map((log, index) => (
-                <div className="tg-poker__gamelog__log" key={index}>
+        <div className="tg-poker__gamelog" ref={ref}>
+            <h4 className="terminal_text">Game Log</h4>
+            {gameLog.slice(-500).map((log, index) => (
+                <div className="tg-poker__gamelog__log terminal_text" key={index}>
                     <p>{getLogMessage(log)}</p>
                 </div>
             ))}

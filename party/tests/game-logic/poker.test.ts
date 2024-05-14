@@ -50,7 +50,9 @@ describe("Poker logic", () => {
         bigBlind: 2,
         smallBlind: 1,
         dealerPosition: 0,
-        maxPlayers: 5
+        maxPlayers: 5,
+        autoStart: true,
+        minPlayers: 2
     }
     test("Game throws with negative raise", () => {
         const game = poker.createPokerGame(defaultConfig, ['0', '1'], [100, 100]);
@@ -255,5 +257,74 @@ describe("Poker logic", () => {
         expect(game.state.whoseTurn).toBe('0');
         game = poker.step(game, { type: 'call' }).next;
     });
+
+    test("Folded players don't get payouts even if they have the best hand", () => {
+        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2'], [100, 100, 100]);
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+
+        game = poker.step(game, { type: 'raise', amount: 5 }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'fold' }).next;
+
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        
+        game.hands['1'] = [{ rank: 1, suit: 'clubs' }, { rank: 1, suit: 'diamonds' }];
+
+        game.hands['2'] = [{ rank: 2, suit: 'hearts' }, { rank: 7, suit: 'spades' }];
+        game.hands['0'] = [{ rank: 3, suit: 'spades' }, { rank: 8, suit: 'hearts' }];
+
+        game.state.cards = [{ rank: 1, suit: 'hearts' }, { rank: 1, suit: 'spades' }, { rank: 2, suit: 'diamonds' }, { rank: 2, suit: 'clubs' }, { rank: 7, suit: 'clubs' }];
+        const payouts = poker.payout(game.state, game.hands).payouts;
+        expect(payouts).toMatchObject({
+            '0': 0,
+            '1': 0,
+            '2': game.state.pot
+        });
+    })
+
+    test("Player that was unable to call receives chips based on what they bet", () => {
+        let game = poker.createPokerGame({
+            ...defaultConfig,
+            bigBlind: 20,
+            smallBlind: 10
+        }, ['0', '1', '2'], [10, 100, 100]);
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+        game = poker.step(game, { type: 'call' }).next;
+
+        expect(game.state.done).toBeTruthy();
+
+        game.hands['0'] = [{ rank: 1, suit: 'clubs' }, { rank: 1, suit: 'diamonds' }];
+
+        game.hands['1'] = [{ rank: 3, suit: 'spades' }, { rank: 8, suit: 'hearts' }];
+        game.hands['2'] = [{ rank: 2, suit: 'hearts' }, { rank: 7, suit: 'spades' }];
+
+        game.state.cards = [{ rank: 1, suit: 'hearts' }, { rank: 1, suit: 'spades' }, { rank: 2, suit: 'diamonds' }, { rank: 2, suit: 'clubs' }, { rank: 7, suit: 'clubs' }];
+
+        const payouts = poker.payout(game.state, game.hands).payouts;
+        expect(payouts).toMatchObject({
+            '0': 30,
+            '1': 0,
+            '2': 20
+        });
+    })
 
 });

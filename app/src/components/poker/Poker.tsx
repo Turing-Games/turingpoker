@@ -13,25 +13,24 @@ interface Props {
   clientState: ClientState;
 }
 
-const PokerTable: FC = ({ clientState }: { clientState: ClientState }) => {
-
+const PokerTable = ({ clientState }: Props) => {
   const serverState = clientState.serverState;
   if (!serverState) {
     return null;
   }
 
   const socket = clientState.socket
-  const inGamePlayers = serverState?.inGamePlayers.map(player => player.playerId)
   const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
   const gameState = serverState.gameState;
   const gameHasEnoughPlayers = serverState?.inGamePlayers?.length >= serverState.config.minPlayers
   const remainingPlayersToJoin = serverState.config.minPlayers - serverState?.inGamePlayers?.length
-  const isPlayerInGame = inGamePlayers.indexOf(clientState?.playerId) !== -1
-  const isPlayerSpectating = spectatorPlayers.indexOf(clientState?.playerId) !== -1
+  const inGamePlayers = serverState.gameState?.players
+  const isPlayerInGame = !!inGamePlayers?.find(p => p.id == clientState?.playerId)
+  const isPlayerSpectating = !!serverState.spectatorPlayers?.find(p => p.playerId == clientState?.playerId)
+  const isPlayerQueued = !!serverState.queuedPlayers?.find(p => p.playerId == clientState?.playerId)
 
   const currentPlayer = gameState?.players.find(player => player.id === clientState?.playerId)
   const isCurrentPlayerTurn = currentPlayer?.id === gameState?.whoseTurn;
-  const opponents = serverState.gameState?.players?.filter(player => player.id !== currentPlayer?.id)
   const currentTurn = gameState?.whoseTurn
   const getPlayerStatus = (playerId: string) => {
     if (serverState.spectatorPlayers.find(player => player.playerId === playerId)) return 'spectator'
@@ -54,8 +53,8 @@ const PokerTable: FC = ({ clientState }: { clientState: ClientState }) => {
 
 
   const gameOverview = [
-    { label: 'Current Pot:', value: gameState?.pot.toString(), prefix: '$' },
-    { label: 'Current Bet:', value: gameState?.targetBet.toString(), prefix: '$' },
+    { label: 'Current Pot:', value: gameState?.pot.toFixed(2), prefix: '$' },
+    { label: 'Current Bet:', value: gameState?.targetBet.toFixed(2), prefix: '$' },
     { label: 'Dealer Position:', value: (gameState?.dealerPosition + 1).toString(), prefix: '' }
   ]
 
@@ -71,123 +70,111 @@ const PokerTable: FC = ({ clientState }: { clientState: ClientState }) => {
     console.log('gameState', gameState)
   }
 
+  const hands: Record<string, Poker.Card[]> = {};
+  for (const player of gameState?.players ?? []) {
+    hands[player.id] = [];
+  }
+  hands[serverState.clientId] = serverState.hand ?? [];
+
+
+  console.log('num players', inGamePlayers?.length)
   // show game table
-  if (gameHasEnoughPlayers && (isPlayerInGame || isPlayerSpectating)) {
-    return (
-      <div className="tg-poker__table">
-        <GameLog gameLog={clientState.updateLog} />
-        <div className="tg-poker__table__top">
-          <div className="tg-poker__overview">
-            {gameOverview.map((stat, i) => (
-              <div key={i} style={{ color: "#5cc133" }}>
-                <div>{stat.label}</div>
-                <div>{`${stat.prefix}${stat.value}`}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="opponents">
-          {opponents?.map((opp, index) => {
-            const playerNumberOffset = !currentPlayer ? 1 : 0;
-            let status = getPlayerStatus(opp.id);
-            return (
-              <Player
-                key={index}
-                player={opp}
-                hand={[]}
-                isCurrentPlayerTurn={opp.id === currentTurn}
-                showCards={gameState?.round == 'showdown' || isPlayerSpectating}
-                title={`Player ${index + 2 - playerNumberOffset} (${status})`}
-                className=""
-              />
-            );
-          })}
-        </div>
-        <div className="tg-poker__table__dealer">
-          {/* <Card /> */}
-          <div>
-            {/* {gameState?.cards.map((data, i) => (
-              <Card
-                key={i}
-                style={{ transform: `translateX(-${78 * (i + 1)}px)` }}
-                value={Poker.formatCard(data)}
-              />
-            ))} */}
-          </div>
-        </div>
-        <div className="tg-poker__table__bottom">
-          {currentPlayer ? (
-            <div>
-              <Player
-                className="tg-poker__player--1"
-                hand={serverState.hand || []}
-                player={currentPlayer}
-                showCards={true}
-                isCurrentPlayerTurn={isCurrentPlayerTurn}
-                title={`You (${getPlayerStatus(currentPlayer.id)})`}
-              />
-              {serverState.state.gamePhase === "pending" ? (
-                <p>Waiting for players to join...</p>
-              ) : isCurrentPlayerTurn ? (
-                <GameControls clientState={clientState} />
-              ) : (
-                <p style={{ height: "40px" }}>Waiting for your turn...</p>
-              )}
+  return (
+    <div className="tg-poker__table">
+      <div className="tg-poker__table__top">
+        <div className="tg-poker__overview">
+          {gameOverview.map((stat, i) => (
+            <div key={i} style={{ color: "#5cc133" }}>
+              <div>{stat.label}</div>
+              <div>{`${stat.prefix}${stat.value}`}</div>
             </div>
-          ) : (
-            <div style={{ height: 100, width: "100%" }} />
-          )}
-          <div className="tg-poker__table__spectators">
-            <h4>Spectators</h4>
-            {serverState.spectatorPlayers
-              .concat(serverState.queuedPlayers)
-              .map((spectator, index) => (
-                <div key={index} className="tg-poker__table__spectators__spectator">
-                  <p>{`Spectator ${index + 1}:`}</p>
-                  <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
-                </div>
-              ))}
-          </div>
+          ))}
         </div>
-        {serverState.winners.length > 0 && (
-          <div className="tg-poker__winner">
-            {serverState.winners.map((id, i) => (
-              <div key={i} style={{ marginBottom: "24px" }}>
-                <p>{`Player #${id} won`}</p>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
-    );
-  } else {
-    if (!isPlayerInGame && !isPlayerSpectating) {
-      return (
-        <>
-          <button
-            onClick={() => sendMessage(socket, { type: 'join-game' })}
+      <div
+        style={{
+          position: "relative",
+          flex: 1,
+        }}
+      >
+        <div
+          className="tg-poker__table__dealer"
+          style={{
+            position: "absolute",
+            transform: "translate(-50%, -50%)",
+            left: "50%",
+            top: "50%",
+          }}
+        >
+          <div
+            className="opponents"
             style={{
-              pointerEvents: isPlayerInGame ? 'none' : 'auto',
-              display: serverState.state.gamePhase === 'active' ? 'none' : 'block'
+              position: "absolute",
+              width: "100%",
+              height: "100%",
             }}
           >
-            Join Game
-          </button>
-          <button
-            onClick={() => sendMessage(socket, { type: 'spectate' })}
-            style={{ pointerEvents: isPlayerInGame ? 'none' : 'auto' }}
-          >
-            Spectate
-          </button>
-          <button>
-            {remainingPlayersToJoin === 0 ?
-              'Game has started' :
-              `Waiting for ${remainingPlayersToJoin} more player${remainingPlayersToJoin > 1 ? 's' : ''} to join...`}
-          </button>
-        </>
-      );
-    }
-  }
+            {inGamePlayers?.map((opp, index) => {
+              const playerNumberOffset = !currentPlayer ? 1 : 0;
+              const angle = (index / inGamePlayers.length) * Math.PI * 2;
+              return (
+                <div
+                  className="tg-poker__table__player-container"
+                  style={{
+                    left:
+                      -Math.cos(angle) * 50 + 50 + "%",
+                    bottom:
+                      -Math.sin(angle) * 50 + 50 + "%",
+                  }}
+                >
+                  <Player
+                    key={index}
+                    player={opp}
+                    hand={hands[opp.id]}
+                    isCurrentPlayerTurn={opp.id === currentTurn}
+                    showCards
+                    title={`Player ${index + 1}${
+                      clientState.playerId === opp.id ? " (You)" : ""
+                    }`}
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <div className="tg-poker__table__dealer__cards">
+            <Card />
+            {gameState?.cards.map((data, i) => (
+              <Card key={i} value={Poker.formatCard(data)} />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="tg-poker__table__controlpanel">
+        <GameControls clientState={clientState} />
+      </div>
+
+      <div className="tg-poker__table__players terminal_text">
+        <h4 className="terminal_text">Players</h4>
+        {serverState.spectatorPlayers
+          .concat(serverState.queuedPlayers)
+          .map((spectator, index) => (
+            <div key={index} className="tg-poker__table__players__player">
+              <p>{`Spectator ${index + 1}:`}</p>
+              <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
+            </div>
+          ))}
+        {serverState.inGamePlayers
+          .map((spectator, index) => (
+            <div key={index} className="tg-poker__table__players__player">
+              <p>{`Player ${index + 1}:`}</p>
+              <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
+            </div>
+          ))}
+      </div>
+      <GameLog gameLog={clientState.updateLog} />
+    </div>
+  );
 };
 
 export default PokerTable;

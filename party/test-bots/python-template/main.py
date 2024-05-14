@@ -3,6 +3,7 @@ import asyncio
 from websockets.sync.client import connect
 import argparse
 import time
+import treys
 
 from tg.bot import Bot
 
@@ -21,7 +22,8 @@ args = parser.parse_args()
 
 class TemplateBot(Bot):
     def act(self, state, hand):
-        #time.sleep(0.001)
+        print('asked to act')
+        time.sleep(0.01)
         print('acting', state, hand, self.my_id)
         return {'type': 'call'}
 

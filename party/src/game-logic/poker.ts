@@ -128,6 +128,8 @@ function dealHands(players: PlayerID[], deck: Card[]): Record<PlayerID, [Card, C
 
 export function createPokerGame(config: IPokerConfig, players: PlayerID[], stacks: number[]): IPokerGame {
     if (players.length != stacks.length) throw new Error("Number of players and stacks must be equal")
+    if (players.length < 2) throw new Error("Must have at least 2 players");
+    if (players.length > config.maxPlayers) throw new Error("Too many players");
     const deck = shuffleDeck(createDeck());
     const hands = dealHands(players, deck);
     const playerCompletedRound: Record<PlayerID, PokerRound> = {};
@@ -193,11 +195,16 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
         for (const player of players) {
             bestHands[player.id] = best5(hands[player.id].concat(state.cards));
         }
-        players.sort((a, b) => handCmp(bestHands[a.id], bestHands[b.id]));
+        const cmp = (a: IPokerPlayer, b: IPokerPlayer) => {
+            if (a.folded && !b.folded) return -1;
+            if (b.folded && !a.folded) return 1;
+            return handCmp(bestHands[a.id], bestHands[b.id]);
+        }
+        players.sort(cmp);
 
         const groups: IPokerPlayer[][] = [];
         for (let i = 0; i < players.length; i++) {
-            if (i == 0 || handCmp(bestHands[players[i].id], bestHands[players[i - 1].id]) != 0) {
+            if (i == 0 || cmp(players[i-1], players[i]) != 0) {
                 groups.push([]);
             }
             groups[groups.length - 1].push(players[i]);
@@ -214,7 +221,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
         let pot = state.pot;
         groups.reverse();
         for (const group of groups) {
-            group.sort((a, b) => a.stack - b.stack);
+            group.sort((a, b) => potShare[a.id] - potShare[b.id]);
             for (let i = 0; i < group.length; i++) {
                 const amount = Math.min(potShare[group[i].id], pot / (group.length - i));
                 for (let j = i; j < group.length; j++) {

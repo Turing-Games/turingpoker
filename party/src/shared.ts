@@ -12,10 +12,7 @@ export type ClientMessage = {
     type: 'join-game'
 } | {
     type: 'reset-game'
-} | {
-    type: 'leave-game'
 }
-
 export type ServerUpdateMessage = {
     type: 'game-ended';
     payouts: { [playerId: string]: number };
@@ -42,11 +39,8 @@ export type ServerStateMessage = {
     inGamePlayers: IPlayer[];
     spectatorPlayers: IPlayer[];
     queuedPlayers: IPlayer[];
-    winners: string[];
-    players: IPlayer[];
     state: IPartyServerState;
     clientId: string;
     lastUpdates: ServerUpdateMessage[]
     config: Poker.IPokerConfig
-    hands: Record<Poker.PlayerID, [Poker.Card, Poker.Card]>[]
 }

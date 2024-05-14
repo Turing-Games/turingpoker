@@ -1,4 +1,5 @@
 // import Logo from '../../public/images/logo.png'
+import {jsx} from 'hono/jsx';
 import Loader from "./Loader";
 import { IPlayer } from "@tg/game";
 
@@ -21,7 +22,7 @@ export default function Header(props: {
           <h2>{gameType ? `Table: ${gameType}` : 'Welcome!'}</h2>
           <p>Turing Games</p>
         </div>
-        < div className='tg-header__logo' style={{ right: '12px' }}>
+        <div className='tg-header__logo' style={{ right: '12px' }}>
           <img src={'../../static/images/logo.png'} alt="Logo" />
         </div>
         {
