@@ -1,6 +1,6 @@
 import { FC } from "hono/jsx";
 import Card from "../Card";
-import * as Poker from "@tg/game-logic/poker";
+import * as Poker from "@app/party/src/game-logic/poker";
 
 interface PlayerProps {
   player: Poker.IPokerPlayer;
@@ -27,7 +27,7 @@ const Player = ({ player, hand, hands, className, style, title, showCards }: Pla
         width: '100%',
        }}>
         {showCards && (
-          handToRender.length ? handToRender.map((c, i) => <Card key={i} value={Poker.formatCard(c)} />) : <>
+          handToRender.length ? handToRender.map((c, i) => <Card key={i} value={c} />) : <>
             <Card />
             <Card />
           </>

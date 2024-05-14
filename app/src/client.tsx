@@ -5,8 +5,8 @@ import Poker from "./components/poker/Poker";
 
 import { render } from "hono/jsx/dom";
 
-import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "../../party/src/shared";
-import * as PokerLogic from "@tg/game-logic/poker";
+import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "./party/src/shared";
+import * as PokerLogic from "@app/party/src/game-logic/poker";
 
 import '@static/styles/styles.css'
 
@@ -31,7 +31,7 @@ export default function Client() {
     const connectSocket = () => {
       console.log(import.meta.env.VITE_PARTYKIT_HOST)
       const socket = new PartySocket({
-        host: import.meta.env.PARTYKIT_HOST,
+        host: import.meta.env.VITE_PARTYKIT_HOST,
         room: "my-new-room"
       });
 

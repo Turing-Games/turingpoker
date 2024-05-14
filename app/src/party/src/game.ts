@@ -254,7 +254,7 @@
 // ChatRoomServer satisfies Party.Worker;
 
 import type * as Party from 'partykit/server';
-import * as Poker from '@tg/game-logic/poker'
+import * as Poker from '@app/party/src/game-logic/poker'
 import { ClientMessage, ServerStateMessage, ServerUpdateMessage } from './shared';
 
 export interface IPlayer {

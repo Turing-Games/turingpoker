@@ -2,13 +2,12 @@ import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
 import { defineConfig } from "vite";
 import adapter from "@hono/vite-dev-server/cloudflare";
-// tsconfig-paths 
 import tsconfigPaths from "vite-tsconfig-paths";
-
 export default defineConfig(({ mode }) => {
+  const paths = tsconfigPaths();
   if (mode === "client") {
     return {
-      plugins: [tsconfigPaths()],
+      plugins: [paths],
       build: {
         rollupOptions: {
           input: "./src/client.tsx",
@@ -21,7 +20,7 @@ export default defineConfig(({ mode }) => {
   } else {
     return {
       plugins: [
-        tsconfigPaths(),
+        paths,
         pages(),
         devServer({
           entry: "./src/index.tsx",

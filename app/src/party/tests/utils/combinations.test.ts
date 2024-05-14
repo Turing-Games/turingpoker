@@ -1,4 +1,4 @@
-import combinations from "@tg/utils/combinations";
+import combinations from "@app/party/src/utils/combinations";
 
 test("Combinations of [1, 2, 3, 4, 5] with n = 3", () => {
     const arr = [1, 2, 3, 4, 5];

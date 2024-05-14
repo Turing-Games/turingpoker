@@ -1,5 +1,5 @@
-import { ClientState } from "@tg/client";
-import { sendMessage } from "@party/utils/websocket";
+import { ClientState } from "@app/client";
+import { sendMessage } from "@app/party/src/utils/websocket";
 
 function GameControls({ clientState }: { clientState: ClientState }) {
   const serverState = clientState?.serverState;

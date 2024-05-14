@@ -1,5 +1,5 @@
-import * as poker from '@tg/game-logic/poker';
-import combinations from '@tg/utils/combinations';
+import * as poker from '@app/party/src/game-logic/poker';
+import combinations from '@app/party/src/utils/combinations';
 const { handCmp } = poker;
 
 const Hand = require('pokersolver').Hand;

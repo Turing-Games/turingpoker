@@ -28,7 +28,7 @@ body {
   font-size: 16px;
   line-height: 1.5;
   color: #333;
-  background-image: url("/images/poker-bg-tile.jpg");
+  background-image: url("/static/images/poker-bg-tile.jpg");
   background-repeat: repeat;
   background-color: rgba(255,255,255,0.85);
   background-blend-mode: lighten;

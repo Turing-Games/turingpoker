@@ -1,7 +1,7 @@
-// import Logo from '../../public/images/logo.png'
-import {jsx} from 'hono/jsx';
+import Logo from '@static/images/logo.png'
+import { jsx } from 'hono/jsx';
 import Loader from "./Loader";
-import { IPlayer } from "@tg/game";
+import { IPlayer } from "@app/party/src/game";
 
 export default function Header(props: {
   players: IPlayer[]
@@ -15,7 +15,7 @@ export default function Header(props: {
     <div style={{ margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <div className="tg-header" >
         <div className='tg-header__logo' style={{ left: '12px' }}>
-          <img src={'../../static/images/logo.png'} alt="Logo" />
+          <img src={Logo} alt="Logo" />
         </div>
         {/* text */}
         <div className='tg-header__title' >
@@ -23,7 +23,7 @@ export default function Header(props: {
           <p>Turing Games</p>
         </div>
         <div className='tg-header__logo' style={{ right: '12px' }}>
-          <img src={'../../static/images/logo.png'} alt="Logo" />
+          <img src={Logo} alt="Logo" />
         </div>
         {
           Array(4).fill('_').map((_, i) => (

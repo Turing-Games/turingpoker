@@ -4,7 +4,8 @@
     "build": "vite build --mode client && vite build",
     "dev": "vite",
     "dev:wrangler": "wrangler dev src/index.tsx",
-    "deploy": "wrangler deploy --minify src/index.ts"
+    "deploy": "wrangler deploy --minify src/index.ts",
+    "dev:partykit": "partykit dev --live"
   },
   "dependencies": {
     "hono": "^4.3.6",

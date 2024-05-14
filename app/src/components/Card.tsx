@@ -1,5 +1,6 @@
 // //TODO: rename all these files to something simpler and then use dynamic imports to get rid of this
 // // all card svgs
+import * as Poker from "@tg/game-logic/poker";
 import clubs2 from '@static/images/cards/svg-cards/2_of_clubs.svg'
 import diamonds2 from '@static/images/cards/svg-cards/2_of_diamonds.svg'
 import hearts2 from '@static/images/cards/svg-cards/2_of_hearts.svg'
@@ -109,15 +110,22 @@ const cardMap = {
   'spades_1': spadesAce
 };
 
-function Card(props) {
+function Card(props: {
+  value?: Poker.Card,
+  style?: any
+}) {
 
   const { value, style } = props;
 
   return (
     <img
-      // src={cardMap[value] || cardBack}
+      src={value ? cardMap[value.suit + '_' + value.rank] : cardBack}
       alt={`Card ${value}`}
-      style={{ ...style }}
+      style={{ 
+        width: '66px',
+        height: '100px',
+        ...style 
+      }}
       className={"card"}
     />
   );

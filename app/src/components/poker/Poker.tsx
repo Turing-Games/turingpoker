@@ -1,13 +1,11 @@
-import { ClientState } from "@tg/client";
+import { ClientState } from "@app/client";
 import card from "../Card";
 import CardLoader from "../Loader";
 import Player from "./Player";
-import * as Poker from '@tg/game-logic/poker'
+import * as Poker from '@app/party/src/game-logic/poker'
 import GameControls from "./GameControls";
 import GameLog from "./GameLog";
 import Card from "../Card";
-import { sendMessage } from "../../../../party/src/utils/websocket";
-import { FC } from "hono/jsx";
 
 interface Props {
   clientState: ClientState;
@@ -15,6 +13,7 @@ interface Props {
 
 const PokerTable = ({ clientState }: Props) => {
   const serverState = clientState.serverState;
+  console.log(clientState)
   if (!serverState) {
     return null;
   }
@@ -101,9 +100,8 @@ const PokerTable = ({ clientState }: Props) => {
           className="tg-poker__table__dealer"
           style={{
             position: "absolute",
-            transform: "translate(-50%, -50%)",
+            transform: "translate(-50%, 0%)",
             left: "50%",
-            top: "50%",
           }}
         >
           <div
@@ -144,7 +142,7 @@ const PokerTable = ({ clientState }: Props) => {
           <div className="tg-poker__table__dealer__cards">
             <Card />
             {gameState?.cards.map((data, i) => (
-              <Card key={i} value={Poker.formatCard(data)} />
+              <Card key={i} value={data} />
             ))}
           </div>
         </div>

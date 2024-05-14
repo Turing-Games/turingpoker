@@ -1,5 +1,5 @@
-import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@tg/server";
-import combinations from "@tg/utils/combinations";
+import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/server";
+import combinations from "@app/party/src/utils/combinations";
 
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';

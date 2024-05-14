@@ -1,4 +1,4 @@
-import PartyServer from "@tg/server"
+import PartyServer from "@app/party/src/server"
 describe('Poker server', () => {
     let server: PartyServer;
     let send = jest.fn();
