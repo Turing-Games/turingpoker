@@ -1,10 +1,11 @@
 {
   "type": "module",
   "scripts": {
+    "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" --kill-others",
     "build": "vite build --mode client && vite build",
-    "dev": "vite",
+    "dev:hono": "vite",
     "dev:wrangler": "wrangler dev src/index.tsx",
-    "deploy": "wrangler deploy --minify src/index.ts",
+    "deploy": "npm run build && wrangler pages deploy dist",
     "dev:partykit": "partykit dev --live"
   },
   "dependencies": {

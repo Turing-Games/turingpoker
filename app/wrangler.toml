@@ -1,5 +1,7 @@
 name = "my-app"
 pages_build_output_dir = "./dist"
+
+compatibility_date = "2024-05-14"
 # node_compat = true
 
 # [vars]
