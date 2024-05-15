@@ -15,20 +15,21 @@ app.get("/", (c) => {
     <html>
       <head>
         {c?.env?.HONO_ENV === 'production' ? (
-          <script type="module" src="/assets/client.js"></script>
+          <>
+            <script type="module" src="/assets/client.js"></script>
+            <link href="/assets/client.css" rel="stylesheet" />
+          </>
         ) : (
-          <script type="module" src="/src/client.tsx"></script>
-        )}
-        {c?.env?.HONO_ENV === 'production' ? (
-          <link href="/assets/client.css" rel="stylesheet"></link>
-        ) : (
-          <link href="/static/styles/styles.css" rel="stylesheet"></link>
+          <>
+            <script type="module" src="/src/client.tsx"></script>
+            <link href="/static/styles/styles.css" rel="stylesheet" />
+          </>
         )}
       </head>
       <body>
         <div id="root"></div>
       </body>
-    </html >
+    </html>
   );
 });
 
