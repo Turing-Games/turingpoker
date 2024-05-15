@@ -28,9 +28,8 @@ export default function Client() {
 
   useEffect(() => {
     const connectSocket = () => {
-      console.log(import.meta.env.VITE_PARTYKIT_HOST)
       const socket = new PartySocket({
-        host: import.meta.env.VITE_PARTYKIT_HOST,
+        host: 'party.turingpoker.com:1999',
         room: "my-new-room"
       });
 

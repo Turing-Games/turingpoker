@@ -11,7 +11,7 @@ export const sendMessage = (socket: PartySocket | null, message: any) => {
 
 export const connect = (socket: PartySocket | null) => {
   socket = new PartySocket({
-    host: PARTYKIT_HOST,
+    host: 'party.turingpoker.com',
     room: "my-new-room"
   });
 }
