@@ -5,12 +5,9 @@ import Poker from "./components/poker/Poker";
 
 import { render } from "hono/jsx/dom";
 
-import { ServerStateMessage, ClientMessage, ServerUpdateMessage } from "./party/src/shared";
-import * as PokerLogic from "@app/party/src/game-logic/poker";
+import { ServerStateMessage, ServerUpdateMessage } from "./party/src/shared";
 
-import '@static/styles/global.css'
-import '@static/styles/header.css'
-import '@static/styles/poker.css'
+import '@static/styles/styles.css'
 
 export type ClientState = {
   isConnected: boolean;

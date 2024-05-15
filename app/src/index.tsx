@@ -1,6 +1,4 @@
 import { Hono } from 'hono'
-import { jsx } from 'hono/jsx'
-import { serveStatic } from '@hono/node-server/serve-static'
 import { jsxRenderer } from 'hono/jsx-renderer';
 
 const app = new Hono()
@@ -21,11 +19,16 @@ app.get("/", (c) => {
         ) : (
           <script type="module" src="/src/client.tsx"></script>
         )}
+        {c?.env?.HONO_ENV === 'production' ? (
+          <link href="/assets/client.css" rel="stylesheet"></link>
+        ) : (
+          <link href="/static/styles/styles.css" rel="stylesheet"></link>
+        )}
       </head>
       <body>
         <div id="root"></div>
       </body>
-    </html>
+    </html >
   );
 });
 
