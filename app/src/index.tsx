@@ -16,7 +16,7 @@ app.get("/", (c) => {
   return c.render(
     <html>
       <head>
-        {import.meta.env.PROD ? (
+        {c?.env?.HONO_ENV === 'production' ? (
           <script type="module" src="/assets/client.js"></script>
         ) : (
           <script type="module" src="/src/client.tsx"></script>

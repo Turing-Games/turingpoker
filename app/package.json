@@ -1,12 +1,12 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" --kill-others",
+    "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" --kill-others --prefix app",
     "build": "vite build --mode client && vite build",
     "dev:hono": "vite",
     "dev:wrangler": "wrangler dev src/index.tsx",
     "deploy": "npm run build && wrangler pages deploy dist",
-    "dev:partykit": "partykit dev --live"
+    "dev:partykit": "npx partykit dev --live"
   },
   "dependencies": {
     "hono": "^4.3.6",
@@ -16,6 +16,7 @@
     "@cloudflare/workers-types": "^4.20240403.0",
     "@hono/vite-cloudflare-pages": "^0.4.0",
     "@hono/vite-dev-server": "^0.12.1",
+    "concurrently": "^8.2.2",
     "vite": "^5.2.11",
     "vite-tsconfig-paths": "^4.3.2",
     "wrangler": "^3.47.0"
