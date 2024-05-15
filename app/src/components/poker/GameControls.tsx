@@ -52,36 +52,21 @@ function GameControls({ clientState }: { clientState: ClientState }) {
               gap: "8px",
             }}
           >
-            <button
-              onClick={() => {
-                if (!isPlayerEvenWithBet) {
-                  sendMessage(socket, {
-                    type: "action",
-                    action: { type: "call" },
-                  });
-                }
-              }}
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || isPlayerEvenWithBet}
-            >
-              Call
-            </button>
             {/* Check button */}
             <button
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || !isPlayerEvenWithBet}
+              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id}
               onClick={() => {
-                if (currentBet === 0 || isPlayerEvenWithBet) {
-                  sendMessage(socket, {
-                    type: "action",
-                    action: { type: "call" },
-                  });
-                }
+                sendMessage(socket, {
+                  type: "action",
+                  action: { type: "call" },
+                });
               }}
             >
-              Check
+              {isPlayerEvenWithBet ? "Check" : "Call"}
             </button>
             {/* Raise button */}
             <button
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < minRaiseAmount}
+              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < (minRaiseAmount ?? 0)}
               onClick={handleRaise}
             >
               Raise

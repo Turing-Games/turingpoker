@@ -31,6 +31,9 @@ export type ServerUpdateMessage = {
 } | {
     type: 'game-started',
     players: IPlayer[]
+} | {
+    type: 'engine-log',
+    message: string
 }
 
 export type ServerStateMessage = {

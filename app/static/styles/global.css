@@ -10,7 +10,7 @@
   box-sizing: border-box;
 }
 
-#app {
+#root {
   display: flex;
   flex-direction: column;
   font-family: Arial, sans-serif;
@@ -20,13 +20,16 @@
 
 body {
   font-family: sans-serif;
-  font-size: 16px;
+  font-size: 12px;
   line-height: 1.5;
   color: #333;
   background-image: url("/static/images/poker-bg-tile.jpg");
   background-repeat: repeat;
   background-color: rgba(255,255,255,0.85);
   background-blend-mode: lighten;
+  padding: 0;
+  min-height: 100vh;
+  margin: 0;
 }
 
 button {

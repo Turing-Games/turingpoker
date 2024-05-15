@@ -118,8 +118,6 @@ function Card(props: {
   const { value } = props;
 
   const style = { 
-    width: '100px',
-    height: '150px',
     ...props.style 
   };
   console.log(style)

@@ -8,6 +8,8 @@ export type Card = { rank: Rank, suit: Suit };
 const cardNames = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
 const cardVals = { 'A': 1, 'T': 10, 'J': 11, 'Q': 12, 'K': 13 }
 
+const eps = 1e-9;
+
 export function parseCard(card: string): Card {
     const rank = card[0];
     const suit = card[1];
@@ -219,22 +221,41 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
         }
 
         let pot = state.pot;
+        const pots: PlayerID[][] = []
+        const potVals: number[] = [];
         groups.reverse();
         for (const group of groups) {
             group.sort((a, b) => potShare[a.id] - potShare[b.id]);
             for (let i = 0; i < group.length; i++) {
                 const amount = Math.min(potShare[group[i].id], pot / (group.length - i));
+                if (amount > eps) {
+                    pots.push([]);
+                    potVals.push(amount);
+                }
                 for (let j = i; j < group.length; j++) {
                     out[group[j].id] += amount;
                     potShare[group[j].id] -= amount;
                     pot -= amount;
+                    if (amount > eps) {
+                        pots[pots.length - 1].push(group[j].id);
+                    }
                 }
+            }
+        }
+
+        const log: GameLog = [];
+        if (pots.length == 1) {
+            log.push(`The pot is won by ${pots[0].join(', ')} (worth ${potVals[0].toFixed(2)})`);
+        }
+        else {
+            for (let pot = 0; pot < pots.length; pot++) {
+                log.push(`Pot ${pot+1} is won by ${pots[pot].join(', ')} (worth ${potVals[pot].toFixed(2)})`);
             }
         }
 
         return {
             payouts: out,
-            log: []
+            log
         }
     }
     else {
@@ -304,10 +325,15 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
                 }
             }
             state.targetBet = target;
-            log.push(`Player ${who} raised ${move.amount}`);
+            log.push(`Player ${who} raised ${move.amount.toFixed(2)}`);
         }
         else {
-            log.push(`Player ${who} called ${state.targetBet - player.currentBet}`);
+            if (state.targetBet - player.currentBet > eps) {
+                log.push(`Player ${who} called ${(state.targetBet - player.currentBet).toFixed(2)}`);
+            }
+            else {
+                log.push(`Player ${who} checked`);
+            }
         }
 
         const toCall = target - player.currentBet;

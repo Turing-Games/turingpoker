@@ -5,7 +5,7 @@ import * as Poker from '@app/party/src/game-logic/poker';
 function describeAction(action: Poker.Action): string {
     switch (action.type) {
         case "raise":
-            return `raised ${action.amount}`;
+            return `raises ${action.amount}`;
         case "call":
             return `calls`;
         case "fold":
@@ -31,6 +31,8 @@ function getLogMessage(log: ServerUpdateMessage): string {
             return `Game has started`;
         case "game-ended":
             return `Game has ended, ${describePayouts(log.payouts)}`;
+        case "engine-log":
+            return log.message;
         default:
             return "";
     }
@@ -50,7 +52,7 @@ function GameLog({ gameLog }: GameLogProps): JSX.Element {
     return (
         <div className="tg-poker__gamelog" ref={ref}>
             <h4 className="terminal_text">Game Log</h4>
-            {gameLog.slice(-500).map((log, index) => (
+            {gameLog.filter((m) => m.type == 'engine-log').slice(-500).map((log, index) => (
                 <div className="tg-poker__gamelog__log terminal_text" key={index}>
                     <p>{getLogMessage(log)}</p>
                 </div>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'hono/jsx'
 import PartySocket from "partysocket";
 import Header from "./components/Header";
 import Poker from "./components/poker/Poker";
+import * as PokerLogic from "./party/src/game-logic/poker";
 
 import { render } from "hono/jsx/dom";
 
@@ -17,22 +18,33 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-const debounce = (fn: Function, ms: number) => {
+function debounceState<T>(fn: (arg: (arg: T) => T) => void, ms: number) {
   let timeout: NodeJS.Timeout;
-  return function () {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => fn.apply(this as any, arguments), ms);
+  const updates: ((arg: T) => T)[] = [];
+  let lastUpdate = Date.now();
+  return (upd: (arg: T) => T) => {
+    if (Date.now() - lastUpdate < ms*10) clearTimeout(timeout);
+    updates.push(upd)
+    timeout = setTimeout(() => {
+      lastUpdate = Date.now();
+      const up = (val: T) => updates.reduce((acc, update) => update(acc), val);
+      fn(up);
+      updates.length = 0
+    }, ms);
   };
 }
 
 export default function Client() {
-  const [clientState, setClientState] = useState<ClientState>({
+  let [clientState, setClientState_] = useState<ClientState>({
     isConnected: false,
     serverState: null,
     socket: null,
     playerId: null,
     updateLog: [],
   });
+  const setClientState = debounceState(setClientState_, 2)
+
+  const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
   useEffect(() => {
     const connectSocket = () => {
@@ -50,12 +62,24 @@ export default function Client() {
         }));
       });
 
-      socket.addEventListener("message", debounce((event) => {
+      socket.addEventListener("message", (event) => {
         try {
           const data: ServerStateMessage = JSON.parse(event.data);
+          for (const update of data.lastUpdates) {
+            if (update.type == 'game-ended') {
+              setPreviousActions({})
+            }
+            if (update.type == 'action') {
+              setPreviousActions((prevState) => ({
+                ...prevState,
+                [update.player.playerId]: update.action,
+              }));
+            }
+          }
           setClientState((prevState) => ({
             ...prevState,
             serverState: data,
+            //TODO: prune this when it gets large
             updateLog: [...prevState.updateLog, ...data.lastUpdates],
           }));
         } catch {
@@ -64,7 +88,7 @@ export default function Client() {
             serverState: null,
           }));
         }
-      }, 10));
+      });
 
       socket.addEventListener("close", () => {
         setClientState((prevState) => ({
@@ -91,17 +115,10 @@ export default function Client() {
       }
     };
   }, []);
+  console.log(clientState);
 
   return (
-    <div>
-      <Header
-        gameType="No Limit Texas Hold'em"
-        players={clientState.serverState?.inGamePlayers || []}
-        playerId={clientState.playerId}
-        minPlayers={clientState.serverState?.config?.minPlayers || 2}
-      />
-      <Poker clientState={clientState} />
-    </div>
+    <Poker clientState={clientState} previousActions={previousActions} />
   );
 };
 
