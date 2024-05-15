@@ -79,8 +79,7 @@ export default function Client() {
           setClientState((prevState) => ({
             ...prevState,
             serverState: data,
-            //TODO: prune this when it gets large
-            updateLog: [...prevState.updateLog, ...data.lastUpdates],
+            updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-1000),
           }));
         } catch {
           setClientState((prevState) => ({
