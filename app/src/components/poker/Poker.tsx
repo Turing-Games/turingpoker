@@ -115,15 +115,17 @@ const PokerTable = ({ clientState }: Props) => {
           >
             {inGamePlayers?.map((opp, index) => {
               const playerNumberOffset = !currentPlayer ? 1 : 0;
-              const angle = (index / inGamePlayers.length) * Math.PI * 2;
+              // rotate so that the action panel is on an edge of the regular polygon
+              const offset = Math.PI*2 / inGamePlayers.length / 2;
+              const angle = (index / inGamePlayers.length) * Math.PI * 2 + offset;
               return (
                 <div
                   className="tg-poker__table__player-container"
                   style={{
                     left:
-                      -Math.cos(angle) * 65 + 50 + "%",
-                    bottom:
                       -Math.sin(angle) * 65 + 50 + "%",
+                    bottom:
+                      -Math.cos(angle) * 65 + 50 + "%",
                   }}
                 >
                   <Player

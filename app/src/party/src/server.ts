@@ -218,6 +218,7 @@ export default class PartyServer implements Party.Server {
     });
     this.gameState = null;
     this.broadcastGameState();
+    this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition+1)%this.inGamePlayers.length;
     if (this.autoStart && this.inGamePlayers.length >= 2) {
       this.startGame();
     }

@@ -17,6 +17,14 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
+const debounce = (fn: Function, ms: number) => {
+  let timeout: NodeJS.Timeout;
+  return function () {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn.apply(this as any, arguments), ms);
+  };
+}
+
 export default function Client() {
   const [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
@@ -29,7 +37,7 @@ export default function Client() {
   useEffect(() => {
     const connectSocket = () => {
       const socket = new PartySocket({
-        host: 'party.turingpoker.com:1999',
+        host: 'localhost:1999',
         room: "my-new-room"
       });
 
@@ -42,7 +50,7 @@ export default function Client() {
         }));
       });
 
-      socket.addEventListener("message", (event) => {
+      socket.addEventListener("message", debounce((event) => {
         try {
           const data: ServerStateMessage = JSON.parse(event.data);
           setClientState((prevState) => ({
@@ -56,7 +64,7 @@ export default function Client() {
             serverState: null,
           }));
         }
-      });
+      }, 10));
 
       socket.addEventListener("close", () => {
         setClientState((prevState) => ({

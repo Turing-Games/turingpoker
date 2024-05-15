@@ -118,14 +118,15 @@ function Card(props: {
   const { value } = props;
 
   const style = { 
-    width: '66px',
-    height: '100px',
+    width: '100px',
+    height: '150px',
     ...props.style 
   };
   console.log(style)
   return (
     <img
       src={value ? cardMap[value.suit + '_' + value.rank] : cardBack}
+      className="card"
       alt={`Card ${value}`}
       style={style}
     />
