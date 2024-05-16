@@ -187,7 +187,7 @@
 .tg-poker__table__dealer__card {
   position: absolute;
   opacity: 0;
-  transition: left 1s ease-out;
+  transition: left 0.1s ease-out;
 }
 
 .tg-poker__table__dealer__placeholder-card {

@@ -163,8 +163,8 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
             </div>
           }
           <GameStatus clientState={clientState}/>
+          <Cards cards={gameState?.cards ?? []} />
         </div>
-        <Cards cards={gameState?.cards ?? []} />
         <div className="tg-poker__table__controlpanel">
           <GameControls clientState={clientState} />
         </div>

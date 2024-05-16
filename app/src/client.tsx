@@ -27,7 +27,6 @@ export default function Client() {
     playerId: null,
     updateLog: [],
   });
-  console.log(clientState)
 
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
@@ -54,6 +53,7 @@ export default function Client() {
           const data: ServerStateMessage = JSON.parse(event.data);
           for (const update of data.lastUpdates) {
             if (update.type == 'game-ended') {
+              console.log('done')
               setPreviousActions({})
             }
             if (update.type == 'action') {

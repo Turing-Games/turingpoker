@@ -15,13 +15,20 @@ export default function Cards({ cards }: { cards: PokerLogic.Card[] }) {
   }
   useLayoutEffect(() => {
     if (!deckRef.current || !realCardsRef.current || !placeholderCardsRef.current) return;
-    const position = deckRef.current.getBoundingClientRect();
+    const position = {
+      left: deckRef.current.offsetLeft,
+      top: deckRef.current.offsetTop
+    };
     for (let i = cards.length; i < PLACEHOLDER_CARDS; i++) {
         realCardsRef.current.children[i].style.top = `${position.top}px`;
         realCardsRef.current.children[i].style.left = `${position.left}px`;
     }
     for (let i = 0; i < cards.length; i++) {
-        const targetPos = placeholderCardsRef.current.children[i].getBoundingClientRect();
+      const child = placeholderCardsRef.current.children[i]
+        const targetPos = {
+          left: child.offsetLeft,
+          top: child.offsetTop
+        };
         realCardsRef.current.children[i].style.top = `${targetPos.top}px`;
         realCardsRef.current.children[i].style.left = `${targetPos.left}px`;
         realCardsRef.current.children[i].style.opacity = 1;
