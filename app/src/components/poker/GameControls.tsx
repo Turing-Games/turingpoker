@@ -8,7 +8,6 @@ function GameControls({ clientState }: { clientState: ClientState }) {
   if (!clientState.isConnected) {
     return <p>Waiting for the game to start or connect...</p>;
   }
-  console.log(gameState);
 
   // Retrieve the current bet and minimum raise amount
   const currentBet = gameState?.targetBet;
@@ -18,7 +17,6 @@ function GameControls({ clientState }: { clientState: ClientState }) {
   const socket = clientState.socket
   const isPlayerSpectating = !!serverState.spectatorPlayers?.find(p => p.playerId === clientState?.playerId)
   const isPlayerInGame = !!serverState.inGamePlayers?.find(p => p.playerId === clientState?.playerId)
-  console.log(isPlayerInGame, isPlayerSpectating, currentPlayer, gameState?.whoseTurn)
 
   // Function to handle raising
   const handleRaise = () => {

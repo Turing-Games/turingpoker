@@ -16,7 +16,6 @@ interface Props {
 
 const PokerTable = ({ clientState, previousActions }: Props) => {
   const serverState = clientState.serverState;
-  console.log(clientState)
   if (!serverState) {
     return null;
   }
@@ -67,10 +66,6 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
     })
   }
 
-  if (process.env.NODE_ENV != 'production') {
-    console.log('gameState', gameState)
-  }
-
   const hands: Record<string, Poker.Card[]> = {};
   for (const player of gameState?.players ?? []) {
     hands[player.id] = [];
@@ -78,7 +73,6 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
   hands[serverState.clientId] = serverState.hand ?? [];
 
 
-  console.log('num players', inGamePlayers?.length)
   const placeholderCards = [];
   while (placeholderCards.length + (gameState?.cards.length ?? 0) < 5) {
     placeholderCards.push(<Card style={{ opacity: '0' }} />);

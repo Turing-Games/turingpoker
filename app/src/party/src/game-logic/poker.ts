@@ -325,14 +325,14 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
                 }
             }
             state.targetBet = target;
-            log.push(`Player ${who} raised ${move.amount.toFixed(2)}`);
+            log.push(`Player ${who} raises ${move.amount.toFixed(2)}`);
         }
         else {
             if (state.targetBet - player.currentBet > eps) {
-                log.push(`Player ${who} called ${(state.targetBet - player.currentBet).toFixed(2)}`);
+                log.push(`Player ${who} calls ${(state.targetBet - player.currentBet).toFixed(2)}`);
             }
             else {
-                log.push(`Player ${who} checked`);
+                log.push(`Player ${who} checks`);
             }
         }
 

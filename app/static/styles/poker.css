@@ -261,23 +261,20 @@
 
 .opponents>div {}
 
-@media (min-width: 1750px) {
+@media (min-width: 1800px) {
   .card {
-    width: 100px;
-    height: 150px;
+    height: 130px;
   }
 }
 
-@media (max-width: 1750px) and (min-width: 1250px) {
+@media (max-width: 1800px) and (min-width: 1250px) {
   .card {
-    width: 66px;
     height: 100px;
   }
 }
 
 @media (max-width: 1250px) {
   .card {
-    width: 44px;
     height: 66px;
   }
 }

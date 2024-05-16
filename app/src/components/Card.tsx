@@ -55,7 +55,7 @@ import heartsKing from '@static/images/cards/svg-cards/king_of_hearts.svg'
 import spadesKing from '@static/images/cards/svg-cards/king_of_spades.svg'
 import cardBack from '@static/images/cards/turing-card-back.png'
 
-const cardMap = {
+const cardMap: any = {
   'clubs_2': clubs2,
   'diamonds_2': diamonds2,
   'hearts_2': hearts2,
@@ -110,6 +110,23 @@ const cardMap = {
   'spades_1': spadesAce
 };
 
+// load images to base64 to avoid flickering
+for (const key in cardMap) {
+  const img = new Image();
+  img.src = cardMap[key];
+
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(img, 0, 0);
+      cardMap[key] = canvas.toDataURL('image/png');
+    }
+  };
+}
+
 function Card(props: {
   value?: Poker.Card,
   style?: any
@@ -120,7 +137,6 @@ function Card(props: {
   const style = { 
     ...props.style 
   };
-  console.log(style)
   return (
     <img
       src={value ? cardMap[value.suit + '_' + value.rank] : cardBack}

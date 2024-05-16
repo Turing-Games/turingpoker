@@ -20,16 +20,16 @@ export type ClientState = {
 
 function debounceState<T>(fn: (arg: (arg: T) => T) => void, ms: number) {
   let timeout: NodeJS.Timeout;
-  const updates: ((arg: T) => T)[] = [];
+  let updates: ((arg: T) => T)[] = [];
   let lastUpdate = Date.now();
   return (upd: (arg: T) => T) => {
-    if (Date.now() - lastUpdate < ms*10) clearTimeout(timeout);
+    if (Date.now() - lastUpdate < 100) clearTimeout(timeout);
     updates.push(upd)
     timeout = setTimeout(() => {
       lastUpdate = Date.now();
       const up = (val: T) => updates.reduce((acc, update) => update(acc), val);
       fn(up);
-      updates.length = 0
+      updates = []
     }, ms);
   };
 }
@@ -114,7 +114,6 @@ export default function Client() {
       }
     };
   }, []);
-  console.log(clientState);
 
   return (
     <Poker clientState={clientState} previousActions={previousActions} />
