@@ -138,10 +138,10 @@ window.addEventListener('load', () => {
   console.log('loaded')
   const root = createRoot(rootDiv!);
   root.render(
-    <Theme>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <Theme>
         <RouterProvider router={router} />
-      </ClerkProvider>
-    </Theme>
+      </Theme>
+    </ClerkProvider>
   );
 });
