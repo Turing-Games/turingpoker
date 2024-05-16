@@ -29,7 +29,7 @@ export default function PokerClient() {
   useEffect(() => {
     const connectSocket = () => {
       const socket = new PartySocket({
-        host: 'localhost:1999',
+        host: 'play.turingpoker.com:1999',
         room: "my-new-room"
       });
 
