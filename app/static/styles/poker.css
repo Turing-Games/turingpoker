@@ -136,6 +136,7 @@
 
 
 .tg-poker__table__controlpanel {
+  margin-top: 200px;
   padding: 8px;
 }
 
@@ -180,7 +181,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: row;
-  width: 70%;
+  width: 80%;
   flex-wrap: wrap;
 }
 

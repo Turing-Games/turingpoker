@@ -40,12 +40,13 @@ export default function Cards({ cards }: { cards: PokerLogic.Card[] }) {
         zIndex: 1
       }}
       ref={deckRef}/>
-      <div ref={realCardsRef}>
+      <div ref={realCardsRef} >
         {realCards}
       </div>
       <div ref={placeholderCardsRef} style={{
         display: 'flex',
-        gap: '8px'
+        gap: '8px',
+        flexWrap: 'wrap',
       }}>
         {placeholderCards}
       </div>

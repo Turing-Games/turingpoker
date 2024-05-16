@@ -1,6 +1,8 @@
 import React from "react";
 import Card from "../Card";
 import * as Poker from "@app/party/src/game-logic/poker";
+import { ClientState } from "@app/client";
+import GameControls from "./GameControls";
 
 interface PlayerProps {
   player: Poker.IPokerPlayer;
@@ -13,7 +15,7 @@ interface PlayerProps {
   showCards: boolean;
 }
 
-const Player = ({ player, hand, hands, className, style, title, showCards }: PlayerProps) => {
+const Player = ({ player, hand, hands, className, style, title, showCards}: PlayerProps) => {
   const handToRender = hand || (hands && hands[player.id]) || [];
 
   return (

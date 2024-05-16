@@ -76,7 +76,8 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
 
 
 
-  const angleOffset = Math.PI*2 / (inGamePlayers?.length ?? 1) / 2;
+  const currentPlayerIndex = gameState?.players.findIndex(player => player.id === clientState.playerId) ?? 0
+  const angleOffset = -currentPlayerIndex * Math.PI*2 / (inGamePlayers?.length ?? 1);
   const dealerAngle = (gameState?.dealerPosition ?? 0) / (inGamePlayers?.length ?? 1) * Math.PI * 2 + angleOffset;
 
   // show game table
@@ -132,6 +133,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
               const angle = (index / inGamePlayers.length) * Math.PI * 2 + angleOffset;
               return (
                 <div
+                  key={index}
                   className="tg-poker__table__player-container"
                   style={{
                     left:
