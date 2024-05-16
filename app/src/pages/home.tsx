@@ -34,14 +34,14 @@ export default function Home() {
               return <Link key={item.link} to={item.link}>{item.label}</Link>
             })
           }
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <Link to='play'></Link>
+            <UserButton />
+          </SignedIn>
         </div>
-        <SignedOut>
-          <SignInButton />
-        </SignedOut>
-        <SignedIn>
-          <Link to='play'></Link>
-          <UserButton />
-        </SignedIn>
       </header>
       <div>
         <PokerClient />

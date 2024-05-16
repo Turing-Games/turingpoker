@@ -10,6 +10,14 @@
   box-sizing: border-box;
 }
 
+a {
+  text-decoration: none;
+}
+
+a:visited {
+  color: inherit;
+}
+
 #root {
   display: flex;
   flex-direction: column;
@@ -83,8 +91,20 @@ button:disabled {
 }
 
 header {
+  background: #fff;
+  border-bottom: 1px solid #000;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 20px;
+}
+
+header>div {
+  align-items: center;
+  display: flex;
+  gap: 6px;
+}
+
+header>div>a {
+  font-size: 16px;
 }
