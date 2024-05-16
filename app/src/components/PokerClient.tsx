@@ -4,18 +4,14 @@ import * as ReactDOM from "react-dom";
 import {
   createBrowserRouter,
   RouterProvider,
-  Link
 } from "react-router-dom";
 import { createRoot } from "react-dom/client";
 import PartySocket from "partysocket";
-import Poker from "./components/poker/Poker";
-import * as PokerLogic from "./party/src/game-logic/poker";
-import { ServerStateMessage, ServerUpdateMessage } from "./party/src/shared";
-import { ClerkProvider } from '@clerk/clerk-react'
-import { Theme } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css';
+import Poker from "./poker/Poker";
+import * as PokerLogic from "..//party/src/game-logic/poker";
+import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
+
 import '@static/styles/styles.css'
-import Home from './pages/home';
 
 export type ClientState = {
   isConnected: boolean;
@@ -112,36 +108,3 @@ export default function Client() {
     <Poker clientState={clientState} previousActions={previousActions} />
   );
 };
-
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
-
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key")
-}
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Home />,
-    children: [
-      {
-        path: "play",
-        element: <Client />,
-      },
-    ],
-  },
-]);
-
-
-window.addEventListener('load', () => {
-  const rootDiv = document.getElementById("root");
-  console.log('loaded')
-  const root = createRoot(rootDiv!);
-  root.render(
-    <Theme>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-        <RouterProvider router={router} />
-      </ClerkProvider>
-    </Theme>
-  );
-});
