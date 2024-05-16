@@ -6,7 +6,7 @@ import { json, notFound } from "./utils/response";
  * The tables party's purpose is to keep track of all chat rooms, so we want
  * every client to connect to the same room instance by sharing the same room id.
  */
-export const SINGLETON_ROOM_ID = "list";
+export const SINGLETON_ROOM_ID = "my-new-room";
 
 /** Chat room sends an update when participants join/leave */
 export type RoomInfoUpdateRequest = {

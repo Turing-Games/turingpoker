@@ -35,8 +35,8 @@ const router = createBrowserRouter([
     element: <Home />,
     children: [
       {
-        path: "play",
-        element: <PokerClient />,
+        path: "games",
+        element: <div>games</div>,
       },
     ],
   },
