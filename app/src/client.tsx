@@ -1,4 +1,4 @@
-import { useState, useEffect } from "hono/jsx/dom";
+import React, { useState, useEffect } from 'react'
 import PartySocket from "partysocket";
 import Header from "./components/Header";
 import Poker from "./components/poker/Poker";
@@ -8,6 +8,7 @@ import { render } from "hono/jsx/dom";
 import { ServerStateMessage, ServerUpdateMessage } from "./party/src/shared";
 
 import '@static/styles/styles.css'
+import { createRoot } from 'react-dom/client';
 
 export type ClientState = {
   isConnected: boolean;
@@ -98,5 +99,6 @@ export default function Client() {
 };
 
 
-const root = document.getElementById("root");
-render(<Client />, root!);
+const el = document.getElementById("root");
+const root = createRoot(el)
+root.render(<Client />);

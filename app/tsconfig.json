@@ -13,8 +13,8 @@
       "@cloudflare/workers-types",
       "vite/client"
     ],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
+    "jsx": "react",
+    // "jsxImportSource": "hono/jsx",
     "baseUrl": ".",
     "paths": {
       "@tg/*": [

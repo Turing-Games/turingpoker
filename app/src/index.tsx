@@ -1,5 +1,7 @@
 import { Hono } from 'hono'
 import { jsxRenderer } from 'hono/jsx-renderer';
+import React from 'react'
+import Client from './client';
 
 const app = new Hono()
 
@@ -16,12 +18,12 @@ app.get("/", (c) => {
       <head>
         {c?.env?.HONO_ENV === 'production' ? (
           <>
-            <script type="module" src="/assets/client.js"></script>
+            <script src="/assets/client.js"></script>
             <link href="/assets/client.css" rel="stylesheet" />
           </>
         ) : (
           <>
-            <script type="module" src="/src/client.tsx"></script>
+            <script src="/src/client.tsx"></script>
             <link href="/static/styles/styles.css" rel="stylesheet" />
           </>
         )}
