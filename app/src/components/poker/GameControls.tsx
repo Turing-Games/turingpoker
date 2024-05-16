@@ -1,3 +1,4 @@
+import React from "react";
 import { ClientState } from "@app/client";
 import { sendMessage } from "@app/party/src/utils/websocket";
 
@@ -8,7 +9,6 @@ function GameControls({ clientState }: { clientState: ClientState }) {
   if (!clientState.isConnected) {
     return <p>Waiting for the game to start or connect...</p>;
   }
-  console.log(gameState);
 
   // Retrieve the current bet and minimum raise amount
   const currentBet = gameState?.targetBet;
@@ -18,7 +18,6 @@ function GameControls({ clientState }: { clientState: ClientState }) {
   const socket = clientState.socket
   const isPlayerSpectating = !!serverState.spectatorPlayers?.find(p => p.playerId === clientState?.playerId)
   const isPlayerInGame = !!serverState.inGamePlayers?.find(p => p.playerId === clientState?.playerId)
-  console.log(isPlayerInGame, isPlayerSpectating, currentPlayer, gameState?.whoseTurn)
 
   // Function to handle raising
   const handleRaise = () => {
@@ -52,36 +51,21 @@ function GameControls({ clientState }: { clientState: ClientState }) {
               gap: "8px",
             }}
           >
-            <button
-              onClick={() => {
-                if (!isPlayerEvenWithBet) {
-                  sendMessage(socket, {
-                    type: "action",
-                    action: { type: "call" },
-                  });
-                }
-              }}
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || isPlayerEvenWithBet}
-            >
-              Call
-            </button>
             {/* Check button */}
             <button
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || !isPlayerEvenWithBet}
+              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id}
               onClick={() => {
-                if (currentBet === 0 || isPlayerEvenWithBet) {
-                  sendMessage(socket, {
-                    type: "action",
-                    action: { type: "call" },
-                  });
-                }
+                sendMessage(socket, {
+                  type: "action",
+                  action: { type: "call" },
+                });
               }}
             >
-              Check
+              {isPlayerEvenWithBet ? "Check" : "Call"}
             </button>
             {/* Raise button */}
             <button
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < minRaiseAmount}
+              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < (minRaiseAmount ?? 0)}
               onClick={handleRaise}
             >
               Raise

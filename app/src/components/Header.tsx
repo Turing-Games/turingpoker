@@ -1,5 +1,5 @@
 import Logo from '@static/images/logo.png'
-import { jsx } from 'hono/jsx';
+import React, { forwardRef } from 'react';
 import Loader from "./Loader";
 import { IPlayer } from "@app/party/src/game";
 
@@ -12,9 +12,9 @@ export default function Header(props: {
   const { players, gameType, minPlayers } = props;
 
   return (
-    <div style={{ margin: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
       <div className="tg-header" >
-        <div className='tg-header__logo' style={{ left: '12px' }}>
+        <div className='tg-header__logo'>
           <img src={Logo} alt="Logo" />
         </div>
         {/* text */}
@@ -22,7 +22,7 @@ export default function Header(props: {
           <h2>{gameType ? `Table: ${gameType}` : 'Welcome!'}</h2>
           <p>Turing Games</p>
         </div>
-        <div className='tg-header__logo' style={{ right: '12px' }}>
+        <div className='tg-header__logo'>
           <img src={Logo} alt="Logo" />
         </div>
         {

@@ -1,18 +1,18 @@
 .tg-header {
-  align-items: center;
+  align-items: left;
   display: flex;
-  justify-content: center;
-  margin: auto;
-  width: 500px;
+  justify-content: left;
   padding: 8px 12px;
+  text-align: left;
   position: relative;
-  text-align: center;
   background-color: black;
+  left: 0;
+  border: 2px solid rgb(92, 193, 51);
 }
 
 .tg-header__logo {
-  position: absolute;
   z-index: 2;
+  margin: 8px;
 }
 
 .tg-header__logo>img {

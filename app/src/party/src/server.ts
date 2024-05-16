@@ -137,12 +137,19 @@ export default class PartyServer implements Party.Server {
       return;
     }
 
-    this.gameState = Poker.step(this.gameState, action).next;
+    const { next, log } = Poker.step(this.gameState, action);
+    this.gameState = next;
     this.queuedUpdates.push({
       type: "action",
       action,
       player,
     });
+    for (const message of log) {
+      this.queuedUpdates.push({
+        type: "engine-log",
+        message,
+      });
+    }
     if (this.gameState.state.done) {
       this.endGame(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
@@ -201,10 +208,17 @@ export default class PartyServer implements Party.Server {
     }
     this.processQueuedPlayers();
 
-    const payouts = Poker.payout(
+    const { payouts, log } = Poker.payout(
       this.gameState.state,
       this.gameState.hands
-    ).payouts;
+    );
+    console.log(log)
+    for (const message of log) {
+      this.queuedUpdates.push({
+        type: "engine-log",
+        message,
+      });
+    }
     for (const playerId in payouts) {
       this.stacks[playerId] =
         (this.gameState.state.players.find((player) => player.id == playerId)
@@ -218,6 +232,7 @@ export default class PartyServer implements Party.Server {
     });
     this.gameState = null;
     this.broadcastGameState();
+    this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition+1)%this.inGamePlayers.length;
     if (this.autoStart && this.inGamePlayers.length >= 2) {
       this.startGame();
     }

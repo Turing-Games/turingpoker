@@ -1,4 +1,4 @@
-import { FC } from "hono/jsx";
+import React from "react";
 import Card from "../Card";
 import * as Poker from "@app/party/src/game-logic/poker";
 

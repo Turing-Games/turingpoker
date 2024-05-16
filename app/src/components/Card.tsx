@@ -1,5 +1,6 @@
 // //TODO: rename all these files to something simpler and then use dynamic imports to get rid of this
 // // all card svgs
+import React, { forwardRef } from "react";
 import * as Poker from "@tg/game-logic/poker";
 import clubs2 from '@static/images/cards/svg-cards/2_of_clubs.svg'
 import diamonds2 from '@static/images/cards/svg-cards/2_of_diamonds.svg'
@@ -55,7 +56,7 @@ import heartsKing from '@static/images/cards/svg-cards/king_of_hearts.svg'
 import spadesKing from '@static/images/cards/svg-cards/king_of_spades.svg'
 import cardBack from '@static/images/cards/turing-card-back.png'
 
-const cardMap = {
+const cardMap: any = {
   'clubs_2': clubs2,
   'diamonds_2': diamonds2,
   'hearts_2': hearts2,
@@ -110,26 +111,43 @@ const cardMap = {
   'spades_1': spadesAce
 };
 
-function Card(props: {
+// load images to base64 to avoid flickering
+for (const key in cardMap) {
+  const img = new Image();
+  img.src = cardMap[key];
+
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.drawImage(img, 0, 0);
+      cardMap[key] = canvas.toDataURL('image/png');
+    }
+  };
+}
+
+const Card = forwardRef(function Card(props: {
   value?: Poker.Card,
-  style?: any
-}) {
+  style?: any,
+  className?: string
+}, ref) {
 
   const { value } = props;
 
   const style = { 
-    width: '66px',
-    height: '100px',
     ...props.style 
   };
-  console.log(style)
   return (
     <img
+      ref={ref}
       src={value ? cardMap[value.suit + '_' + value.rank] : cardBack}
+      className={"card " + (props.className ?? '')}
       alt={`Card ${value}`}
       style={style}
     />
   );
-}
+})
 
 export default Card;

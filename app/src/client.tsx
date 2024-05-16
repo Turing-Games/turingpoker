@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
+import * as React from 'react';
+import { createRoot } from "react-dom/client";
 import PartySocket from "partysocket";
 import Header from "./components/Header";
 import Poker from "./components/poker/Poker";
-
-import { render } from "hono/jsx/dom";
-
+import * as PokerLogic from "./party/src/game-logic/poker";
 import { ServerStateMessage, ServerUpdateMessage } from "./party/src/shared";
 
 import '@static/styles/styles.css'
-import { createRoot } from 'react-dom/client';
 
 export type ClientState = {
   isConnected: boolean;
@@ -19,7 +18,7 @@ export type ClientState = {
 };
 
 export default function Client() {
-  const [clientState, setClientState] = useState<ClientState>({
+  let [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
     serverState: null,
     socket: null,
@@ -27,14 +26,18 @@ export default function Client() {
     updateLog: [],
   });
 
+  const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
+
   useEffect(() => {
+    console.log('opening')
     const connectSocket = () => {
       const socket = new PartySocket({
-        host: 'party.turingpoker.com:1999',
+        host: 'localhost:1999',
         room: "my-new-room"
       });
 
       socket.addEventListener("open", () => {
+        console.log('opened')
         setClientState((prevState) => ({
           ...prevState,
           isConnected: true,
@@ -46,10 +49,22 @@ export default function Client() {
       socket.addEventListener("message", (event) => {
         try {
           const data: ServerStateMessage = JSON.parse(event.data);
+          for (const update of data.lastUpdates) {
+            if (update.type == 'game-ended') {
+              console.log('done')
+              setPreviousActions({})
+            }
+            if (update.type == 'action') {
+              setPreviousActions((prevState) => ({
+                ...prevState,
+                [update.player.playerId]: update.action,
+              }));
+            }
+          }
           setClientState((prevState) => ({
             ...prevState,
             serverState: data,
-            updateLog: [...prevState.updateLog, ...data.lastUpdates],
+            updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-1000),
           }));
         } catch {
           setClientState((prevState) => ({
@@ -83,22 +98,16 @@ export default function Client() {
         clientState.socket.close();
       }
     };
-  }, []);
+  }, [setClientState]);
 
   return (
-    <div>
-      <Header
-        gameType="No Limit Texas Hold'em"
-        players={clientState.serverState?.inGamePlayers || []}
-        playerId={clientState.playerId}
-        minPlayers={clientState.serverState?.config?.minPlayers || 2}
-      />
-      <Poker clientState={clientState} />
-    </div>
+    <Poker clientState={clientState} previousActions={previousActions} />
   );
 };
 
 
-const el = document.getElementById("root");
-const root = createRoot(el)
-root.render(<Client />);
+window.addEventListener('load', () => {
+  const rootDiv = document.getElementById("root");
+  const root = createRoot(rootDiv!);
+  root.render(<Client />);
+});

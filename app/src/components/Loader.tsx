@@ -1,3 +1,4 @@
+import React from 'react';
 function CardLoader({ style }: any) {
   return (
     <div className="tg-poker__card-loader" style={style}>
