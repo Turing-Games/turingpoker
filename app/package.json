@@ -5,8 +5,9 @@
     "build": "vite build --mode client && vite build",
     "dev:hono": "vite",
     "dev:wrangler": "wrangler dev src/index.tsx",
-    "deploy": "npm run build && wrangler pages deploy dist",
-    "dev:partykit": "npx partykit dev --live"
+    "dev:partykit": "npx partykit dev --live",
+    "deploy:pages": "npm run build && wrangler pages deploy dist",
+    "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.1.0",
