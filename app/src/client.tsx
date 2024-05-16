@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, startTransition } from 'react'
 import * as React from 'react';
 import PartySocket from "partysocket";
 import Header from "./components/Header";
@@ -53,7 +53,6 @@ export default function Client() {
           const data: ServerStateMessage = JSON.parse(event.data);
           for (const update of data.lastUpdates) {
             if (update.type == 'game-ended') {
-              console.log('done')
               setPreviousActions({})
             }
             if (update.type == 'action') {
@@ -63,11 +62,13 @@ export default function Client() {
               }));
             }
           }
-          setClientState((prevState) => ({
-            ...prevState,
-            serverState: data,
-            updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-1000),
-          }));
+          startTransition(() => {
+            setClientState((prevState) => ({
+              ...prevState,
+              serverState: data,
+              updateLog: [...prevState.updateLog, ...data.lastUpdates],
+            }));
+          });
         } catch {
           setClientState((prevState) => ({
             ...prevState,
