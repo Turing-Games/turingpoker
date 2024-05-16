@@ -11,8 +11,8 @@ HONO_ENV = "development"
 HONO_ENV = "production"
 
 # [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+binding = "turingpoker_dev"
+id = "d32c16c2fa6b4d2099cdcbd5d023662f"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"

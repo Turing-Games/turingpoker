@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'hono/jsx'
+import { useState, useEffect } from "hono/jsx/dom";
 import PartySocket from "partysocket";
 import Header from "./components/Header";
 import Poker from "./components/poker/Poker";

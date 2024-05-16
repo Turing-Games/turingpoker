@@ -5,15 +5,27 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "skipLibCheck": true,
-    "lib": ["ESNext", "DOM"],
-    "types": ["@cloudflare/workers-types", "vite/client"],
+    "lib": [
+      "ESNext",
+      "DOM"
+    ],
+    "types": [
+      "@cloudflare/workers-types",
+      "vite/client"
+    ],
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
     "baseUrl": ".",
     "paths": {
-        "@tg/*": ["src/party/src/*"],
-        "@app/*": ["src/*"],
-        "@static/*": ["static/*"],
+      "@tg/*": [
+        "src/party/src/*"
+      ],
+      "@app/*": [
+        "src/*"
+      ],
+      "@static/*": [
+        "static/*"
+      ],
     }
   }
 }
