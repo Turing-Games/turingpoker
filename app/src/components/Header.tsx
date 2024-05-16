@@ -1,5 +1,5 @@
 import Logo from '@static/images/logo.png'
-import { jsx } from 'hono/jsx';
+import React, { forwardRef } from 'react';
 import Loader from "./Loader";
 import { IPlayer } from "@app/party/src/game";
 

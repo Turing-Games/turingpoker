@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "hono/jsx";
+import { useEffect, useRef } from "react";
 import { ServerUpdateMessage } from "@app/party/src/shared";
 import * as Poker from '@app/party/src/game-logic/poker';
 

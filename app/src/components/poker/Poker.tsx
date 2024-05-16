@@ -1,3 +1,4 @@
+import React from "react";
 import { ClientState } from "@app/client";
 import card from "../Card";
 import CardLoader from "../Loader";
@@ -8,6 +9,7 @@ import GameLog from "./GameLog";
 import Card from "../Card";
 import Header from "../Header";
 import GameStatus from "./GameStatus";
+import Cards from "./Cards";
 
 interface Props {
   clientState: ClientState;
@@ -73,10 +75,6 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
   hands[serverState.clientId] = serverState.hand ?? [];
 
 
-  const placeholderCards = [];
-  while (placeholderCards.length + (gameState?.cards.length ?? 0) < 5) {
-    placeholderCards.push(<Card style={{ opacity: '0' }} />);
-  }
 
   const angleOffset = Math.PI*2 / (inGamePlayers?.length ?? 1) / 2;
   const dealerAngle = (gameState?.dealerPosition ?? 0) / (inGamePlayers?.length ?? 1) * Math.PI * 2 + angleOffset;
@@ -156,22 +154,17 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
               );
             })}
           </div>
-          <div className="tg-poker__table__dealer_marker" style={{
-            left: Math.sin(dealerAngle) * 40 + 50 + "%",
-            bottom: -Math.cos(dealerAngle) * 40 + 50 + "%",
-          }}>
-            D
-
-          </div>
+          {
+            gameState && <div className="tg-poker__table__dealer_marker" style={{
+              left: Math.sin(dealerAngle) * 40 + 50 + "%",
+              bottom: -Math.cos(dealerAngle) * 40 + 50 + "%",
+            }}>
+              D
+            </div>
+          }
           <GameStatus clientState={clientState}/>
-          <div className="tg-poker__table__dealer__cards">
-            <Card />
-            {gameState?.cards.map((data, i) => (
-              <Card key={i} value={data} />
-            ))}
-            {placeholderCards}
-          </div>
         </div>
+        <Cards cards={gameState?.cards ?? []} />
         <div className="tg-poker__table__controlpanel">
           <GameControls clientState={clientState} />
         </div>

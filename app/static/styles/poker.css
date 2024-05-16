@@ -184,6 +184,16 @@
   flex-wrap: wrap;
 }
 
+.tg-poker__table__dealer__card {
+  position: absolute;
+  opacity: 0;
+  transition: left 1s ease-out;
+}
+
+.tg-poker__table__dealer__placeholder-card {
+  opacity: 0;
+}
+
 .tg-poker__dealer-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -191,16 +201,6 @@
   position: absolute;
   width: 100%;
   height: 100%;
-}
-
-/* dealer cards */
-.tg-poker__table__dealer>img {
-  height: auto;
-  width: 60px;
-}
-
-.tg-poker__table__dealer>img:not(:nth-child(1)) {
-  animation: slideRight 0.3s linear forwards;
 }
 
 .tg-poker__winner {

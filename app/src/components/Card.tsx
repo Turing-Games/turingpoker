@@ -1,5 +1,6 @@
 // //TODO: rename all these files to something simpler and then use dynamic imports to get rid of this
 // // all card svgs
+import React, { forwardRef } from "react";
 import * as Poker from "@tg/game-logic/poker";
 import clubs2 from '@static/images/cards/svg-cards/2_of_clubs.svg'
 import diamonds2 from '@static/images/cards/svg-cards/2_of_diamonds.svg'
@@ -127,10 +128,11 @@ for (const key in cardMap) {
   };
 }
 
-function Card(props: {
+const Card = forwardRef(function Card(props: {
   value?: Poker.Card,
-  style?: any
-}) {
+  style?: any,
+  className?: string
+}, ref) {
 
   const { value } = props;
 
@@ -139,12 +141,13 @@ function Card(props: {
   };
   return (
     <img
+      ref={ref}
       src={value ? cardMap[value.suit + '_' + value.rank] : cardBack}
-      className="card"
+      className={"card " + (props.className ?? '')}
       alt={`Card ${value}`}
       style={style}
     />
   );
-}
+})
 
 export default Card;

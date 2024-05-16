@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'hono/jsx'
+import { useState, useEffect, useMemo } from 'react'
+import * as React from 'react';
 import PartySocket from "partysocket";
 import Header from "./components/Header";
 import Poker from "./components/poker/Poker";
 import * as PokerLogic from "./party/src/game-logic/poker";
 
-import { render } from "hono/jsx/dom";
+import { createRoot } from "react-dom/client";
 
 import { ServerStateMessage, ServerUpdateMessage } from "./party/src/shared";
 
@@ -18,35 +19,20 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-function debounceState<T>(fn: (arg: (arg: T) => T) => void, ms: number) {
-  let timeout: NodeJS.Timeout;
-  let updates: ((arg: T) => T)[] = [];
-  let lastUpdate = Date.now();
-  return (upd: (arg: T) => T) => {
-    if (Date.now() - lastUpdate < 100) clearTimeout(timeout);
-    updates.push(upd)
-    timeout = setTimeout(() => {
-      lastUpdate = Date.now();
-      const up = (val: T) => updates.reduce((acc, update) => update(acc), val);
-      fn(up);
-      updates = []
-    }, ms);
-  };
-}
-
 export default function Client() {
-  let [clientState, setClientState_] = useState<ClientState>({
+  let [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
     serverState: null,
     socket: null,
     playerId: null,
     updateLog: [],
   });
-  const setClientState = debounceState(setClientState_, 2)
+  console.log(clientState)
 
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
   useEffect(() => {
+    console.log('opening')
     const connectSocket = () => {
       const socket = new PartySocket({
         host: 'localhost:1999',
@@ -54,6 +40,7 @@ export default function Client() {
       });
 
       socket.addEventListener("open", () => {
+        console.log('opened')
         setClientState((prevState) => ({
           ...prevState,
           isConnected: true,
@@ -113,7 +100,7 @@ export default function Client() {
         clientState.socket.close();
       }
     };
-  }, []);
+  }, [setClientState]);
 
   return (
     <Poker clientState={clientState} previousActions={previousActions} />
@@ -121,5 +108,9 @@ export default function Client() {
 };
 
 
-const root = document.getElementById("root");
-render(<Client />, root!);
+window.addEventListener('load', () => {
+  const rootDiv = document.getElementById("root");
+  console.log(rootDiv, <Client />);
+  const root = createRoot(rootDiv!);
+  root.render(<Client />);
+});
