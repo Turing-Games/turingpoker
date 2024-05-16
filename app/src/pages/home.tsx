@@ -3,7 +3,7 @@ import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo.png'
-import Client from '@app/client';
+import PokerClient from '@app/components/PokerClient';
 
 const sharedItems = [
   { link: 'games', label: 'Games' },
@@ -28,11 +28,13 @@ export default function Home() {
         <Link to='/'>
           <img src={Logo} style={{ height: 40 }} />
         </Link>
-        {
-          menuItems.map((item) => {
-            return <Link key={item.link} to={item.link}>{item.label}</Link>
-          })
-        }
+        <div>
+          {
+            menuItems.map((item) => {
+              return <Link key={item.link} to={item.link}>{item.label}</Link>
+            })
+          }
+        </div>
         <SignedOut>
           <SignInButton />
         </SignedOut>
@@ -42,7 +44,7 @@ export default function Home() {
         </SignedIn>
       </header>
       <div>
-        <Client />
+        <PokerClient />
       </div>
     </>
   )

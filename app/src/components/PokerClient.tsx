@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react'
 import * as React from 'react';
-import * as ReactDOM from "react-dom";
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-import { createRoot } from "react-dom/client";
 import PartySocket from "partysocket";
 import Poker from "./poker/Poker";
 import * as PokerLogic from "..//party/src/game-logic/poker";
@@ -21,7 +15,7 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-export default function Client() {
+export default function PokerClient() {
   let [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
     serverState: null,
@@ -33,7 +27,6 @@ export default function Client() {
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
   useEffect(() => {
-    console.log('opening')
     const connectSocket = () => {
       const socket = new PartySocket({
         host: 'localhost:1999',
