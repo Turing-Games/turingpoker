@@ -12,8 +12,6 @@ import Poker from "./components/poker/Poker";
 import * as PokerLogic from "./party/src/game-logic/poker";
 import { ServerStateMessage, ServerUpdateMessage } from "./party/src/shared";
 import { ClerkProvider } from '@clerk/clerk-react'
-import { Theme } from '@radix-ui/themes';
-import '@radix-ui/themes/styles.css';
 import '@static/styles/styles.css'
 import Home from './pages/home';
 
@@ -139,9 +137,7 @@ window.addEventListener('load', () => {
   const root = createRoot(rootDiv!);
   root.render(
     <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <Theme>
-        <RouterProvider router={router} />
-      </Theme>
+      <RouterProvider router={router} />
     </ClerkProvider>
   );
 });
