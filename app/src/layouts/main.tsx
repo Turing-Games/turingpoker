@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo.png'
 import PokerClient from '@app/components/PokerClient';
+import { ReactNode } from 'hono/jsx';
 
 const sharedItems = [
   { link: 'games', label: 'Games' },
@@ -12,7 +13,7 @@ const sharedItems = [
 ]
 
 
-export default function Home() {
+export default function Home({ children }: ReactNode) {
 
   // const isSignedIn = useAuth()?.isSignedIn
   const isSignedIn = false
@@ -35,18 +36,18 @@ export default function Home() {
               return <Link key={item.link} to={item.link}>{item.label}</Link>
             })
           }
-          {/* <SignedOut>
+          <SignedOut>
             <SignInButton />
           </SignedOut>
           <SignedIn>
             <Link to='play'></Link>
             <UserButton />
-          </SignedIn> */}
+          </SignedIn>
         </div>
       </header>
-      <div>
-        <PokerClient />
-      </div>
+      <main>
+        {children}
+      </main>
     </>
   )
 }

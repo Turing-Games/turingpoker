@@ -44,8 +44,8 @@ const router = createBrowserRouter([
 
 export default function Root() {
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-      <RouterProvider router={router} />
-    </ClerkProvider>
+    <RouterProvider router={router} />
+    // <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    // </ClerkProvider>
   )
 };
