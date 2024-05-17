@@ -2,6 +2,8 @@ import * as React from 'react'
 import Main from '@app/layouts/main';
 import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { TrashIcon } from '@radix-ui/react-icons';
+import { SignedIn } from '@clerk/clerk-react';
+import { sendMessage } from '@tg/utils/websocket';
 
 
 export default function Games() {
@@ -11,6 +13,8 @@ export default function Games() {
 
   const host = import.meta.env.VITE_ENV == 'production' ? 'ws.turingpoker.com' : 'localhost:1999'
   const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
+
+  const isSignedIn = useAuth()?.isSignedIn
 
   const deleteTable = async (id: number) => {
     const res = await fetch(partyUrl, {
@@ -54,6 +58,15 @@ export default function Games() {
                   </div>
                   <p style={{ margin: '8px 0' }}>Table: {table.id}</p>
                   <p>{table.connections} player{table.connections > 1 ? 's' : ''} in the room</p>
+                  <SignedIn>
+                    <button
+                      onClick={() => {
+                        sendMessage(socket, { type: "join-game" });
+                      }}
+                    >
+                      Join game
+                    </button>
+                  </SignedIn>
                 </div>
               )
             })

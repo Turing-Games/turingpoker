@@ -16,7 +16,7 @@ interface Props {
   previousActions: Record<string, Poker.Action>;
 }
 
-const PokerTable = ({ clientState, previousActions }: Props) => {
+const Poker = ({ clientState, previousActions }: Props) => {
   const serverState = clientState.serverState;
   if (!serverState) {
     return null;
