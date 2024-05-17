@@ -4,6 +4,7 @@ import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
+import { useAuth } from '@clerk/clerk-react';
 
 
 export default function Games() {

@@ -9,6 +9,7 @@ import { ClerkProvider } from '@clerk/clerk-react'
 import '@static/styles/styles.css'
 import Home from '../pages/home';
 import Games from '@app/pages/games';
+import { SocketContext } from '@app/components/SocketContext';
 
 export type ClientState = {
   isConnected: boolean;
@@ -38,9 +39,11 @@ const router = createBrowserRouter([
 export default function Root() {
   return (
     <React.StrictMode>
-      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-        <RouterProvider router={router} />
-      </ClerkProvider>
+      <SocketContext.Provider value={{}}>
+        <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+          <RouterProvider router={router} />
+        </ClerkProvider>
+      </SocketContext.Provider>
     </React.StrictMode>
   )
 };
