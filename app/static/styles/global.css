@@ -81,3 +81,9 @@ button:disabled {
   margin-top: 10px;
   border-radius: 8px;
 }
+
+@media (max-width: 768px) {
+  body {
+    font-size: 10px;
+  }
+}

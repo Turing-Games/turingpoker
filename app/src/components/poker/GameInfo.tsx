@@ -4,6 +4,7 @@ import GameLog from "./GameLog";
 import Header from "../Header";
 import { ServerStateMessage } from "@tg/shared";
 import Collapse, { CollapseToggle } from "../Collapse";
+import useSmallScreen from "@app/hooks/useSmallScreen";
 
 export function GameInfo({
   clientState, serverState, getPlayerStatus
@@ -12,18 +13,8 @@ export function GameInfo({
   serverState: ServerStateMessage;
   getPlayerStatus: (playerId: string) => string;
 }) {
-    const [collapsible, setCollapsible] = React.useState(false);
+    const collapsible = useSmallScreen();
     const [collapsed, setCollapsed] = React.useState(true);
-
-    useEffect(() => {
-        const matchQuery = window.matchMedia("(max-width: 1200px)");
-        const handleResize = () => {
-            setCollapsible(matchQuery.matches);
-        };
-        handleResize();
-        matchQuery.addEventListener('change', handleResize);
-        return () => matchQuery.addEventListener('change', handleResize);
-    }, [setCollapsible]);
 
   return <div style={{
     position: collapsible ? "absolute" : undefined,

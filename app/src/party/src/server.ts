@@ -212,7 +212,7 @@ export default class PartyServer implements Party.Server {
       this.gameState.state,
       this.gameState.hands
     );
-    console.log(log)
+
     for (const message of log) {
       this.queuedUpdates.push({
         type: "engine-log",
@@ -344,8 +344,13 @@ export default class PartyServer implements Party.Server {
   removePlayer(playerId: string) {
     // Attempt to remove from players list first
     // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
-    if (this.gameState) {
-      this.gameState = Poker.forcedFold(this.gameState, playerId);
+    if (this.serverState.gamePhase == 'active' && this.gameState) {
+      try {
+        this.gameState = Poker.forcedFold(this.gameState, playerId);
+      }
+      catch (e) {
+        console.error("Error in forced fold", e);
+      }
     }
     this.spectatorPlayers = this.spectatorPlayers.filter(
       (player) => player.playerId !== playerId

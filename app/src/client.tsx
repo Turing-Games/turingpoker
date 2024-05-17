@@ -14,6 +14,7 @@ import '@static/styles/styles.css'
 export type ClientState = {
   isConnected: boolean;
   serverState: ServerStateMessage | null;
+  lastServerState: ServerStateMessage | null;
   socket: PartySocket | null;
   playerId: string | null;
   updateLog: ServerUpdateMessage[];
@@ -24,6 +25,7 @@ export default function Client() {
     isConnected: false,
     serverState: null,
     socket: null,
+    lastServerState: null,
     playerId: null,
     updateLog: [],
   });
@@ -66,7 +68,7 @@ export default function Client() {
             setClientState((prevState) => ({
               ...prevState,
               serverState: data,
-              updateLog: [...prevState.updateLog, ...data.lastUpdates],
+              updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-500),
             }));
           });
         } catch {

@@ -2,7 +2,7 @@ import React from "react";
 import { ClientState } from "@app/client";
 import { sendMessage } from "@app/party/src/utils/websocket";
 
-function GameControls({ clientState }: { clientState: ClientState }) {
+function GameControls({ clientState, joinLeave }: { clientState: ClientState, joinLeave: boolean }) {
   const serverState = clientState?.serverState;
   const gameState = serverState?.gameState;
 
@@ -85,7 +85,7 @@ function GameControls({ clientState }: { clientState: ClientState }) {
           </div>
         )}
 
-        <button
+        {joinLeave && <button
           onClick={() => {
             if (isPlayerSpectating) {
               sendMessage(socket, { type: "join-game" });
@@ -99,7 +99,7 @@ function GameControls({ clientState }: { clientState: ClientState }) {
             : isPlayerInGame
             ? "Leave game"
             : "Queued to join game"}
-        </button>
+        </button>}
       </div>
     </div>
   );

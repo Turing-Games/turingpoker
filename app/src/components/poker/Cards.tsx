@@ -16,12 +16,13 @@ export default function Cards({ cards }: { cards: PokerLogic.Card[] }) {
   const [windowSz, setWindowSz] = useState({ width: window.innerWidth, height: window.innerHeight });
 
   useLayoutEffect(() => {
-    const handleResize = () => {
+    if (!allRef.current) return;
+    const observer = new ResizeObserver(() => {
       setWindowSz({ width: window.innerWidth, height: window.innerHeight });
-    }
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [])
+    });
+    observer.observe(allRef.current);
+    return () => observer.disconnect();
+  }, [allRef.current])
 
   useLayoutEffect(() => {
     if (!deckRef.current || !allRef.current) return;
@@ -44,12 +45,12 @@ export default function Cards({ cards }: { cards: PokerLogic.Card[] }) {
       allRef.current.children[i+1].style.opacity = 1;
     }
   }, [cards, deckRef.current, allRef.current, windowSz])
+
   return (
     <div className="tg-poker__table__dealer__cards" ref={allRef}>
       <Card style={{
         zIndex: 1
-      }}
-      ref={deckRef}/>
+      }} ref={deckRef}/>
       {realCards}
       {placeholderCards}
     </div>

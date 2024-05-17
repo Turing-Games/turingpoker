@@ -139,7 +139,7 @@
 
 .tg-poker__table__controlpanel {
   position:absolute;
-  bottom: 32px;
+  bottom: 12px;
   padding: 8px;
 }
 
@@ -159,16 +159,18 @@
   justify-content: center;
   flex-direction: column;
   gap: 8px;
-  height: 40vh;
   margin: 0 auto;
   max-width: 1200px;
+  padding: 8px;
   position: relative;
   width: 60%;
+  min-height: 40vh;
 }
 
 @media (max-width: 1200px) {
   .tg-poker__table__dealer {
     border-radius: 32px;
+    width: 50%;
   }
 }
 
@@ -237,13 +239,21 @@
 }
 
 .tg-poker__table__gamestatus {
-  display:grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 40px;
-  width: 200px;
   padding: 8px;
   background: black;
   border-radius: 4px;
+  width: fit-content;
+  margin: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .tg-poker__table__gamestatus {
+    grid-auto-rows: 32px;
+  }
 }
 
 .tg-poker__table__player-container {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { ClientState } from "@app/client";
 import card from "../Card";
 import CardLoader from "../Loader";
@@ -9,6 +9,8 @@ import Card from "../Card";
 import GameStatus from "./GameStatus";
 import Cards from "./Cards";
 import { GameInfo } from "./GameInfo";
+import { sendMessage } from "@tg/utils/websocket";
+import useSmallScreen from "@app/hooks/useSmallScreen";
 
 interface Props {
   clientState: ClientState;
@@ -52,6 +54,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
     return "in game"
   }
 
+  const smallScreen = useSmallScreen();
 
   const gameOverview = [
     { label: 'Current Pot:', value: gameState?.pot.toFixed(2), prefix: '$' },
@@ -73,27 +76,56 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
   }
   hands[serverState.clientId] = serverState.hand ?? [];
 
-
-
   const currentPlayerIndex = gameState?.players.findIndex(player => player.id === clientState.playerId) ?? 0
   const angleOffset = -currentPlayerIndex * Math.PI*2 / (inGamePlayers?.length ?? 1);
   const dealerAngle = (gameState?.dealerPosition ?? 0) / (inGamePlayers?.length ?? 1) * Math.PI * 2 + angleOffset;
 
+  const joinButton = <button
+      style={{
+        position: "absolute",
+        ...(
+          smallScreen
+            ? { top: "12px", right: "12px" }
+            : { bottom: "12px", left: "50%", transform: "translateX(-50%)", width: '100%' }
+        ),
+      }}
+      onClick={() => {
+        if (isPlayerSpectating) {
+          sendMessage(socket, { type: "join-game" });
+        } else {
+          sendMessage(socket, { type: "spectate" });
+        }
+      }}
+    >
+      {isPlayerSpectating
+        ? "Join game"
+        : isPlayerInGame
+        ? "Leave game"
+        : "Queued to join game"}
+    </button>;
+
+  const playerDistScaleX = smallScreen ? 75 : 65;
+  const playerDistScaleY = smallScreen ? 60 : 65;
+
   // show game table
   return (
     <div className="tg-poker__table">
-      <GameInfo clientState={clientState} serverState={serverState} getPlayerStatus={getPlayerStatus} />
+      <GameInfo
+        clientState={clientState}
+        serverState={serverState}
+        getPlayerStatus={getPlayerStatus}
+      />
 
       <div
         style={{
           flex: 1,
           flexDirection: "column",
           display: "flex",
-          alignItems: 'center',
-          justifyContent: 'center',
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        <div className="tg-poker__table__dealer" >
+        <div className="tg-poker__table__dealer">
           <div
             className="opponents"
             style={{
@@ -103,16 +135,15 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
             }}
           >
             {inGamePlayers?.map((opp, index) => {
-              const angle = (index / inGamePlayers.length) * Math.PI * 2 + angleOffset;
+              const angle =
+                (index / inGamePlayers.length) * Math.PI * 2 + angleOffset;
               return (
                 <div
                   key={index}
                   className="tg-poker__table__player-container"
                   style={{
-                    left:
-                      Math.sin(angle) * 65 + 50 + "%",
-                    bottom:
-                      -Math.cos(angle) * 65 + 50 + "%",
+                    left: Math.sin(angle) * playerDistScaleX + 50 + "%",
+                    bottom: -Math.cos(angle) * playerDistScaleY + 50 + "%",
                   }}
                 >
                   <Player
@@ -129,21 +160,25 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
               );
             })}
           </div>
-          {
-            gameState && <div className="tg-poker__table__dealer_marker" style={{
-              left: Math.sin(dealerAngle) * 40 + 50 + "%",
-              bottom: -Math.cos(dealerAngle) * 40 + 50 + "%",
-            }}>
+          {gameState && (
+            <div
+              className="tg-poker__table__dealer_marker"
+              style={{
+                left: Math.sin(dealerAngle) * 40 + 50 + "%",
+                bottom: -Math.cos(dealerAngle) * 40 + 50 + "%",
+              }}
+            >
               D
             </div>
-          }
-          <GameStatus clientState={clientState}/>
+          )}
+          <GameStatus clientState={clientState} />
           <Cards cards={gameState?.cards ?? []} />
         </div>
         <div className="tg-poker__table__controlpanel">
-          <GameControls clientState={clientState} />
+          <GameControls clientState={clientState} joinLeave={!smallScreen} />
         </div>
       </div>
+      {smallScreen && joinButton}
     </div>
   );
 };

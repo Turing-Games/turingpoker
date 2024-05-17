@@ -8,7 +8,6 @@ const KV = ({ label, value }: { label: string, value: string }) => (
     flexDirection: 'column',
     justifyContent: 'space-between',
     height: 'fit-content',
-    fontSize: '12px'
   }}>
     <div>{label}</div>
     <div>{value}</div>
