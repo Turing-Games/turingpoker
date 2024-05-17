@@ -1,5 +1,4 @@
 import type * as Party from "partykit/server";
-import { User } from "./utils/auth";
 import { json, notFound } from "./utils/response";
 
 /**

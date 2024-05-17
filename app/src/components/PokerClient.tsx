@@ -27,10 +27,11 @@ export default function PokerClient() {
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
   useEffect(() => {
+    const roomId = Math.round(Math.random() * 10000)
     const connectSocket = () => {
       const socket = new PartySocket({
-        host: import.meta.env.VITE_ENV == 'production' ? 'ws.turingpoker.com' : 'localhost:1999',
-        room: "tgpoker",
+        host: import.meta?.env?.VITE_ENV == 'production' ? 'ws.turingpoker.com' : 'localhost:1999',
+        room: `tgpoker-${roomId}`,
         party: "game"
       });
 

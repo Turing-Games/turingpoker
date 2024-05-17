@@ -22,6 +22,8 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
     return null;
   }
 
+  console.log({ clientState })
+
   const socket = clientState.socket
   const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
   const gameState = serverState.gameState;
@@ -76,7 +78,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
 
 
 
-  const angleOffset = Math.PI*2 / (inGamePlayers?.length ?? 1) / 2;
+  const angleOffset = Math.PI * 2 / (inGamePlayers?.length ?? 1) / 2;
   const dealerAngle = (gameState?.dealerPosition ?? 0) / (inGamePlayers?.length ?? 1) * Math.PI * 2 + angleOffset;
 
   // show game table
@@ -146,9 +148,8 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
                     hand={hands[opp.id]}
                     isCurrentPlayerTurn={opp.id === currentTurn}
                     showCards
-                    title={`Player ${index + 1}${
-                      clientState.playerId === opp.id ? " (You)" : ""
-                    }`}
+                    title={`Player ${index + 1}${clientState.playerId === opp.id ? " (You)" : ""
+                      }`}
                   />
                 </div>
               );
@@ -162,7 +163,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
               D
             </div>
           }
-          <GameStatus clientState={clientState}/>
+          <GameStatus clientState={clientState} />
           <Cards cards={gameState?.cards ?? []} />
         </div>
         <div className="tg-poker__table__controlpanel">

@@ -97,8 +97,8 @@ function GameControls({ clientState }: { clientState: ClientState }) {
           {isPlayerSpectating
             ? "Join game"
             : isPlayerInGame
-            ? "Leave game"
-            : "Queued to join game"}
+              ? "Leave game"
+              : "Queued to join game"}
         </button>
       </div>
     </div>

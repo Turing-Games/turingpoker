@@ -10,8 +10,9 @@ export const sendMessage = (socket: PartySocket | null, message: any) => {
 }
 
 export const connect = (socket: PartySocket | null) => {
+  const roomId = Math.round(Math.random() * 10000)
   socket = new PartySocket({
     host: 'party.turingpoker.com',
-    room: "tgpoker"
+    room: `tgpoker-${roomId}`
   });
 }
