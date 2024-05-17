@@ -52,6 +52,9 @@ export default class PartyServer implements Party.Server {
     this.timeoutLoopInterval = setInterval(() => {
       // check if anyone should be disconnected
       for (const player of this.inGamePlayers) {
+        // if it's not this players turn then we don't want to disconnect them
+        if (this.gameState?.state.whoseTurn != player.playerId) 
+          this.lastActed[player.playerId] = Date.now();
         if (
           this.serverState.gamePhase == "active" &&
           this.lastActed[player.playerId] &&
