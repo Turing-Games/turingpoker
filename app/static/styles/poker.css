@@ -70,9 +70,13 @@
   position: absolute;
   background: white;
   color: black;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+
+
+  top: 0px;
+  right:0px;
 
   display: flex;
   justify-content: center;
@@ -116,6 +120,13 @@
   background: #000;
   border-radius: 4px;
   padding: 8px;
+  z-index: 5;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
+  white-space: nowrap;
 }
 
 .tg-poker__player .tg-poker__player__details>div {

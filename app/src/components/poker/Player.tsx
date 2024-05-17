@@ -13,9 +13,10 @@ interface PlayerProps {
   isCurrentPlayerTurn: boolean;
   title: string;
   showCards: boolean;
+  dealer: boolean;
 }
 
-const Player = ({ player, hand, hands, className, style, title, showCards}: PlayerProps) => {
+const Player = ({ player, hand, hands, className, style, title, showCards, dealer}: PlayerProps) => {
   const handToRender = hand || (hands && hands[player.id]) || [];
   const [cardEffects, setCardEffects] = useState<[CSSProperties, CSSProperties]>([{}, {}]);
 
@@ -36,15 +37,25 @@ const Player = ({ player, hand, hands, className, style, title, showCards}: Play
       ]);
     }
     else {
-      setCardEffects([{}, {}]);
+      const x1 = 13 + Math.random() * 8, x2 = 13 + Math.random() * 8;
+      const y1 = 18 + Math.random() * 8, y2 = 18 + Math.random() * 8;
+      const r1 = 5 + Math.random() * 20, r2 = 5 + Math.random() * 20;
+      setCardEffects([{
+        transform: `rotate(-${r1.toFixed(2)}deg) translate(${x1.toFixed(2)}px, ${y1.toFixed(2)}px)`,
+      }, {
+        transform: `rotate(${r2.toFixed(2)}deg) translate(-${x2.toFixed(2)}px, ${y2.toFixed(2)}px)`,
+      }]);
     }
   }, [player.folded]);
+  console.log(cardEffects)
 
   return (
     <div className={`tg-poker__player${className ? '.' + className : ''}`} style={style}>
       <div className="tg-poker__player__details">
         <h4>{`${title}`}</h4>
         <div>{player.folded ? 'Folded' : `$${player.currentBet.toFixed(2)}`} / ${player.stack.toFixed(2)}</div>
+
+        {dealer && <div className="tg-poker__table__dealer_marker">D</div>}
       </div>
       <div style={{ display: 'flex', gap: '6px', margin: '16px 0',
         flexDirection: 'row', justifyContent: 'center',

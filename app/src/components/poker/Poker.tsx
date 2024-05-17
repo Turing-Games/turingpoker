@@ -78,7 +78,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
 
   const currentPlayerIndex = gameState?.players.findIndex(player => player.id === clientState.playerId) ?? 0
   const angleOffset = -currentPlayerIndex * Math.PI*2 / (inGamePlayers?.length ?? 1);
-  const dealerAngle = (gameState?.dealerPosition ?? 0) / (inGamePlayers?.length ?? 1) * Math.PI * 2 + angleOffset;
+  const dealerIndex = (gameState?.dealerPosition ?? 0)
 
   const joinButton = <button
       style={{
@@ -104,8 +104,35 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
         : "Queued to join game"}
     </button>;
 
-  const playerDistScaleX = smallScreen ? 75 : 65;
-  const playerDistScaleY = smallScreen ? 60 : 65;
+  const getPlayerPosition: (index: number, button?: boolean) => {
+    left: string;
+    bottom: string;
+  } = (index: number, button: boolean=false) => {
+    const cnt = inGamePlayers?.length ?? 1;
+    const angle =
+      (index / cnt) * Math.PI * 2 + angleOffset;
+    let x = Math.sin(angle);
+    let y = Math.cos(angle);
+
+    const lo = Math.max(x, y, -x, -y);
+    // on small screens project onto edge of rectangle
+    if (smallScreen) {
+      x /= lo;
+      y /= lo;
+    }
+    console.log(x, y)
+
+    const scaleX = smallScreen ? 70 : 65;
+    const scaleY = button ? 70 : (smallScreen ? 63 : 65);
+
+    const offsetX = 0;
+    const offsetY = (smallScreen && !button) ? 8 : 0;
+    const scale = button ? 0.55 : 1;
+    return {
+      left: ((x*scaleX + offsetX)*scale + 50) + "%",
+      bottom: ((-y*scaleY + offsetY)*scale + 50) + "%",
+    }
+  }
 
   // show game table
   return (
@@ -135,15 +162,12 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
             }}
           >
             {inGamePlayers?.map((opp, index) => {
-              const angle =
-                (index / inGamePlayers.length) * Math.PI * 2 + angleOffset;
               return (
                 <div
                   key={index}
                   className="tg-poker__table__player-container"
                   style={{
-                    left: Math.sin(angle) * playerDistScaleX + 50 + "%",
-                    bottom: -Math.cos(angle) * playerDistScaleY + 50 + "%",
+                    ...(getPlayerPosition(index))
                   }}
                 >
                   <Player
@@ -155,22 +179,12 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
                     title={`Player ${index + 1}${
                       clientState.playerId === opp.id ? " (You)" : ""
                     }`}
+                    dealer={index === gameState?.dealerPosition}
                   />
                 </div>
               );
             })}
           </div>
-          {gameState && (
-            <div
-              className="tg-poker__table__dealer_marker"
-              style={{
-                left: Math.sin(dealerAngle) * 40 + 50 + "%",
-                bottom: -Math.cos(dealerAngle) * 40 + 50 + "%",
-              }}
-            >
-              D
-            </div>
-          )}
           <GameStatus clientState={clientState} />
           <Cards cards={gameState?.cards ?? []} />
         </div>
