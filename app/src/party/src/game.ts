@@ -38,7 +38,11 @@ export default class PartyServer implements Party.Server {
 
   public queuedUpdates: ServerUpdateMessage[] = [];
 
-  constructor(public readonly room: Party.Room, public readonly autoStart: boolean = true, public readonly party: Party.Party) {
+  constructor(
+    public readonly room: Party.Room,
+    public readonly autoStart: boolean = true,
+    public readonly party: Party.Party
+  ) {
     this.room = room;
     this.party = party
   }
