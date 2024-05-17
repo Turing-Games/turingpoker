@@ -5,11 +5,10 @@ import CardLoader from "../Loader";
 import Player from "./Player";
 import * as Poker from '@app/party/src/game-logic/poker'
 import GameControls from "./GameControls";
-import GameLog from "./GameLog";
 import Card from "../Card";
-import Header from "../Header";
 import GameStatus from "./GameStatus";
 import Cards from "./Cards";
+import { GameInfo } from "./GameInfo";
 
 interface Props {
   clientState: ClientState;
@@ -83,33 +82,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
   // show game table
   return (
     <div className="tg-poker__table">
-      <div className="tg-poker__table__gameinfo">
-        <Header
-          gameType="No Limit Texas Hold'em"
-          players={clientState.serverState?.inGamePlayers || []}
-          playerId={clientState.playerId}
-          minPlayers={clientState.serverState?.config?.minPlayers || 2}
-        />
-        <div className="tg-poker__table__players terminal_text">
-          <h4 className="terminal_text">Players</h4>
-          {serverState.spectatorPlayers
-            .concat(serverState.queuedPlayers)
-            .map((spectator, index) => (
-              <div key={index} className="tg-poker__table__players__player">
-                <p>{`Spectator ${index + 1}:`}</p>
-                <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
-              </div>
-            ))}
-          {serverState.inGamePlayers
-            .map((spectator, index) => (
-              <div key={index} className="tg-poker__table__players__player">
-                <p>{`Player ${index + 1}:`}</p>
-                <p>{`${getPlayerStatus(spectator.playerId)}`}</p>
-              </div>
-            ))}
-        </div>
-        <GameLog gameLog={clientState.updateLog} />
-      </div>
+      <GameInfo clientState={clientState} serverState={serverState} getPlayerStatus={getPlayerStatus} />
 
       <div
         style={{

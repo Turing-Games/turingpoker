@@ -34,7 +34,7 @@ export default function Client() {
     console.log('opening')
     const connectSocket = () => {
       const socket = new PartySocket({
-        host: 'localhost:1999',
+        host: window.location.hostname + ':1999',
         room: "my-new-room"
       });
 

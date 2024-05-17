@@ -54,14 +54,16 @@
 .tg-poker__table__gameinfo {
   display: flex;
   flex-direction: column;
+  height: 100%;
   padding: 0;
   margin: 0;
   gap: 8px;
-  width: 30vw;
+  max-width: 450px;
   padding: 16px;
   justify-content: space-between;
   align-items: stretch;
   background-color: black;
+  overflow-x: hidden;
 }
 
 .tg-poker__table__dealer_marker {
@@ -136,7 +138,8 @@
 
 
 .tg-poker__table__controlpanel {
-  margin-top: 200px;
+  position:absolute;
+  bottom: 32px;
   padding: 8px;
 }
 
@@ -156,22 +159,16 @@
   justify-content: center;
   flex-direction: column;
   gap: 8px;
-  height: 600px;
+  height: 40vh;
   margin: 0 auto;
   max-width: 1200px;
   position: relative;
   width: 60%;
 }
 
-@media (max-height: 1200px) {
+@media (max-width: 1200px) {
   .tg-poker__table__dealer {
-    height: 400px;
-  }
-}
-
-@media (max-height: 800px) {
-  .tg-poker__table__dealer {
-    height: 300px;
+    border-radius: 32px;
   }
 }
 
@@ -188,7 +185,7 @@
 .tg-poker__table__dealer__card {
   position: absolute;
   opacity: 0;
-  transition: left 0.1s ease-out;
+  transition: left 0.1s ease-out, top 0.1s ease-out;
 }
 
 .tg-poker__table__dealer__placeholder-card {

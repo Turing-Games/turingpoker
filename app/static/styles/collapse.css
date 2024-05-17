@@ -1,0 +1,14 @@
+.tg-collapse {
+    transition: max-width 0.2s ease-out;
+    position: relative;
+    z-index: 2;
+}
+
+.tg-poker__collapse__content {
+    overflow: hidden;
+}
+
+.tg-collapse__toggle {
+    z-index: 10;
+    position:absolute;
+}
