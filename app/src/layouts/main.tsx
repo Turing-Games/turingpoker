@@ -1,10 +1,11 @@
-import * as React from 'react'
-import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo.png'
-import PokerClient from '@app/components/PokerClient';
-import { ReactNode } from 'hono/jsx';
+import { ReactNode } from 'react';
+
+type Props = {
+  children: ReactNode
+}
 
 const sharedItems = [
   { link: 'games', label: 'Games' },
@@ -12,11 +13,9 @@ const sharedItems = [
   { link: 'discord', label: 'Discord' }
 ]
 
+export default function Main({ children }: Props) {
 
-export default function Home({ children }: ReactNode) {
-
-  // const isSignedIn = useAuth()?.isSignedIn
-  const isSignedIn = false
+  const isSignedIn = useAuth()?.isSignedIn
 
   const menuItems = isSignedIn ? [
     ...sharedItems,

@@ -1,19 +1,14 @@
-import { useState, useEffect } from 'react'
 import * as React from 'react';
-import * as ReactDOM from "react-dom";
 import {
   createBrowserRouter,
   RouterProvider,
-  Link
 } from "react-router-dom";
 import PartySocket from "partysocket";
-import Poker from "../components/poker/Poker";
-import * as PokerLogic from "../party/src/game-logic/poker";
 import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 import { ClerkProvider } from '@clerk/clerk-react'
 import '@static/styles/styles.css'
 import Home from '../pages/home';
-import PokerClient from '../components/PokerClient';
+import Games from '@app/pages/games';
 
 export type ClientState = {
   isConnected: boolean;
@@ -33,19 +28,19 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <Home />,
-    children: [
-      {
-        path: "games",
-        element: <div>games</div>,
-      },
-    ],
+  },
+  {
+    path: "games",
+    element: <Games />,
   },
 ]);
 
 export default function Root() {
   return (
-    <RouterProvider router={router} />
-    // <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-    // </ClerkProvider>
+    <React.StrictMode>
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+        <RouterProvider router={router} />
+      </ClerkProvider>
+    </React.StrictMode>
   )
 };
