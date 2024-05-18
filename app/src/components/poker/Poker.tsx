@@ -20,7 +20,18 @@ interface Props {
 const PokerTable = ({ clientState, previousActions }: Props) => {
   const serverState = clientState.serverState;
   if (!serverState) {
-    return null;
+    return <div style={{
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'column',
+      height: '100%',
+      width: '100%',
+      flex: 1
+    }}>
+      <h2>No connection to poker engine...</h2>
+      <CardLoader />
+    </div>;
   }
 
   const socket = clientState.socket

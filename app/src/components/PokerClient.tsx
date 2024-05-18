@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, startTransition } from 'react'
 import * as React from 'react';
 import PartySocket from "partysocket";
 import Poker from "./poker/Poker";
@@ -32,8 +32,11 @@ export default function PokerClient() {
     console.log('opening')
     const connectSocket = () => {
       const socket = new PartySocket({
-        host: window.location.hostname + ':1999',
-        room: "my-new-room"
+        host: import.meta.env.VITE_ENV == "production"
+            ? "ws.turingpoker.com"
+            : "localhost:1999",
+        room: "tgpoker",
+        party: "game",
       });
 
       socket.addEventListener("open", () => {

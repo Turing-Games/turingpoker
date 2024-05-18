@@ -20,8 +20,7 @@ export default function Main({ children }: Props) {
   const menuItems = isSignedIn ? [
     ...sharedItems,
     { link: 'play', label: 'Play' },
-  ] :
-    sharedItems
+  ] : sharedItems;
 
   return (
     <>
@@ -44,7 +43,10 @@ export default function Main({ children }: Props) {
           </SignedIn>
         </div>
       </header>
-      <main>
+      <main style={{
+        position: 'relative',
+        height: '100%',
+      }}>
         {children}
       </main>
     </>

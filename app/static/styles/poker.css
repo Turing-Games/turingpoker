@@ -44,7 +44,7 @@
   padding: 0;
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: 100%;
   width: 100%;
   align-items: stretch;
   justify-content: space-between;
@@ -294,13 +294,13 @@
   }
 }
 
-@media (max-width: 1800px) and (min-width: 1250px) {
+@media (max-width: 1800px) and (min-width: 1200px) {
   .card {
     height: 100px;
   }
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1200px) {
   .card {
     height: 66px;
   }
