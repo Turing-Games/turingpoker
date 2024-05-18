@@ -10,6 +10,15 @@
   box-sizing: border-box;
 }
 
+a {
+  color: #000;
+  text-decoration: none;
+}
+
+a:visited {
+  color: inherit;
+}
+
 #root {
   display: flex;
   flex-direction: column;
@@ -25,7 +34,7 @@ body {
   color: #333;
   background-image: url("/static/images/poker-bg-tile.jpg");
   background-repeat: repeat;
-  background-color: rgba(255,255,255,0.85);
+  background-color: rgba(255, 255, 255, 0.85);
   background-blend-mode: lighten;
   padding: 0;
   min-height: 100vh;
@@ -86,4 +95,23 @@ button:disabled {
   body {
     font-size: 10px;
   }
+}
+
+header {
+  background: #fff;
+  border-bottom: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+header>div {
+  align-items: center;
+  display: flex;
+}
+
+header>div>* {
+  font-size: 16px;
+  margin-left: 8px;
 }
