@@ -129,6 +129,14 @@
   white-space: nowrap;
 }
 
+@media (min-width: 1200px) {
+  .tg-poker__player__details {
+    position: static !important;
+    transform: none !important;
+    width: 100% !important;
+  }
+}
+
 .tg-poker__player .tg-poker__player__details>div {
   align-items: center;
   display: flex;

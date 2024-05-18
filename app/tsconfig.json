@@ -6,13 +6,13 @@
     "strict": true,
     "skipLibCheck": true,
     "lib": ["ESNext", "DOM"],
-    "types": ["@cloudflare/workers-types", "vite/client"],
+    "types": ["@cloudflare/workers-types", "vite/client", "jest"],
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
         "@tg/*": ["src/party/src/*"],
         "@app/*": ["src/*"],
-        "@static/*": ["static/*"],
+        "@static/*": ["static/*"]
     }
   }
 }

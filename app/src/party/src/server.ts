@@ -135,23 +135,27 @@ export default class PartyServer implements Party.Server {
       return;
     }
 
-    if (this.gameState.state.whoseTurn !== playerId) {
+    if (this.gameState.state.whoseTurn !== playerId || this.gameState.state.done) {
       console.log("Player attempted to make action out of turn", playerId);
       return;
     }
 
-    const { next, log } = Poker.step(this.gameState, action);
-    this.gameState = next;
-    this.queuedUpdates.push({
-      type: "action",
-      action,
-      player,
-    });
-    for (const message of log) {
+    try {
+      const { next, log } = Poker.step(this.gameState, action);
+      for (const message of log) {
+        this.queuedUpdates.push({
+          type: "engine-log",
+          message,
+        });
+      }
+      this.gameState = next;
       this.queuedUpdates.push({
-        type: "engine-log",
-        message,
+        type: "action",
+        action,
+        player,
       });
+    } catch (err) {
+      console.log(err);
     }
     if (this.gameState.state.done) {
       this.endGame(
@@ -349,7 +353,14 @@ export default class PartyServer implements Party.Server {
     // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
     if (this.serverState.gamePhase == 'active' && this.gameState) {
       try {
-        this.gameState = Poker.forcedFold(this.gameState, playerId);
+        const { next, log } = Poker.forcedFold(this.gameState, playerId);
+        this.gameState = next;
+        for (const message of log) {
+          this.queuedUpdates.push({
+            type: "engine-log",
+            message,
+          });
+        }
       }
       catch (e) {
         console.error("Error in forced fold", e);
@@ -364,6 +375,7 @@ export default class PartyServer implements Party.Server {
     this.queuedPlayers = this.queuedPlayers.filter(
       (player) => player.playerId !== playerId
     );
+    console.log(this.spectatorPlayers, this.inGamePlayers, this.queuedPlayers);
     this.queuedUpdates.push({
       type: "player-left",
       player: {
@@ -371,7 +383,14 @@ export default class PartyServer implements Party.Server {
       },
     });
 
-    if (this.inGamePlayers.length < 2) {
+    // it's important to remove the players before ending the game since if autostart is on
+    // we don't want the removed player to get added
+    if (this.gameState?.state.done) {
+      this.endGame(
+        this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
+      );
+    }
+    else if (this.inGamePlayers.length < 2) {
       this.endGame("fold");
     }
 

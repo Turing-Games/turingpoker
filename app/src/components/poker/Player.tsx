@@ -3,6 +3,7 @@ import Card from "../Card";
 import * as Poker from "@app/party/src/game-logic/poker";
 import { ClientState } from "@app/client";
 import GameControls from "./GameControls";
+import useSmallScreen from "@app/hooks/useSmallScreen";
 
 interface PlayerProps {
   player: Poker.IPokerPlayer;
@@ -19,18 +20,19 @@ interface PlayerProps {
 const Player = ({ player, hand, hands, className, style, title, showCards, dealer}: PlayerProps) => {
   const handToRender = hand || (hands && hands[player.id]) || [];
   const [cardEffects, setCardEffects] = useState<[CSSProperties, CSSProperties]>([{}, {}]);
+  const smallScreen = useSmallScreen();
 
   useEffect(() => {
     if (player.folded) {
       // pick random rotation, transform and set opacity to 0
       setCardEffects([
         {
-          transition: 'transform 1s ease-out, opacity 1s ease-out',
+          transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
           transform: `translate(${Math.random() * 600-300}px, ${Math.random() * 600-300}px) rotate(${Math.random() * 360}deg)`,
           opacity: 0,
         },
         {
-          transition: 'transform 1s ease-out, opacity 1s ease-out',
+          transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
           transform: `translate(${Math.random() * 600-300}px, ${Math.random() * 600-300}px) rotate(${Math.random() * 360}deg)`,
           opacity: 0,
         },
@@ -40,13 +42,22 @@ const Player = ({ player, hand, hands, className, style, title, showCards, deale
       const x1 = 13 + Math.random() * 8, x2 = 13 + Math.random() * 8;
       const y1 = 18 + Math.random() * 8, y2 = 18 + Math.random() * 8;
       const r1 = 5 + Math.random() * 20, r2 = 5 + Math.random() * 20;
-      setCardEffects([{
-        transform: `rotate(-${r1.toFixed(2)}deg) translate(${x1.toFixed(2)}px, ${y1.toFixed(2)}px)`,
-      }, {
-        transform: `rotate(${r2.toFixed(2)}deg) translate(-${x2.toFixed(2)}px, ${y2.toFixed(2)}px)`,
-      }]);
+      if (smallScreen) {
+        setCardEffects([{
+          transform: `rotate(-${r1.toFixed(2)}deg) translate(${x1.toFixed(2)}px, ${y1.toFixed(2)}px)`,
+        }, {
+          transform: `rotate(${r2.toFixed(2)}deg) translate(-${x2.toFixed(2)}px, ${y2.toFixed(2)}px)`,
+        }]);
+      }
+      else {
+        setCardEffects([{
+          position: 'unset'
+        }, {
+          position: 'unset'
+        }]);
+      }
     }
-  }, [player.folded]);
+  }, [player.folded, smallScreen]);
   console.log(cardEffects)
 
   return (

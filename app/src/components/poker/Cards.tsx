@@ -20,7 +20,7 @@ export default function Cards({ cards }: { cards: PokerLogic.Card[] }) {
     const observer = new ResizeObserver(() => {
       setWindowSz({ width: window.innerWidth, height: window.innerHeight });
     });
-    observer.observe(allRef.current);
+    observer.observe(allRef.current.parentElement ?? allRef.current);
     return () => observer.disconnect();
   }, [allRef.current])
 
