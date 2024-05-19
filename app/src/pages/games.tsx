@@ -43,21 +43,16 @@ export default function Games() {
     <Main>
       <div style={{ padding: 20 }}>
         <h2>Tables ({tables.length})</h2>
-        <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+        <div
+          className="tg-poker__games-list"
+        >
           {
             tables.map((table, i) => {
               return (
-                <div
+                <Link
+                  className="tg-poker__games-list__card"
+                  to={`/games/${table.id}`}
                   key={table.id}
-                  style={{
-                    display: 'grid',
-                    gap: 8,
-                    cursor: 'pointer',
-                    background: '#fff',
-                    border: '1px solid #000',
-                    borderRadius: 4,
-                    padding: 20
-                  }}
                 >
                   <div
                     onClick={() => {
@@ -68,30 +63,13 @@ export default function Games() {
                   </div>
                   <p>Table: {table.id}</p>
                   <p>{table.connections} player{table.connections > 1 ? 's' : ''} in the room</p>
-                  <SignedIn>
-                    <button>
-                      <Link
-                        to={`/games/${table.id}`}
-                        style={{ color: '#fff' }}
-                      >
-                        Join game
-                      </Link>
-                    </button>
-                  </SignedIn>
-                  <button>
-                    <Link
-                      to={`/games/${table.id}`}
-                      style={{ color: '#fff' }}
-                    >
-                      Spectate
-                    </Link>
-                  </button>
-                </div>
+                </Link>
               )
             })
           }
         </div>
       </div>
+      <style>{`#root{overflow:auto!important`}</style>
     </Main >
   )
 }

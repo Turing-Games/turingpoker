@@ -239,7 +239,7 @@
 }
 
 .tg-poker__table__gamestatus {
-  display:grid;
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-auto-rows: 40px;
   width: 200px;
@@ -260,6 +260,22 @@
 }
 
 .opponents>div {}
+
+.tg-poker__games-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.tg-poker__games-list__card {
+  border: 1px solid #000;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+}
 
 @media (min-width: 1800px) {
   .card {
