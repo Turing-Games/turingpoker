@@ -33,7 +33,7 @@ export default function PokerClient({ gameId }: { gameId?: string }) {
         // host: 'localhost:1999',
         host: 'ws.turingpoker.com',
         room: gameId || `tgpoker-${roomId}`,
-        party: "games"
+        party: "poker"
       });
 
       socket.addEventListener("open", () => {

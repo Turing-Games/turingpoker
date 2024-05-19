@@ -15,6 +15,6 @@ export const connect = (socket: PartySocket | null) => {
     host: 'ws.turingpoker.com',
     // host: 'localhost:1999',
     room: `tgpoker-${roomId}`,
-    party: 'games'
+    party: 'poker'
   });
 }

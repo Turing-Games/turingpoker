@@ -196,7 +196,7 @@ export default class PartyServer implements Party.Server {
     });
     this.gameState = null;
     this.broadcastGameState();
-    if (this.autoStart && this.inGamePlayers.length >= 2) {
+    if (this.gameConfig.autoStart && this.inGamePlayers.length >= 2) {
       this.startGame();
     }
   }
@@ -264,7 +264,7 @@ export default class PartyServer implements Party.Server {
       });
     }
 
-    if (this.autoStart && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
+    if (this.gameConfig.autoStart && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
       this.startGame();
     } else {
       this.broadcastGameState();

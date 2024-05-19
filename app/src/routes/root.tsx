@@ -10,6 +10,7 @@ import '@static/styles/styles.css'
 import Home from '../pages/home';
 import Games from '@app/pages/games';
 import { SocketContext } from '@app/components/SocketContext';
+import Learn from '@app/pages/learn';
 
 export type ClientState = {
   isConnected: boolean;
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
   {
     path: "/games",
     element: <Games />,
+  },
+  {
+    path: "/learn",
+    element: <Learn />,
   },
 ]);
 
