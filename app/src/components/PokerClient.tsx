@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, startTransition } from 'react'
 import * as React from 'react';
 import PartySocket from "partysocket";
 import Poker from "./poker/Poker";
@@ -10,6 +10,7 @@ import '@static/styles/styles.css'
 export type ClientState = {
   isConnected: boolean;
   serverState: ServerStateMessage | null;
+  lastServerState: ServerStateMessage | null;
   socket: PartySocket | null;
   playerId: string | null;
   updateLog: ServerUpdateMessage[];
@@ -20,6 +21,7 @@ export default function PokerClient({ gameId }: { gameId?: string }) {
     isConnected: false,
     serverState: null,
     socket: null,
+    lastServerState: null,
     playerId: null,
     updateLog: [],
   });
@@ -27,74 +29,74 @@ export default function PokerClient({ gameId }: { gameId?: string }) {
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
   useEffect(() => {
-    const roomId = Math.round(Math.random() * 10000)
-    const connectSocket = () => {
-      const socket = new PartySocket({
-        // host: 'localhost:1999',
-        host: 'ws.turingpoker.com',
-        room: gameId || `tgpoker-${roomId}`,
-        party: "poker"
-      });
+    const roomId = Math.round(Math.random() * 10000);
+    const socket = new PartySocket({
+      host: import.meta.env.VITE_ENV == "production"
+          ? "ws.turingpoker.com"
+          : "localhost:1999",
+      room: gameId ?? roomId.toString(),
+      party: "poker",
+    });
 
-      socket.addEventListener("open", () => {
-        setClientState((prevState) => ({
-          ...prevState,
-          isConnected: true,
-          playerId: socket.id,
-          socket: socket,
-        }));
-      });
+    socket.addEventListener("open", () => {
+      console.log('connect', socket)
+      setClientState((prevState) => ({
+        ...prevState,
+        isConnected: true,
+        playerId: socket.id,
+        socket: socket,
+      }));
+    });
 
-      socket.addEventListener("message", (event) => {
-        try {
-          const data: ServerStateMessage = JSON.parse(event.data);
-          for (const update of data.lastUpdates) {
-            if (update.type == 'game-ended') {
-              setPreviousActions({})
-            }
-            if (update.type == 'action') {
-              setPreviousActions((prevState) => ({
-                ...prevState,
-                [update.player.playerId]: update.action,
-              }));
-            }
+    socket.addEventListener("message", (event) => {
+      try {
+        const data: ServerStateMessage = JSON.parse(event.data);
+        if (!data.state) return;
+        for (const update of data.lastUpdates) {
+          if (update.type == 'game-ended') {
+            setPreviousActions({})
           }
+          if (update.type == 'action') {
+            setPreviousActions((prevState) => ({
+              ...prevState,
+              [update.player.playerId]: update.action,
+            }));
+          }
+        }
+        startTransition(() => {
           setClientState((prevState) => ({
             ...prevState,
             serverState: data,
-            updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-1000),
+            updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-500),
           }));
-        } catch {
-          setClientState((prevState) => ({
-            ...prevState,
-            serverState: null,
-          }));
-        }
-      });
-
-      socket.addEventListener("close", () => {
+        });
+      } catch {
         setClientState((prevState) => ({
           ...prevState,
-          isConnected: false,
+          serverState: null,
         }));
-      });
+      }
+    });
 
-      socket.addEventListener("error", (event) => {
-        console.error("WebSocket error:", event);
-      });
-
+    socket.addEventListener("close", () => {
       setClientState((prevState) => ({
         ...prevState,
-        socket: socket,
+        isConnected: false,
       }));
-    };
+    });
 
-    connectSocket();
+    socket.addEventListener("error", (event) => {
+      console.error("WebSocket error:", event);
+    });
+
+    setClientState((prevState) => ({
+      ...prevState,
+      socket: socket,
+    }));
+
 
     return () => {
-      if (clientState.socket) {
-        clientState.socket.close();
-      }
+      socket.close();
     };
   }, [setClientState]);
 

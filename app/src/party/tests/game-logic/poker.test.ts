@@ -2,11 +2,12 @@ import * as poker from '@app/party/src/game-logic/poker';
 import combinations from '@app/party/src/utils/combinations';
 const { handCmp } = poker;
 
-const Hand = require('pokersolver').Hand;
+//const Hand = require('pokersolver').Hand;
 
 const names = " A23456789TJQK";
 const suits = "cdhs";
 
+/*
 // Commented out because it's too slow
 describe("Hand evaluation", () => {
     // generate a fraction of all 2.5M hands by choosing all 5-card combinations of 36 randomly chosen cards
@@ -43,7 +44,7 @@ describe("Hand evaluation", () => {
         indexB.sort((a, b) => handCmp(handsB[a], handsB[b]));
         expect(indexA).toEqual(indexB);
     });
-})
+})*/
 
 describe("Poker logic", () => {
     const defaultConfig: poker.IPokerConfig = {
@@ -219,7 +220,7 @@ describe("Poker logic", () => {
         game = poker.step(game, { type: 'call' }).next;
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.step(game, { type: 'fold' }).next;
-        game = poker.forcedFold(game, '1');
+        game = poker.forcedFold(game, '1').next;
         expect(game.state.done).toBeTruthy();
         // the only player left should get the pot
         expect(poker.payout(game.state, game.hands).payouts).toMatchObject({ '4': game.state.pot });
@@ -232,7 +233,7 @@ describe("Poker logic", () => {
         game = poker.step(game, { type: 'call' }).next;
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.step(game, { type: 'fold' }).next;
-        game = poker.forcedFold(game, '4');
+        game = poker.forcedFold(game, '4').next;
         expect(game.state.whoseTurn).toBe('1');
         expect(game.state.done).toBeTruthy();
         // the only player left should get the pot

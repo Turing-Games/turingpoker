@@ -11,7 +11,8 @@
     ],
     "types": [
       "@cloudflare/workers-types",
-      "vite/client"
+      "vite/client",
+      "jest"
     ],
     "jsx": "react-jsx",
     "baseUrl": ".",

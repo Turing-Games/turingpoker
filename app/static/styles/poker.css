@@ -32,6 +32,7 @@
   padding: 12px;
   left: 0;
   display: flex;
+  min-height: 100px;
   flex-direction: column;
   border: 2px solid rgb(92, 193, 51);
 }
@@ -44,33 +45,41 @@
   padding: 0;
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: 100%;
   width: 100%;
   align-items: stretch;
   justify-content: space-between;
   color: rgb(92, 193, 51);
+  overflow: hidden;
 }
 
 .tg-poker__table__gameinfo {
   display: flex;
   flex-direction: column;
+  height: 0;
+  min-height: 100%;
   padding: 0;
   margin: 0;
   gap: 8px;
-  width: 30vw;
+  max-width: 450px;
   padding: 16px;
   justify-content: space-between;
   align-items: stretch;
   background-color: black;
+  overflow-x: hidden;
 }
 
 .tg-poker__table__dealer_marker {
   position: absolute;
   background: white;
   color: black;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
+
+
+  top: 0px;
+  right:0px;
 
   display: flex;
   justify-content: center;
@@ -114,6 +123,22 @@
   background: #000;
   border-radius: 4px;
   padding: 8px;
+  z-index: 5;
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: fit-content;
+  white-space: nowrap;
+}
+
+@media (min-width: 1200px) {
+  .tg-poker__player__details {
+    left: unset !important;
+    position: relative !important;
+    transform: none !important;
+    width: 100% !important;
+  }
 }
 
 .tg-poker__player .tg-poker__player__details>div {
@@ -155,22 +180,18 @@
   justify-content: center;
   flex-direction: column;
   gap: 8px;
-  height: 600px;
   margin: 0 auto;
   max-width: 1200px;
   position: relative;
   width: 60%;
+  min-height: 40vh;
+  padding: 8px;
 }
 
-@media (max-height: 1200px) {
+@media (max-width: 1200px) {
   .tg-poker__table__dealer {
-    height: 400px;
-  }
-}
-
-@media (max-height: 800px) {
-  .tg-poker__table__dealer {
-    height: 300px;
+    border-radius: 32px;
+    width: 50%;
   }
 }
 
@@ -180,14 +201,13 @@
   justify-content: center;
   align-items: center;
   flex-direction: row;
-  width: 70%;
   flex-wrap: wrap;
 }
 
 .tg-poker__table__dealer__card {
   position: absolute;
   opacity: 0;
-  transition: left 0.1s ease-out;
+  transition: left 0.1s ease-out, top 0.1s ease-out;
 }
 
 .tg-poker__table__dealer__placeholder-card {
@@ -239,13 +259,22 @@
 }
 
 .tg-poker__table__gamestatus {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 40px;
-  width: 200px;
   padding: 8px;
   background: black;
   border-radius: 4px;
+  width: fit-content;
+  margin: 16px;
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+@media (max-width: 768px) {
+  .tg-poker__table__gamestatus {
+    grid-auto-rows: 32px;
+  }
 }
 
 .tg-poker__table__player-container {
@@ -261,6 +290,9 @@
 
 .opponents>div {}
 
+.card {
+  pointer-events: none;
+}
 .tg-poker__games-list {
   display: flex;
   flex-wrap: wrap;
@@ -295,14 +327,20 @@
   }
 }
 
-@media (max-width: 1800px) and (min-width: 1250px) {
+@media (max-width: 1800px) and (min-width: 1200px) {
   .card {
     height: 100px;
   }
 }
 
-@media (max-width: 1250px) {
+@media (max-width: 1200px) {
   .card {
     height: 66px;
+  }
+}
+
+@media (max-width: 700px) {
+  .card {
+    height: 50px;
   }
 }

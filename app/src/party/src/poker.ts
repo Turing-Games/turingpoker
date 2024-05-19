@@ -31,7 +31,7 @@ export default class PartyServer implements Party.Server {
   public queuedPlayers: IPlayer[] = [];
   public stacks: Record<string, number> = {};
   public serverState: IPartyServerState = {
-    gamePhase: 'pending'
+    gamePhase: "pending",
   };
   public lastActed: Record<string, number> = {};
 
@@ -39,13 +39,20 @@ export default class PartyServer implements Party.Server {
 
   public queuedUpdates: ServerUpdateMessage[] = [];
 
-  constructor(public readonly party: Party.Party) { }
+  constructor(public readonly party: Party.Party) {}
 
   onStart(): void | Promise<void> {
     this.timeoutLoopInterval = setInterval(() => {
       // check if anyone should be disconnected
       for (const player of this.inGamePlayers) {
-        if (this.serverState.gamePhase == 'active' && this.lastActed[player.playerId] && Date.now() - this.lastActed[player.playerId] > 300000) {
+        // if it's not this players turn then we don't want to disconnect them
+        if (this.gameState?.state.whoseTurn != player.playerId)
+          this.lastActed[player.playerId] = Date.now();
+        if (
+          this.serverState.gamePhase == "active" &&
+          this.lastActed[player.playerId] &&
+          Date.now() - this.lastActed[player.playerId] > 300000
+        ) {
           this.playerSpectate(player.playerId);
         }
       }
@@ -57,7 +64,7 @@ export default class PartyServer implements Party.Server {
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
     if (this.inGamePlayers.length < 2) {
       this.updateRoomList("enter", conn);
-      this.serverState.gamePhase = 'pending'
+      this.serverState.gamePhase = "pending";
     }
 
     this.addPlayer(conn.id);
@@ -73,66 +80,85 @@ export default class PartyServer implements Party.Server {
       let data: ClientMessage;
 
       this.lastActed[websocket.id] = Date.now();
-      if (typeof message === 'string') {  // Check if the message is string to parse it
+      if (typeof message === "string") {
+        // Check if the message is string to parse it
         data = JSON.parse(message);
-      }
-      else {
+      } else {
         throw new Error("Invalid message type");
       }
 
       // TODO: you shouldn't be able to start/reset game unless you are an admin
       if (data.type == "action" && Poker.isAction(data.action)) {
         this.handlePlayerAction(websocket.id, data.action);
-      }
-      else if (data.type == 'join-game') {
+      } else if (data.type == "join-game") {
         this.playerJoinGame(websocket.id);
-      }
-      else if (data.type == 'start-game') {
+      } else if (data.type == "start-game") {
         this.startGame();
-      }
-      else if (data.type == 'spectate') {
+      } else if (data.type == "spectate") {
         this.playerSpectate(websocket.id);
-      }
-      else if (data.type == 'reset-game') {
-        this.endGame('system');
-      }
-      else {
+      } else if (data.type == "reset-game") {
+        this.endGame("system");
+      } else {
         console.error("Invalid message type", data);
       }
     } catch (error) {
       console.error(`Error parsing message from ${websocket.id}:`, error);
-      if (typeof websocket.send === 'function') {
-        websocket.send(JSON.stringify({ error: "Error processing your action" }));
+      if (typeof websocket.send === "function") {
+        websocket.send(
+          JSON.stringify({ error: "Error processing your action" })
+        );
       } else {
-        console.error('websocket.send is not a function', websocket);
+        console.error("websocket.send is not a function", websocket);
       }
     }
   }
 
   handlePlayerAction(playerId: string, action: Poker.Action) {
-    const player = this.inGamePlayers.find(p => p.playerId === playerId);
+    const player = this.inGamePlayers.find((p) => p.playerId === playerId);
     if (!player) {
-      console.log("Player attempted to make action while not in game", playerId);
+      console.log(
+        "Player attempted to make action while not in game",
+        playerId
+      );
       return;
     }
     if (!this.gameState) {
-      console.log("Player attempted to make action while game is not active", playerId);
+      console.log(
+        "Player attempted to make action while game is not active",
+        playerId
+      );
       return;
     }
 
-    if (this.gameState.state.whoseTurn !== playerId) {
+    if (
+      this.gameState.state.whoseTurn !== playerId ||
+      this.gameState.state.done
+    ) {
       console.log("Player attempted to make action out of turn", playerId);
       return;
     }
 
-    this.gameState = Poker.step(this.gameState, action).next;
-    this.queuedUpdates.push({
-      type: 'action',
-      action,
-      player,
-    });
+    try {
+      const { next, log } = Poker.step(this.gameState, action);
+      for (const message of log) {
+        this.queuedUpdates.push({
+          type: "engine-log",
+          message,
+        });
+      }
+      this.gameState = next;
+      this.queuedUpdates.push({
+        type: "action",
+        action,
+        player,
+      });
+    } catch (err) {
+      console.log(err);
+    }
     if (this.gameState.state.done) {
-      this.endGame(this.gameState?.state?.round === 'showdown' ? 'showdown' : 'fold');
+      this.endGame(
+        this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
+      );
     }
     this.broadcastGameState();
   }
@@ -150,7 +176,6 @@ export default class PartyServer implements Party.Server {
     this.queuedPlayers = [];
   }
 
-
   startGame() {
     if (this.gameState && !this.gameState.state.done) {
       return;
@@ -163,11 +188,15 @@ export default class PartyServer implements Party.Server {
       }
     }
     this.processQueuedPlayers();
-    this.gameState = Poker.createPokerGame(this.gameConfig, this.inGamePlayers.map(p => p.playerId), this.inGamePlayers.map(p => this.stacks[p.playerId]));
-    this.serverState.gamePhase = 'active';
+    this.gameState = Poker.createPokerGame(
+      this.gameConfig,
+      this.inGamePlayers.map((p) => p.playerId),
+      this.inGamePlayers.map((p) => this.stacks[p.playerId])
+    );
+    this.serverState.gamePhase = "active";
 
     this.queuedUpdates.push({
-      type: 'game-started',
+      type: "game-started",
       players: this.inGamePlayers,
     });
 
@@ -175,34 +204,49 @@ export default class PartyServer implements Party.Server {
 
     setTimeout(() => {
       this.broadcastGameState();
-    }, 3000)
+    }, 3000);
   }
 
-  endGame(reason: 'showdown' | 'fold' | 'system') {
+  endGame(reason: "showdown" | "fold" | "system") {
     if (!this.gameState) {
       return;
     }
     this.processQueuedPlayers();
 
-    const payouts = Poker.payout(this.gameState.state, this.gameState.hands).payouts;
-    for (const playerId in payouts) {
-      this.stacks[playerId] = (this.gameState.state.players.find(player => player.id == playerId)?.stack ?? 0) + payouts[playerId];
+    const { payouts, log } = Poker.payout(
+      this.gameState.state,
+      this.gameState.hands
+    );
+
+    for (const message of log) {
+      this.queuedUpdates.push({
+        type: "engine-log",
+        message,
+      });
     }
-    this.serverState.gamePhase = 'pending';
+    for (const playerId in payouts) {
+      this.stacks[playerId] =
+        (this.gameState.state.players.find((player) => player.id == playerId)
+          ?.stack ?? 0) + payouts[playerId];
+    }
+    this.serverState.gamePhase = "pending";
     this.queuedUpdates.push({
-      type: 'game-ended',
+      type: "game-ended",
       payouts,
-      reason
+      reason,
     });
     this.gameState = null;
     this.broadcastGameState();
-    if (this.gameConfig.autoStart && this.inGamePlayers.length >= 2) {
+    this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
+    if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
       this.startGame();
     }
   }
 
   getStateMessage(playerId: string): ServerStateMessage {
-    const isSpectator = this.spectatorPlayers.map(s => s.playerId).indexOf(playerId) !== -1
+    const isSpectator =
+      this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
+    console.log(this.gameState?.hands);
     return {
       gameState: this.gameState?.state ?? null,
       hand: this.gameState?.hands?.[playerId] ?? null,
@@ -213,11 +257,13 @@ export default class PartyServer implements Party.Server {
       state: this.serverState,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
-    }
+    };
   }
 
   broadcastGameState() {
-    for (const player of this.inGamePlayers.concat(this.spectatorPlayers).concat(this.queuedPlayers)) {
+    for (const player of this.inGamePlayers
+      .concat(this.spectatorPlayers)
+      .concat(this.queuedPlayers)) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
       // Send game state; ensure spectators do not receive any cards information
@@ -232,31 +278,36 @@ export default class PartyServer implements Party.Server {
   playerSpectate(playerId: string) {
     this.removePlayer(playerId);
     this.spectatorPlayers.push({
-      playerId
+      playerId,
     });
     this.queuedUpdates.push({
-      type: 'player-left',
+      type: "player-left",
       player: {
-        playerId
-      }
+        playerId,
+      },
     });
     this.broadcastGameState();
   }
 
   playerJoinGame(playerId: string) {
-    if (this.queuedPlayers.find(player => player.playerId === playerId)
-      || this.inGamePlayers.find(player => player.playerId === playerId)) return;
+    if (
+      this.queuedPlayers.find((player) => player.playerId === playerId) ||
+      this.inGamePlayers.find((player) => player.playerId === playerId)
+    )
+      return;
 
-    this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
-    if (this.serverState.gamePhase === 'pending') {
+    this.spectatorPlayers = this.spectatorPlayers.filter(
+      (player) => player.playerId !== playerId
+    );
+    if (this.serverState.gamePhase === "pending") {
       this.inGamePlayers.push({
         playerId,
       });
       this.queuedUpdates.push({
-        type: 'player-joined',
+        type: "player-joined",
         player: {
           playerId,
-        }
+        },
       });
     } else {
       this.queuedPlayers.push({
@@ -264,7 +315,11 @@ export default class PartyServer implements Party.Server {
       });
     }
 
-    if (this.gameConfig.autoStart && this.serverState.gamePhase === 'pending' && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
+    if (
+      this.gameConfig.autoStart &&
+      this.serverState.gamePhase === "pending" &&
+      this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START
+    ) {
       this.startGame();
     } else {
       this.broadcastGameState();
@@ -275,36 +330,65 @@ export default class PartyServer implements Party.Server {
     if (this.playerExists(playerId)) return;
     this.stacks[playerId] = defaultStack;
     this.spectatorPlayers.push({
-      playerId
+      playerId,
     });
 
     this.broadcastGameState();
   }
 
   playerExists(playerId: string) {
-    return this.inGamePlayers.find(player => player.playerId === playerId) !== undefined
-      || this.spectatorPlayers.find(player => player.playerId === playerId) !== undefined
-      || this.queuedPlayers.find(player => player.playerId === playerId) !== undefined;
+    return (
+      this.inGamePlayers.find((player) => player.playerId === playerId) !==
+        undefined ||
+      this.spectatorPlayers.find((player) => player.playerId === playerId) !==
+        undefined ||
+      this.queuedPlayers.find((player) => player.playerId === playerId) !==
+        undefined
+    );
   }
 
   removePlayer(playerId: string) {
     // Attempt to remove from players list first
     // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
-    if (this.gameState) {
-      this.gameState = Poker.forcedFold(this.gameState, playerId);
-    }
-    this.spectatorPlayers = this.spectatorPlayers.filter(player => player.playerId !== playerId);
-    this.inGamePlayers = this.inGamePlayers.filter(player => player.playerId !== playerId);
-    this.queuedPlayers = this.queuedPlayers.filter(player => player.playerId !== playerId);
-    this.queuedUpdates.push({
-      type: 'player-left',
-      player: {
-        playerId
+    if (this.serverState.gamePhase == "active" && this.gameState) {
+      try {
+        const { next, log } = Poker.forcedFold(this.gameState, playerId);
+        this.gameState = next;
+        for (const message of log) {
+          this.queuedUpdates.push({
+            type: "engine-log",
+            message,
+          });
+        }
+      } catch (e) {
+        console.error("Error in forced fold", e);
       }
+    }
+    this.spectatorPlayers = this.spectatorPlayers.filter(
+      (player) => player.playerId !== playerId
+    );
+    this.inGamePlayers = this.inGamePlayers.filter(
+      (player) => player.playerId !== playerId
+    );
+    this.queuedPlayers = this.queuedPlayers.filter(
+      (player) => player.playerId !== playerId
+    );
+    console.log(this.spectatorPlayers, this.inGamePlayers, this.queuedPlayers);
+    this.queuedUpdates.push({
+      type: "player-left",
+      player: {
+        playerId,
+      },
     });
 
-    if (this.inGamePlayers.length < 2) {
-      this.endGame('fold');
+    // it's important to remove the players before ending the game since if autostart is on
+    // we don't want the removed player to get added
+    if (this.gameState?.state.done) {
+      this.endGame(
+        this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
+      );
+    } else if (this.inGamePlayers.length < 2) {
+      this.endGame("fold");
     }
 
     this.broadcastGameState();
@@ -322,7 +406,10 @@ export default class PartyServer implements Party.Server {
   }
 
   /** Send room presence to the room listing party */
-  async updateRoomList(action: "enter" | "leave", connection: Party.Connection) {
+  async updateRoomList(
+    action: "enter" | "leave",
+    connection: Party.Connection
+  ) {
     return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({

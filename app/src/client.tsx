@@ -8,6 +8,7 @@ import Root from './routes/root';
 export type ClientState = {
   isConnected: boolean;
   serverState: ServerStateMessage | null;
+  lastServerState: ServerStateMessage | null;
   socket: PartySocket | null;
   playerId: string | null;
   updateLog: ServerUpdateMessage[];

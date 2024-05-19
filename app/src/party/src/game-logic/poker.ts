@@ -395,11 +395,14 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
  * @param playerId The id of the player to force to fold
  * @returns 
  */
-export function forcedFold(game: IPokerGame, playerId: PlayerID): IPokerGame {
+export function forcedFold(game: IPokerGame, playerId: PlayerID): {
+    next: IPokerGame,
+    log: GameLog
+} {
     const player = game.state.players.find(p => p.id == playerId);
-    if (player == undefined) return game;
+    if (player == undefined) return {next: game, log: []};
     if (player.id == game.state.whoseTurn) {
-        game = step(game, { type: 'fold' }).next;
+        return step(game, { type: 'fold' });
     }
     else {
         player.folded = true;
@@ -408,7 +411,10 @@ export function forcedFold(game: IPokerGame, playerId: PlayerID): IPokerGame {
         }
     }
 
-    return game;
+    return {
+        next: game,
+        log: []
+    }
 }
 
 function lexicoCompare(a: number[], b: number[]): number {
