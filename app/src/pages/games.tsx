@@ -49,9 +49,8 @@ export default function Games() {
           {
             tables.map((table, i) => {
               return (
-                <Link
+                <div
                   className="tg-poker__games-list__card"
-                  to={`/games/${table.id}`}
                   key={table.id}
                 >
                   <div
@@ -63,7 +62,12 @@ export default function Games() {
                   </div>
                   <p>Table: {table.id}</p>
                   <p>{table.connections} player{table.connections > 1 ? 's' : ''} in the room</p>
-                </Link>
+                  <Link
+                    style={{ color: 'rgb(92, 193, 51)' }}
+                    to={`/games/${table.id}`}
+                    key={table.id}
+                  >View Game</Link>
+                </div>
               )
             })
           }

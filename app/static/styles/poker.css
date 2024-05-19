@@ -271,17 +271,14 @@
   background: #fff;
   border: 1px solid #000;
   border-radius: 4px;
-  color: #000;
-  cursor: pointer;
   display: grid;
   gap: 8px;
   padding: 20px;
-  transition: 0.3s ease;
+  padding-bottom: 10px;
 }
 
-.tg-poker__games-list__card:hover {
-  background: #000;
-  color: #fff;
+.tg-poker__games-list__card>a {
+  margin-top: 6px;
 }
 
 @media (min-width: 1800px) {
