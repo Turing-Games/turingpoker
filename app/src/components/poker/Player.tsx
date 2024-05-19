@@ -18,6 +18,7 @@ interface PlayerProps {
 }
 
 const Player = ({ player, hand, hands, className, style, title, showCards, dealer}: PlayerProps) => {
+  console.log(hand, hands, player.id)
   const handToRender = hand || (hands && hands[player.id]) || [];
   const [cardEffects, setCardEffects] = useState<[CSSProperties, CSSProperties]>([{}, {}]);
   const smallScreen = useSmallScreen();
@@ -30,23 +31,29 @@ const Player = ({ player, hand, hands, className, style, title, showCards, deale
           transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
           transform: `translate(${Math.random() * 600-300}px, ${Math.random() * 600-300}px) rotate(${Math.random() * 360}deg)`,
           opacity: 0,
+          position: 'absolute'
         },
         {
           transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
           transform: `translate(${Math.random() * 600-300}px, ${Math.random() * 600-300}px) rotate(${Math.random() * 360}deg)`,
           opacity: 0,
+          position: 'absolute'
         },
       ]);
     }
     else {
-      const x1 = 13 + Math.random() * 8, x2 = 13 + Math.random() * 8;
-      const y1 = 18 + Math.random() * 8, y2 = 18 + Math.random() * 8;
+      const yoff = -25;
+      const xoff = -25;
+      const x1 = xoff + Math.random() * 8, x2 = xoff + Math.random() * 8;
+      const y1 = yoff + Math.random() * 8, y2 = yoff + Math.random() * 8;
       const r1 = 5 + Math.random() * 20, r2 = 5 + Math.random() * 20;
       if (smallScreen) {
         setCardEffects([{
-          transform: `rotate(-${r1.toFixed(2)}deg) translate(${x1.toFixed(2)}px, ${y1.toFixed(2)}px)`,
+          transform: `rotate(-${r1.toFixed(2)}deg) translate(${x1.toFixed(2)}%, ${y1.toFixed(2)}%)`,
+          position: 'absolute'
         }, {
-          transform: `rotate(${r2.toFixed(2)}deg) translate(-${x2.toFixed(2)}px, ${y2.toFixed(2)}px)`,
+          transform: `rotate(${r2.toFixed(2)}deg) translate(${(-x2).toFixed(2)}%, ${y2.toFixed(2)}%)`,
+          position: 'absolute'
         }]);
       }
       else {

@@ -115,6 +115,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
         : "Queued to join game"}
     </button>;
 
+  const verticalScreen = useSmallScreen(500, 1e9);
   const getPlayerPosition: (index: number, button?: boolean) => {
     left: string;
     bottom: string;
@@ -134,16 +135,21 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
     console.log(x, y)
 
     const scaleX = smallScreen ? 70 : 65;
-    const scaleY = button ? 70 : (smallScreen ? 63 : 65);
+    let scaleY = button ? 70 : (smallScreen ? 75 : 65);
 
     const offsetX = 0;
-    const offsetY = (smallScreen && !button) ? 8 : 0;
+    let offsetY = (smallScreen && !button) ? 20 : 0;
     const scale = button ? 0.55 : 1;
+    if (verticalScreen) {
+      scaleY *= 0.9;
+      offsetY *= 0.9;
+    }
     return {
       left: ((x*scaleX + offsetX)*scale + 50) + "%",
       bottom: ((-y*scaleY + offsetY)*scale + 50) + "%",
     }
   }
+
 
   // show game table
   return (
@@ -160,9 +166,11 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
           flexDirection: "column",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
         }}
       >
+        {/* spacer so that game board is centered minus height of controlpanel*/}
+        <div style={{ height: '24px', width: '100%' }}></div>
         <div className="tg-poker__table__dealer">
           <div
             className="opponents"

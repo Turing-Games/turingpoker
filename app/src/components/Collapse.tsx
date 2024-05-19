@@ -8,6 +8,7 @@ export default function Collapse({collapsed, children}: {
     return (
         <div className="tg-collapse" style={{
             maxWidth: collapsed ? "0" : "100%",
+            zIndex: 100
         }}>
             <div className="tg-poker__collapse__content">
                 {children}

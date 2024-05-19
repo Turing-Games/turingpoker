@@ -42,48 +42,42 @@ function GameControls({ clientState, joinLeave }: { clientState: ClientState, jo
         }}
       >
         {/* Call button */}
-        {isPlayerInGame && (
-          <div
-            style={{
-              flexDirection: "row",
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "8px",
-            }}
-          >
-            {/* Check button */}
-            <button
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id}
-              onClick={() => {
-                sendMessage(socket, {
-                  type: "action",
-                  action: { type: "call" },
-                });
-              }}
-            >
-              {isPlayerEvenWithBet ? "Check" : "Call"}
-            </button>
+        <div style={{
+          flexDirection: "row",
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "8px",
+        }}>
+          {/* Check button */}
+          <button disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || !isPlayerInGame}
+            onClick={() => {
+              sendMessage(socket, {
+                type: "action",
+                action: { type: "call" },
+              });
+            }}>
+            {isPlayerEvenWithBet ? "Check" : "Call"}
+          </button>
             {/* Raise button */}
-            <button
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < (minRaiseAmount ?? 0)}
-              onClick={handleRaise}
-            >
-              Raise
-            </button>
+          <button
+          disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < (minRaiseAmount ?? 0) || !isPlayerInGame}
+            onClick={handleRaise}
+          >
+            Raise
+          </button>
             {/* Fold button */}
-            <button
-              disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id}
-              onClick={() =>
-                sendMessage(socket, {
-                  type: "action",
-                  action: { type: "fold" },
-                })
-              }
+          <button
+          disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || !isPlayerInGame}
+            onClick={() =>
+            sendMessage(socket, {
+              type: "action",
+              action: { type: "fold" },
+            })
+            }
             >
-              Fold
-            </button>
-          </div>
-        )}
+            Fold
+          </button>
+        </div>
 
         {joinLeave && <button
           onClick={() => {

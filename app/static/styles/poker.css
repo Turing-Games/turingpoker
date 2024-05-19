@@ -32,6 +32,7 @@
   padding: 12px;
   left: 0;
   display: flex;
+  min-height: 100px;
   flex-direction: column;
   border: 2px solid rgb(92, 193, 51);
 }
@@ -49,12 +50,14 @@
   align-items: stretch;
   justify-content: space-between;
   color: rgb(92, 193, 51);
+  overflow: hidden;
 }
 
 .tg-poker__table__gameinfo {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 0;
+  min-height: 100%;
   padding: 0;
   margin: 0;
   gap: 8px;
@@ -131,7 +134,8 @@
 
 @media (min-width: 1200px) {
   .tg-poker__player__details {
-    position: static !important;
+    left: unset !important;
+    position: relative !important;
     transform: none !important;
     width: 100% !important;
   }
@@ -157,8 +161,6 @@
 
 
 .tg-poker__table__controlpanel {
-  position:absolute;
-  bottom: 12px;
   padding: 8px;
 }
 
@@ -180,10 +182,10 @@
   gap: 8px;
   margin: 0 auto;
   max-width: 1200px;
-  padding: 8px;
   position: relative;
   width: 60%;
   min-height: 40vh;
+  padding: 8px;
 }
 
 @media (max-width: 1200px) {
@@ -199,7 +201,6 @@
   justify-content: center;
   align-items: center;
   flex-direction: row;
-  width: 80%;
   flex-wrap: wrap;
 }
 
@@ -267,6 +268,7 @@
   flex-direction: row;
   gap: 8px;
   flex-wrap: wrap;
+  justify-content: space-between;
 }
 
 @media (max-width: 768px) {
@@ -288,6 +290,10 @@
 
 .opponents>div {}
 
+.car {
+  pointer-events: none;
+}
+
 @media (min-width: 1800px) {
   .card {
     height: 130px;
@@ -303,5 +309,11 @@
 @media (max-width: 1200px) {
   .card {
     height: 66px;
+  }
+}
+
+@media (max-width: 700px) {
+  .card {
+    height: 50px;
   }
 }
