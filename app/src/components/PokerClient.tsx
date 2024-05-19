@@ -16,7 +16,7 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-export default function PokerClient() {
+export default function PokerClient({ gameId }: { gameId?: string }) {
   let [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
     serverState: null,
@@ -29,11 +29,12 @@ export default function PokerClient() {
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
   useEffect(() => {
+    const roomId = Math.round(Math.random() * 10000);
     const socket = new PartySocket({
       host: import.meta.env.VITE_ENV == "production"
           ? "ws.turingpoker.com"
           : "localhost:1999",
-      room: "tgpoker",
+      room: roomId.toString(),
       party: "game",
     });
 

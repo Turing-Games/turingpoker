@@ -1,6 +1,7 @@
 import type * as Party from 'partykit/server';
 import * as Poker from '@app/party/src/game-logic/poker'
 import { ClientMessage, ServerStateMessage, ServerUpdateMessage } from './shared';
+import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 
 export interface IPlayer {
   playerId: string;
@@ -66,10 +67,11 @@ export default class PartyServer implements Party.Server {
   }
 
   // Start as soon as two players are in
+  // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    this.updateRoomList("enter", conn);
     if (this.inGamePlayers.length < 2) {
-      this.serverState.gamePhase = "pending";
+      this.updateRoomList("enter", conn);
+      this.serverState.gamePhase = 'pending'
     }
 
     this.addPlayer(conn.id);
@@ -91,7 +93,6 @@ export default class PartyServer implements Party.Server {
       } else {
         throw new Error("Invalid message type");
       }
-      console.log("Action data: ", data, websocket.id);
 
       // TODO: you shouldn't be able to start/reset game unless you are an admin
       if (data.type == "action" && Poker.isAction(data.action)) {
@@ -241,7 +242,7 @@ export default class PartyServer implements Party.Server {
     this.gameState = null;
     this.broadcastGameState();
     this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition+1)%this.inGamePlayers.length;
-    if (this.autoStart && this.inGamePlayers.length >= 2) {
+    if (this.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
       this.startGame();
     }
   }
@@ -270,7 +271,7 @@ export default class PartyServer implements Party.Server {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
       // Send game state; ensure spectators do not receive any cards information
-      const conn = this.room.getConnection(player.playerId);
+      const conn = this.party.getConnection(player.playerId);
       if (conn) {
         conn.send(JSON.stringify(message));
       }
@@ -319,7 +320,7 @@ export default class PartyServer implements Party.Server {
     }
 
     if (
-      this.autoStart &&
+      this.gameConfig.autoStart &&
       this.serverState.gamePhase === "pending" &&
       this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START
     ) {
@@ -401,7 +402,7 @@ export default class PartyServer implements Party.Server {
 
   /** Remove this room from the room listing party */
   async removeRoomFromRoomList(id: string) {
-    return this.party.context.parties.chatrooms.get(SINGLETON_ROOM_ID).fetch({
+    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id,
@@ -410,24 +411,9 @@ export default class PartyServer implements Party.Server {
     });
   }
 
-  /** Request the AI bot party to connect to this room, if not already connected */
-  async ensureAIParticipant() {
-    if (!this.botId) {
-      this.botId = nanoid();
-      this.party.context.parties.ai.get(this.party.id).fetch({
-        method: "POST",
-        body: JSON.stringify({
-          action: "connect",
-          roomId: this.party.id,
-          botId: this.botId,
-        }),
-      });
-    }
-  }
-
   /** Send room presence to the room listing party */
-  async updateRoomList(action: "enter" | "leave", connection: ChatConnection) {
-    return this.party.context.parties.chatrooms.get(SINGLETON_ROOM_ID).fetch({
+  async updateRoomList(action: "enter" | "leave", connection: Party.Connection) {
+    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id: this.party.id,
@@ -438,85 +424,6 @@ export default class PartyServer implements Party.Server {
     });
   }
 
-  async authenticateUser(proxiedRequest: Party.Request) {
-    // find the connection
-    const id = new URL(proxiedRequest.url).searchParams.get("_pk");
-    const connection = id && this.party.getConnection(id);
-    if (!connection) {
-      return error(`No connection with id ${id}`);
-    }
-
-    // authenticate the user
-    const session = await getNextAuthSession(proxiedRequest);
-    if (!session) {
-      return error(`No session found`);
-    }
-
-    this.updateRoomList("enter", connection);
-
-    connection.setState({ user: session });
-    connection.send(
-      newMessage({
-        from: { id: "system" },
-        text: `Welcome ${session.username}!`,
-      })
-    );
-
-    if (!this.party.env.OPENAI_API_KEY) {
-      connection.send(
-        systemMessage("OpenAI API key not configured. AI bot is not available")
-      );
-    }
-  }
-
-  /**
-   * Responds to HTTP requests to /parties/chatroom/:roomId endpoint
-   */
-  async onRequest(request: Party.Request) {
-    const messages = await this.ensureLoadMessages();
-
-    // mark room as created by storing its id in object storage
-    if (request.method === "POST") {
-      // respond to authentication requests proxied through the app's
-      // rewrite rules. See next.config.js in project root.
-      if (new URL(request.url).pathname.endsWith("/auth")) {
-        await this.authenticateUser(request);
-        return ok();
-      }
-
-      await this.party.storage.put("id", this.party.id);
-      return ok();
-    }
-
-    // return list of messages for server rendering pages
-    if (request.method === "GET") {
-      if (await this.party.storage.get("id")) {
-        return json<SyncMessage>({ type: "sync", messages });
-      }
-      return notFound();
-    }
-
-    // clear room history
-    if (request.method === "DELETE") {
-      await this.removeRoomMessages();
-      this.party.broadcast(JSON.stringify(<ClearRoomMessage>{ type: "clear" }));
-      this.party.broadcast(
-        newMessage({
-          from: { id: "system" },
-          text: `Room history cleared`,
-        })
-      );
-      return ok();
-    }
-
-    // respond to cors preflight requests
-    if (request.method === "OPTIONS") {
-      return ok();
-    }
-
-    return notFound();
-  }
-
   /**
    * A scheduled job that executes when the room storage alarm is triggered
    */
@@ -524,8 +431,8 @@ export default class PartyServer implements Party.Server {
     // alarms don't have access to room id, so retrieve it from storage
     const id = await this.party.storage.get<string>("id");
     if (id) {
-      await this.removeRoomMessages();
-      await this.removeRoomFromRoomList(id);
+      // await this.removeRoomMessages();
+      // await this.removeRoomFromRoomList(id);
     }
   }
 }

@@ -17,8 +17,9 @@ interface Props {
   previousActions: Record<string, Poker.Action>;
 }
 
-const PokerTable = ({ clientState, previousActions }: Props) => {
+const Poker = ({ clientState, previousActions }: Props) => {
   const serverState = clientState.serverState;
+  console.log({ serverState })
   if (!serverState) {
     return <div style={{
       display: 'flex',
@@ -73,7 +74,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
     { label: 'Dealer Position:', value: (gameState?.dealerPosition + 1).toString(), prefix: '' }
   ]
 
-  if (process.env.NODE_ENV != 'production') {
+  if (import.meta.env.DEV) {
     gameOverview.push({
       label: 'Betting Round',
       value: gameState?.round,
@@ -215,4 +216,4 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
   );
 };
 
-export default PokerTable;
+export default Poker;

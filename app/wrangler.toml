@@ -11,8 +11,8 @@ HONO_ENV = "development"
 HONO_ENV = "production"
 
 # [[kv_namespaces]]
-# binding = "turingpoker_dev"
-# id = "d32c16c2fa6b4d2099cdcbd5d023662f"
+binding = "turingpoker_dev"
+id = "d32c16c2fa6b4d2099cdcbd5d023662f"
 
 # [[r2_buckets]]
 # binding = "MY_BUCKET"
@@ -20,8 +20,8 @@ HONO_ENV = "production"
 
 # [[d1_databases]]
 # binding = "DB"
-# database_name = "turinggames"
-# database_id = ""
+# database_name = "turingpoker_dev"
+# database_id = "20e9a3cf-ec9e-4cfe-a7d4-7e39ae3f3a53"
 
 # [ai]
 # binding = "AI"

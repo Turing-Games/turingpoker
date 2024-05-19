@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, UserButton, useAuth, useUser } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo.png'
 import { ReactNode } from 'react';
 import useSmallScreen from '@app/hooks/useSmallScreen';
@@ -9,10 +9,10 @@ type Props = {
 }
 
 const sharedItems = [
-  { link: '/games', label: 'Games' },
-  { link: '/learn', label: 'Learn' },
-  { link: '/discord', label: 'Discord' }
-]
+  { link: "/games", label: "Games" },
+  { link: "/learn", label: "Learn" },
+  { link: "https://discord.gg/kz5ed2Q4QP", label: "Discord" },
+];
 
 export default function Main({ children }: Props) {
 
@@ -72,7 +72,6 @@ export default function Main({ children }: Props) {
             <SignInButton />
           </SignedOut>
           <SignedIn>
-            <Link to='play'></Link>
             <UserButton />
           </SignedIn>
         </div>

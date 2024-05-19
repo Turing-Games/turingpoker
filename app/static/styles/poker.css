@@ -290,8 +290,35 @@
 
 .opponents>div {}
 
-.car {
+.card {
   pointer-events: none;
+}
+.tg-poker__games-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.tg-poker__games-list__card {
+  background: #fff;
+  border: 1px solid #000;
+  border-radius: 4px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.tg-poker__games-list__card__delete {
+  cursor: pointer;
+  border: 1px solid #000;
+  border-radius: 50px;
+  display: inline-block;
+  justify-content: flex-end;
+  padding: 4px;
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: #fff;
 }
 
 @media (min-width: 1800px) {
