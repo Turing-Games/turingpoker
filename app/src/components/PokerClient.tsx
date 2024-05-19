@@ -29,78 +29,73 @@ export default function PokerClient() {
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
   useEffect(() => {
-    console.log('opening')
-    const connectSocket = () => {
-      const socket = new PartySocket({
-        host: import.meta.env.VITE_ENV == "production"
-            ? "ws.turingpoker.com"
-            : "localhost:1999",
-        room: "tgpoker",
-        party: "game",
-      });
+    const socket = new PartySocket({
+      host: import.meta.env.VITE_ENV == "production"
+          ? "ws.turingpoker.com"
+          : "localhost:1999",
+      room: "tgpoker",
+      party: "game",
+    });
 
-      socket.addEventListener("open", () => {
-        console.log('opened')
-        setClientState((prevState) => ({
-          ...prevState,
-          isConnected: true,
-          playerId: socket.id,
-          socket: socket,
-        }));
-      });
-
-      socket.addEventListener("message", (event) => {
-        try {
-          const data: ServerStateMessage = JSON.parse(event.data);
-          for (const update of data.lastUpdates) {
-            if (update.type == 'game-ended') {
-              setPreviousActions({})
-            }
-            if (update.type == 'action') {
-              setPreviousActions((prevState) => ({
-                ...prevState,
-                [update.player.playerId]: update.action,
-              }));
-            }
-          }
-          startTransition(() => {
-            setClientState((prevState) => ({
-              ...prevState,
-              serverState: data,
-              updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-500),
-            }));
-          });
-        } catch {
-          setClientState((prevState) => ({
-            ...prevState,
-            serverState: null,
-          }));
-        }
-      });
-
-      socket.addEventListener("close", () => {
-        setClientState((prevState) => ({
-          ...prevState,
-          isConnected: false,
-        }));
-      });
-
-      socket.addEventListener("error", (event) => {
-        console.error("WebSocket error:", event);
-      });
-
+    socket.addEventListener("open", () => {
+      console.log('connect', socket)
       setClientState((prevState) => ({
         ...prevState,
+        isConnected: true,
+        playerId: socket.id,
         socket: socket,
       }));
-    };
+    });
 
-    connectSocket();
+    socket.addEventListener("message", (event) => {
+      try {
+        const data: ServerStateMessage = JSON.parse(event.data);
+        if (!data.state) return;
+        for (const update of data.lastUpdates) {
+          if (update.type == 'game-ended') {
+            setPreviousActions({})
+          }
+          if (update.type == 'action') {
+            setPreviousActions((prevState) => ({
+              ...prevState,
+              [update.player.playerId]: update.action,
+            }));
+          }
+        }
+        startTransition(() => {
+          setClientState((prevState) => ({
+            ...prevState,
+            serverState: data,
+            updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-500),
+          }));
+        });
+      } catch {
+        setClientState((prevState) => ({
+          ...prevState,
+          serverState: null,
+        }));
+      }
+    });
+
+    socket.addEventListener("close", () => {
+      setClientState((prevState) => ({
+        ...prevState,
+        isConnected: false,
+      }));
+    });
+
+    socket.addEventListener("error", (event) => {
+      console.error("WebSocket error:", event);
+    });
+
+    setClientState((prevState) => ({
+      ...prevState,
+      socket: socket,
+    }));
+
 
     return () => {
-      if (clientState.socket) {
-        clientState.socket.close();
-      }
+      socket.close();
     };
   }, [setClientState]);
 

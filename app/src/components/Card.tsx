@@ -128,7 +128,7 @@ for (const key in cardMap) {
   };
 }
 
-const Card = forwardRef(function Card(props: {
+const Card = forwardRef<HTMLImageElement>(function Card(props: {
   value?: Poker.Card,
   style?: CSSProperties,
   className?: string

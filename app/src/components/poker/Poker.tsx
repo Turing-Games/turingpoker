@@ -132,7 +132,6 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
       x /= lo;
       y /= lo;
     }
-    console.log(x, y)
 
     const scaleX = smallScreen ? 70 : 65;
     let scaleY = button ? 70 : (smallScreen ? 75 : 65);
@@ -170,7 +169,7 @@ const PokerTable = ({ clientState, previousActions }: Props) => {
         }}
       >
         {/* spacer so that game board is centered minus height of controlpanel*/}
-        <div style={{ height: '24px', width: '100%' }}></div>
+        <div style={{ height: '12px', width: '100%' }}></div>
         <div className="tg-poker__table__dealer">
           <div
             className="opponents"

@@ -9,20 +9,20 @@ type Props = {
 }
 
 const sharedItems = [
-  { link: 'games', label: 'Games' },
-  { link: 'learn', label: 'Learn' },
-  { link: 'discord', label: 'Discord' }
+  { link: '/games', label: 'Games' },
+  { link: '/learn', label: 'Learn' },
+  { link: '/discord', label: 'Discord' }
 ]
 
 export default function Main({ children }: Props) {
 
   const isSignedIn = useAuth()?.isSignedIn
   
-  const smallScreen = useSmallScreen(1e9, 600);
+  const smallScreen = useSmallScreen(1e9, 450);
 
   const menuItems = isSignedIn ? [
     ...sharedItems,
-    { link: 'play', label: 'Play' },
+    { link: '/play', label: 'Play' },
   ] : sharedItems;
 
   return (

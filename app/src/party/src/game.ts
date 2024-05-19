@@ -249,6 +249,7 @@ export default class PartyServer implements Party.Server {
   getStateMessage(playerId: string): ServerStateMessage {
     const isSpectator =
       this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
+    console.log(this.gameState?.hands);
     return {
       gameState: this.gameState?.state ?? null,
       hand: this.gameState?.hands?.[playerId] ?? null,

@@ -18,7 +18,6 @@ interface PlayerProps {
 }
 
 const Player = ({ player, hand, hands, className, style, title, showCards, dealer}: PlayerProps) => {
-  console.log(hand, hands, player.id)
   const handToRender = hand || (hands && hands[player.id]) || [];
   const [cardEffects, setCardEffects] = useState<[CSSProperties, CSSProperties]>([{}, {}]);
   const smallScreen = useSmallScreen();
@@ -65,7 +64,6 @@ const Player = ({ player, hand, hands, className, style, title, showCards, deale
       }
     }
   }, [player.folded, smallScreen]);
-  console.log(cardEffects)
 
   return (
     <div className={`tg-poker__player${className ? '.' + className : ''}`} style={style}>
