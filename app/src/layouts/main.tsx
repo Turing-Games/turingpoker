@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton, useAuth, useUser } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo-dark.png'
+import MobileLogo from '../../static/images/logo.png'
 import { ReactNode } from 'react';
 import useSmallScreen from '@app/hooks/useSmallScreen';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
@@ -46,7 +47,8 @@ export default function Main({ children }: Props) {
         })
       }}>
         <Link to='/'>
-          <img src={Logo} style={{ height: 40 }} />
+          <img src={Logo} alt="Logo" className="desktop" style={{ height: 40 }} />
+          <img src={MobileLogo} alt="Logo" className="mobile" style={{ height: 40 }} />
         </Link>
         <div style={{
           gap: '8px',
