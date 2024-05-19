@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { SignedIn, SignedOut, SignInButton, UserButton, useAuth } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, UserButton, useAuth, useUser } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo.png'
 import { ReactNode } from 'react';
 

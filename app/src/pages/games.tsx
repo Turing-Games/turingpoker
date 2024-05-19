@@ -2,7 +2,7 @@ import * as React from 'react'
 import Main from '@app/layouts/main';
 import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { TrashIcon } from '@radix-ui/react-icons';
-import { SignedIn } from '@clerk/clerk-react';
+import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
 import { useAuth } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
@@ -14,8 +14,7 @@ export default function Games() {
   const [tables, setTables] = React.useState([])
 
   const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
-
-  const isSignedIn = useAuth()?.isSignedIn
+  const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
 
   const deleteTable = async (id: number) => {
     const res = await fetch(partyUrl, {
@@ -49,25 +48,23 @@ export default function Games() {
           {
             tables.map((table, i) => {
               return (
-                <div
+                <Link
                   className="tg-poker__games-list__card"
+                  to={`/games/${table.id}`}
                   key={table.id}
                 >
-                  <div
-                    onClick={() => {
-                      deleteTable(table.id)
-                    }}
-                  >
-                    <TrashIcon />
-                  </div>
+                  {isAdmin &&
+                    <div
+                      onClick={() => {
+                        deleteTable(table.id)
+                      }}
+                    >
+                      <TrashIcon />
+                    </div>
+                  }
                   <p>Table: {table.id}</p>
                   <p>{table.connections} player{table.connections > 1 ? 's' : ''} in the room</p>
-                  <Link
-                    style={{ color: 'rgb(92, 193, 51)' }}
-                    to={`/games/${table.id}`}
-                    key={table.id}
-                  >View Game</Link>
-                </div>
+                </Link>
               )
             })
           }

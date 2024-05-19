@@ -277,10 +277,6 @@
   padding-bottom: 10px;
 }
 
-.tg-poker__games-list__card>a {
-  margin-top: 6px;
-}
-
 @media (min-width: 1800px) {
   .card {
     height: 130px;
