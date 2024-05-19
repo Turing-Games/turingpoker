@@ -3,7 +3,7 @@
   "name": "turinggames-poker",
   "main": "src/party/src/main.ts",
   "parties": {
-    "games": "src/party/src/games.ts",
+    "poker": "src/party/src/poker.ts",
     "tables": "src/party/src/tables.ts"
   },
   "compatibilityDate": "2024-04-08"

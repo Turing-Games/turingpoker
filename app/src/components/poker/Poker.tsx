@@ -18,6 +18,7 @@ interface Props {
 
 const Poker = ({ clientState, previousActions }: Props) => {
   const serverState = clientState.serverState;
+  console.log({ serverState })
   if (!serverState) {
     return null;
   }

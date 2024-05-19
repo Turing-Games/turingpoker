@@ -5,6 +5,7 @@ import { TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
 import { useAuth } from '@clerk/clerk-react';
+import { Link } from 'react-router-dom';
 
 
 export default function Games() {
@@ -46,7 +47,18 @@ export default function Games() {
           {
             tables.map((table, i) => {
               return (
-                <div style={{ cursor: 'pointer', background: '#fff', border: '1px solid #000', borderRadius: 4, padding: 20 }}>
+                <div
+                  key={table.id}
+                  style={{
+                    display: 'grid',
+                    gap: 8,
+                    cursor: 'pointer',
+                    background: '#fff',
+                    border: '1px solid #000',
+                    borderRadius: 4,
+                    padding: 20
+                  }}
+                >
                   <div
                     onClick={() => {
                       deleteTable(table.id)
@@ -54,17 +66,26 @@ export default function Games() {
                   >
                     <TrashIcon />
                   </div>
-                  <p style={{ margin: '8px 0' }}>Table: {table.id}</p>
+                  <p>Table: {table.id}</p>
                   <p>{table.connections} player{table.connections > 1 ? 's' : ''} in the room</p>
                   <SignedIn>
-                    <button
-                      onClick={() => {
-                        sendMessage(socket, { type: "join-game" });
-                      }}
-                    >
-                      Join game
+                    <button>
+                      <Link
+                        to={`/games/${table.id}`}
+                        style={{ color: '#fff' }}
+                      >
+                        Join game
+                      </Link>
                     </button>
                   </SignedIn>
+                  <button>
+                    <Link
+                      to={`/games/${table.id}`}
+                      style={{ color: '#fff' }}
+                    >
+                      Spectate
+                    </Link>
+                  </button>
                 </div>
               )
             })

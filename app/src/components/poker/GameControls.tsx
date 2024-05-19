@@ -1,6 +1,7 @@
 import React from "react";
 import { ClientState } from "@app/client";
 import { sendMessage } from "@app/party/src/utils/websocket";
+import { useAuth } from "@clerk/clerk-react";
 
 function GameControls({ clientState }: { clientState: ClientState }) {
   const serverState = clientState?.serverState;
@@ -28,6 +29,9 @@ function GameControls({ clientState }: { clientState: ClientState }) {
       alert(`Invalid raise amount. You must raise at least $${minRaiseAmount}.`);
     }
   };
+
+  const isSignedIn = useAuth()?.isSignedIn
+  const playerCanJoin = isSignedIn && !isPlayerInGame
 
   // Render game controls
   return (
@@ -87,18 +91,14 @@ function GameControls({ clientState }: { clientState: ClientState }) {
 
         <button
           onClick={() => {
-            if (isPlayerSpectating) {
+            if (playerCanJoin) {
               sendMessage(socket, { type: "join-game" });
             } else {
               sendMessage(socket, { type: "spectate" });
             }
           }}
         >
-          {isPlayerSpectating
-            ? "Join game"
-            : isPlayerInGame
-              ? "Leave game"
-              : "Queued to join game"}
+          {playerCanJoin ? "Join game" : "Spectate"}
         </button>
       </div>
     </div>

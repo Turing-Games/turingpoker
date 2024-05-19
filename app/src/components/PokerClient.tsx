@@ -15,7 +15,7 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-export default function PokerClient() {
+export default function PokerClient({ gameId }: { gameId?: string }) {
   let [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
     serverState: null,
@@ -32,7 +32,7 @@ export default function PokerClient() {
       const socket = new PartySocket({
         // host: 'localhost:1999',
         host: 'ws.turingpoker.com',
-        room: `tgpoker-${roomId}`,
+        room: gameId || `tgpoker-${roomId}`,
         party: "games"
       });
 
