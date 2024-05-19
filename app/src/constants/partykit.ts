@@ -1,9 +1,8 @@
-const PARTYKIT_HOST = import.meta.env?.VITE_ENV == 'production' ? 'ws.turingpoker.com' : 'localhost:1999'
+// const PARTYKIT_HOST = 'localhost:1999'
+const PARTYKIT_HOST = 'ws.turingpoker.com'
 
-export const PARTYKIT_PROTOCOL =
-  import.meta.env?.VITE_ENV === 'production'
-    ? "https"
-    : "http";
+// export const PARTYKIT_PROTOCOL = 'http'
+export const PARTYKIT_PROTOCOL = 'https'
 
 export const PARTYKIT_URL = `${PARTYKIT_PROTOCOL}://${PARTYKIT_HOST}`;
 

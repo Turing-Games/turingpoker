@@ -314,7 +314,7 @@ export default class PartyServer implements Party.Server {
 
   /** Remove this room from the room listing party */
   async removeRoomFromRoomList(id: string) {
-    return this.party.context.parties.chatrooms.get(SINGLETON_ROOM_ID).fetch({
+    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id,
@@ -325,7 +325,7 @@ export default class PartyServer implements Party.Server {
 
   /** Send room presence to the room listing party */
   async updateRoomList(action: "enter" | "leave", connection: Party.Connection) {
-    return this.party.context.parties.chatrooms.get(SINGLETON_ROOM_ID).fetch({
+    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id: this.party.id,

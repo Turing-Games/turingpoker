@@ -62,7 +62,7 @@ const Poker = ({ clientState, previousActions }: Props) => {
     { label: 'Dealer Position:', value: (gameState?.dealerPosition + 1).toString(), prefix: '' }
   ]
 
-  if (process.env.NODE_ENV != 'production') {
+  if (import.meta.env.DEV) {
     gameOverview.push({
       label: 'Betting Round',
       value: gameState?.round,
@@ -174,4 +174,4 @@ const Poker = ({ clientState, previousActions }: Props) => {
   );
 };
 
-export default PokerTable;
+export default Poker;

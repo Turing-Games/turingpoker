@@ -39,7 +39,6 @@ export default function Main({ children }: Props) {
             <SignInButton />
           </SignedOut>
           <SignedIn>
-            <Link to='play'></Link>
             <UserButton />
           </SignedIn>
         </div>

@@ -12,7 +12,6 @@ export default function Games() {
   const [loading, setLoading] = React.useState(false)
   const [tables, setTables] = React.useState([])
 
-  const host = import.meta.env.VITE_ENV == 'production' ? 'ws.turingpoker.com' : 'localhost:1999'
   const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
 
   const isSignedIn = useAuth()?.isSignedIn

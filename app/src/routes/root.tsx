@@ -28,10 +28,10 @@ if (!PUBLISHABLE_KEY) {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Games />,
+    element: <Home />,
   },
   {
-    path: "games",
+    path: "/games",
     element: <Games />,
   },
 ]);

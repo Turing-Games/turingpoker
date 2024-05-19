@@ -30,9 +30,10 @@ export default function PokerClient() {
     const roomId = Math.round(Math.random() * 10000)
     const connectSocket = () => {
       const socket = new PartySocket({
-        host: import.meta?.env?.VITE_ENV == 'production' ? 'ws.turingpoker.com' : 'localhost:1999',
+        // host: 'localhost:1999',
+        host: 'ws.turingpoker.com',
         room: `tgpoker-${roomId}`,
-        party: "game"
+        party: "tables"
       });
 
       socket.addEventListener("open", () => {
