@@ -48,13 +48,10 @@ export default function Games() {
           {
             tables.map((table, i) => {
               return (
-                <Link
-                  className="tg-poker__games-list__card"
-                  to={`/games/${table.id}`}
-                  key={table.id}
-                >
+                <div style={{ position: 'relative' }}>
                   {isAdmin &&
                     <div
+                      className="tg-poker__games-list__card__delete"
                       onClick={() => {
                         deleteTable(table.id)
                       }}
@@ -62,9 +59,15 @@ export default function Games() {
                       <TrashIcon />
                     </div>
                   }
-                  <p>Table: {table.id}</p>
-                  <p>{table.connections} player{table.connections > 1 ? 's' : ''} in the room</p>
-                </Link>
+                  <Link
+                    className="tg-poker__games-list__card"
+                    to={`/games/${table.id}`}
+                    key={table.id}
+                  >
+                    <p>Table: {table.id}</p>
+                    <p>{table.connections} player{table.connections > 1 ? 's' : ''} in the room</p>
+                  </Link>
+                </div>
               )
             })
           }
