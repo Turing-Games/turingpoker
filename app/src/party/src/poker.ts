@@ -39,14 +39,7 @@ export default class PartyServer implements Party.Server {
 
   public queuedUpdates: ServerUpdateMessage[] = [];
 
-  constructor(
-    public readonly room: Party.Room,
-    public readonly autoStart: boolean = true,
-    public readonly party: Party.Party
-  ) {
-    this.room = room;
-    this.party = party;
-  }
+  constructor(public readonly party: Party.Party) {}
 
   onStart(): void | Promise<void> {
     this.timeoutLoopInterval = setInterval(() => {
@@ -71,7 +64,7 @@ export default class PartyServer implements Party.Server {
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
     if (this.inGamePlayers.length < 2) {
       this.updateRoomList("enter", conn);
-      this.serverState.gamePhase = 'pending'
+      this.serverState.gamePhase = "pending";
     }
 
     this.addPlayer(conn.id);
@@ -137,7 +130,10 @@ export default class PartyServer implements Party.Server {
       return;
     }
 
-    if (this.gameState.state.whoseTurn !== playerId || this.gameState.state.done) {
+    if (
+      this.gameState.state.whoseTurn !== playerId ||
+      this.gameState.state.done
+    ) {
       console.log("Player attempted to make action out of turn", playerId);
       return;
     }
@@ -241,8 +237,8 @@ export default class PartyServer implements Party.Server {
     });
     this.gameState = null;
     this.broadcastGameState();
-    this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition+1)%this.inGamePlayers.length;
-    if (this.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
+    this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
+    if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
       this.startGame();
     }
   }
@@ -364,8 +360,7 @@ export default class PartyServer implements Party.Server {
             message,
           });
         }
-      }
-      catch (e) {
+      } catch (e) {
         console.error("Error in forced fold", e);
       }
     }
@@ -392,8 +387,7 @@ export default class PartyServer implements Party.Server {
       this.endGame(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );
-    }
-    else if (this.inGamePlayers.length < 2) {
+    } else if (this.inGamePlayers.length < 2) {
       this.endGame("fold");
     }
 
@@ -412,7 +406,10 @@ export default class PartyServer implements Party.Server {
   }
 
   /** Send room presence to the room listing party */
-  async updateRoomList(action: "enter" | "leave", connection: Party.Connection) {
+  async updateRoomList(
+    action: "enter" | "leave",
+    connection: Party.Connection
+  ) {
     return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({

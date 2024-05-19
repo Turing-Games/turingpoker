@@ -34,8 +34,8 @@ export default function PokerClient({ gameId }: { gameId?: string }) {
       host: import.meta.env.VITE_ENV == "production"
           ? "ws.turingpoker.com"
           : "localhost:1999",
-      room: roomId.toString(),
-      party: "game",
+      room: gameId ?? roomId.toString(),
+      party: "poker",
     });
 
     socket.addEventListener("open", () => {
