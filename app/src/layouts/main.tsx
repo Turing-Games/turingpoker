@@ -3,27 +3,21 @@ import { SignedIn, SignedOut, SignInButton, UserButton, useAuth, useUser } from 
 import Logo from '../../static/images/logo-dark.png'
 import { ReactNode } from 'react';
 import useSmallScreen from '@app/hooks/useSmallScreen';
+import { DiscordLogoIcon } from '@radix-ui/react-icons';
 
 type Props = {
   children: ReactNode
 }
 
-const sharedItems = [
+const menuItems = [
   { link: "/games", label: "Games" },
   { link: "/learn", label: "Learn" },
-  { link: "https://discord.gg/kz5ed2Q4QP", label: "Discord" },
+  { link: "https://discord.gg/kz5ed2Q4QP", label: <DiscordLogoIcon /> },
 ];
 
 export default function Main({ children }: Props) {
 
-  const isSignedIn = useAuth()?.isSignedIn
-
   const smallScreen = useSmallScreen(1e9, 450);
-
-  const menuItems = isSignedIn ? [
-    ...sharedItems,
-    { link: '/play', label: 'Play' },
-  ] : sharedItems;
 
   return (
     <div style={{
