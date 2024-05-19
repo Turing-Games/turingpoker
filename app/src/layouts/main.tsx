@@ -17,7 +17,7 @@ const sharedItems = [
 export default function Main({ children }: Props) {
 
   const isSignedIn = useAuth()?.isSignedIn
-  
+
   const smallScreen = useSmallScreen(1e9, 450);
 
   const menuItems = isSignedIn ? [
@@ -55,13 +55,14 @@ export default function Main({ children }: Props) {
           <img src={Logo} style={{ height: 40 }} />
         </Link>
         <div style={{
-          alignItems: 'baseline',
           gap: '8px',
           display: 'flex',
           textAlign: 'left',
           ...(smallScreen ? {
+            alignItems: 'baseline',
             flexDirection: 'column',
           } : {
+            alignItems: 'center',
             flexDirection: 'row'
           })
         }}>
