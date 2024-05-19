@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton, useAuth, useUser } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo-dark.png'
 import MobileLogo from '../../static/images/logo.png'
@@ -13,7 +13,7 @@ type Props = {
 const menuItems = [
   { link: "/games", label: "Games" },
   { link: "/learn", label: "Learn" },
-  { link: "https://discord.gg/kz5ed2Q4QP", label: <DiscordLogoIcon /> },
+  { link: "https://discord.gg/kz5ed2Q4QP", label: <DiscordLogoIcon />, target: '_blank' },
 ];
 
 export default function Main({ children }: Props) {
@@ -64,7 +64,16 @@ export default function Main({ children }: Props) {
         }}>
           {
             menuItems.map((item) => {
-              return <Link key={item.link} to={item.link}>{item.label}</Link>
+              return (
+                <NavLink
+                  key={item.link}
+                  to={item.link}
+                  target={item.target ?? '_self'}
+                  className={({ isActive, isPending }) => isActive ? "menu-active" : ""}
+                >
+                  {item.label}
+                </NavLink>
+              )
             })
           }
           <SignedOut>
@@ -74,13 +83,13 @@ export default function Main({ children }: Props) {
             <UserButton />
           </SignedIn>
         </div>
-      </header>
+      </header >
       <main style={{
         position: 'relative',
         flexGrow: 1
       }}>
         {children}
       </main>
-    </div>
+    </div >
   )
 }

@@ -31,9 +31,7 @@ export default function PokerClient({ gameId }: { gameId?: string }) {
   useEffect(() => {
     const roomId = Math.round(Math.random() * 10000);
     const socket = new PartySocket({
-      host: import.meta.env.VITE_ENV == "production"
-          ? "ws.turingpoker.com"
-          : "localhost:1999",
+      host: "ws.turingpoker.com",
       room: gameId ?? roomId.toString(),
       party: "poker",
     });
