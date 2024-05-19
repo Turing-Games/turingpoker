@@ -44,7 +44,9 @@ export default function Main({ children }: Props) {
         textAlign: 'left',
         ...(smallScreen ? {
           flexDirection: 'column',
-          padding: '8px'
+          padding: '8px',
+          borderBottom: 'none',
+          borderRight: '1px solid black',
         } : {
           flexDirection: 'row'
         })
