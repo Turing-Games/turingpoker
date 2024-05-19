@@ -8,9 +8,9 @@ type Props = {
 }
 
 const sharedItems = [
-  { link: 'games', label: 'Games' },
-  { link: 'learn', label: 'Learn' },
-  { link: 'discord', label: 'Discord' }
+  { link: '/games', label: 'Games' },
+  { link: '/learn', label: 'Learn' },
+  // { link: 'discord', label: 'Discord' }
 ]
 
 export default function Main({ children }: Props) {
@@ -19,7 +19,7 @@ export default function Main({ children }: Props) {
 
   const menuItems = isSignedIn ? [
     ...sharedItems,
-    { link: 'play', label: 'Play' },
+    { link: '/play', label: 'Play' },
   ] :
     sharedItems
 

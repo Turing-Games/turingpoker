@@ -25,7 +25,6 @@ export default function Games() {
       })
     });
     const rooms = ((await res.json()) ?? []);
-    console.log(rooms)
     setTables(rooms)
   }
 
@@ -33,7 +32,6 @@ export default function Games() {
     const getData = async () => {
       const res = await fetch(partyUrl);
       const rooms = ((await res.json()) ?? []);
-      console.log(rooms)
       setTables(rooms)
     }
 

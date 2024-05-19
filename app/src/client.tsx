@@ -15,7 +15,6 @@ export type ClientState = {
 
 window.addEventListener('load', () => {
   const rootDiv = document.getElementById("root");
-  console.log('loaded')
   const root = createRoot(rootDiv!);
   root.render(<Root />);
 });

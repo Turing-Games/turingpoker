@@ -22,8 +22,6 @@ const Poker = ({ clientState, previousActions }: Props) => {
     return null;
   }
 
-  console.log({ clientState })
-
   const socket = clientState.socket
   const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
   const gameState = serverState.gameState;

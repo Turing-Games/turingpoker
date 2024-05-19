@@ -33,11 +33,10 @@ export default function PokerClient() {
         // host: 'localhost:1999',
         host: 'ws.turingpoker.com',
         room: `tgpoker-${roomId}`,
-        party: "tables"
+        party: "games"
       });
 
       socket.addEventListener("open", () => {
-        console.log('opened')
         setClientState((prevState) => ({
           ...prevState,
           isConnected: true,
@@ -51,7 +50,6 @@ export default function PokerClient() {
           const data: ServerStateMessage = JSON.parse(event.data);
           for (const update of data.lastUpdates) {
             if (update.type == 'game-ended') {
-              console.log('done')
               setPreviousActions({})
             }
             if (update.type == 'action') {

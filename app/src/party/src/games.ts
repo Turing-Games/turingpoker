@@ -56,7 +56,6 @@ export default class PartyServer implements Party.Server {
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
     if (this.inGamePlayers.length < 2) {
-      console.log('connected with less than 2')
       this.updateRoomList("enter", conn);
       this.serverState.gamePhase = 'pending'
     }
@@ -80,7 +79,6 @@ export default class PartyServer implements Party.Server {
       else {
         throw new Error("Invalid message type");
       }
-      console.log("Action data: ", data, websocket.id);
 
       // TODO: you shouldn't be able to start/reset game unless you are an admin
       if (data.type == "action" && Poker.isAction(data.action)) {
