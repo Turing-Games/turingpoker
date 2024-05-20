@@ -1,6 +1,6 @@
 import type * as Party from 'partykit/server';
 import * as Poker from '@app/party/src/game-logic/poker'
-import { ClientMessage, ServerStateMessage, ServerUpdateMessage } from './shared';
+import { ClientMessage, ServerStateMessage, ServerUpdateMessage, TABLE_STATE_VERSION, TableState } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 
 export interface IPlayer {
@@ -64,7 +64,6 @@ export default class PartyServer implements Party.Server {
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
     console.log(ctx.request.cf);
     if (this.inGamePlayers.length < 2) {
-      this.updateRoomList("enter", conn);
       this.serverState.gamePhase = "pending";
     }
 
@@ -73,7 +72,6 @@ export default class PartyServer implements Party.Server {
 
   onClose(conn: Party.Connection) {
     this.removePlayer(conn.id);
-    this.updateRoomList("leave", conn);
   }
 
   onMessage(message: string, websocket: Party.Connection): void {
@@ -274,6 +272,25 @@ export default class PartyServer implements Party.Server {
       }
     }
     this.queuedUpdates = [];
+
+    const tableState: TableState = {
+      queuedPlayers: this.queuedPlayers,
+      spectatorPlayers: this.spectatorPlayers,
+      inGamePlayers: this.inGamePlayers,
+      config: this.gameConfig,
+      gameState: this.gameState?.state ?? null,
+      id: this.party.id,
+      version: TABLE_STATE_VERSION
+    }
+
+    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+      method: "POST",
+      body: JSON.stringify({
+        id: this.party.id,
+        action: 'update',
+        tableState
+      }),
+    });
   }
 
   playerSpectate(playerId: string) {
@@ -401,22 +418,6 @@ export default class PartyServer implements Party.Server {
       body: JSON.stringify({
         id,
         action: "delete",
-      }),
-    });
-  }
-
-  /** Send room presence to the room listing party */
-  async updateRoomList(
-    action: "enter" | "leave",
-    connection: Party.Connection
-  ) {
-    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
-      method: "POST",
-      body: JSON.stringify({
-        id: this.party.id,
-        connections: [...this.party.getConnections()].length,
-        user: connection.state?.user,
-        action,
       }),
     });
   }

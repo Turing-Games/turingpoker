@@ -1,5 +1,5 @@
 import * as Poker from './game-logic/poker';
-import { IPartyServerState, IPlayer } from './server';
+import { IPartyServerState, IPlayer } from './poker';
 
 export type ClientMessage = {
     type: 'action',
@@ -47,3 +47,15 @@ export type ServerStateMessage = {
     lastUpdates: ServerUpdateMessage[]
     config: Poker.IPokerConfig
 }
+
+export type TableState = {
+    id: string;
+    queuedPlayers: IPlayer[];
+    spectatorPlayers: IPlayer[];
+    inGamePlayers: IPlayer[];
+    config: Poker.IPokerConfig;
+    gameState: Poker.IPokerSharedState | null;
+    // bump this when making breaking changes so the client doesn't try to render it
+    version: number;
+}
+export const TABLE_STATE_VERSION = 0;

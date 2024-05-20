@@ -1,5 +1,6 @@
 import type * as Party from "partykit/server";
 import { json, notFound } from "./utils/response";
+import { TableState } from "./shared";
 
 /**
  * The tables party's purpose is to keep track of all chat rooms, so we want
@@ -7,28 +8,16 @@ import { json, notFound } from "./utils/response";
  */
 export const SINGLETON_ROOM_ID = "tgpoker";
 
-/** Chat room sends an update when participants join/leave */
+/** Poker room sends an update whenever server state changes */
 export type RoomInfoUpdateRequest = {
+  action: 'update';
   id: string;
-  connections: number;
-  action: "enter" | "leave";
-  user?: User;
+  tableState: TableState;
 };
 
-/** Chat room notifies us when it's deleted  */
 export type RoomDeleteRequest = {
   id: string;
   action: "delete";
-};
-
-/** Chat rooms sends us information about connections and users */
-export type RoomInfo = {
-  id: string;
-  connections: number;
-  users: {
-    username: string;
-    present: boolean;
-  }[];
 };
 
 export default class TablesServer implements Party.Server {
@@ -69,8 +58,8 @@ export default class TablesServer implements Party.Server {
     return notFound();
   }
   /** Fetches list of active rooms */
-  async getActiveRooms(): Promise<RoomInfo[]> {
-    const rooms = await this.party.storage.list<RoomInfo>();
+  async getActiveRooms(): Promise<TableState[]> {
+    const rooms = await this.party.storage.list<TableState>();
     return [...rooms.values()];
   }
   /** Updates list of active rooms with information received from chatroom */
@@ -79,49 +68,19 @@ export default class TablesServer implements Party.Server {
       | RoomInfoUpdateRequest
       | RoomDeleteRequest;
 
-      console.log('room infom', update)
     if (update.action === "delete") {
       await this.party.storage.delete(update.id);
       return this.getActiveRooms();
     }
 
-    const persistedInfo = await this.party.storage.get<RoomInfo>(update.id);
-    if (!persistedInfo && update.action === "leave") {
-      return this.getActiveRooms();
-    }
-
-    const info = persistedInfo ?? {
-      id: update.id,
-      connections: 0,
-      users: [],
-    };
-
-    info.connections = update.connections;
-    if (info.connections == 0) {
+    const info = update.tableState;
+    if (info.queuedPlayers.length + info.spectatorPlayers.length + info.inGamePlayers.length == 0) {
       // if no users are present, delete the room
       await this.party.storage.delete(update.id);
       return this.getActiveRooms();
     }
 
-    const user = update.user;
-    if (user) {
-      if (update.action === "enter") {
-        // bump user to the top of the list on entry
-        info.users = info.users.filter((u) => u.username !== user.username);
-        info.users.unshift({
-          username: user.username,
-          image: user.image,
-          joinedAt: new Date().toISOString(),
-          present: true,
-        });
-      } else {
-        info.users = info.users.map((u) =>
-          u.username === user.username
-            ? { ...u, present: false, leftAt: new Date().toISOString() }
-            : u
-        );
-      }
-    }
+    this.party.storage.put(update.id, info);
 
     await this.party.storage.put(update.id, info);
     return this.getActiveRooms();
