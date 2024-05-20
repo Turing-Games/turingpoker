@@ -79,6 +79,7 @@ export default class TablesServer implements Party.Server {
       | RoomInfoUpdateRequest
       | RoomDeleteRequest;
 
+      console.log('room infom', update)
     if (update.action === "delete") {
       await this.party.storage.delete(update.id);
       return this.getActiveRooms();
@@ -96,6 +97,11 @@ export default class TablesServer implements Party.Server {
     };
 
     info.connections = update.connections;
+    if (info.connections == 0) {
+      // if no users are present, delete the room
+      await this.party.storage.delete(update.id);
+      return this.getActiveRooms();
+    }
 
     const user = update.user;
     if (user) {
@@ -114,11 +120,6 @@ export default class TablesServer implements Party.Server {
             ? { ...u, present: false, leftAt: new Date().toISOString() }
             : u
         );
-        if (info.users.filter((u) => u.present).length === 0) {
-          // if no users are present, delete the room
-          await this.party.storage.delete(update.id);
-          return this.getActiveRooms();
-        }
       }
     }
 

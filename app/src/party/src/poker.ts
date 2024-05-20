@@ -373,7 +373,6 @@ export default class PartyServer implements Party.Server {
     this.queuedPlayers = this.queuedPlayers.filter(
       (player) => player.playerId !== playerId
     );
-    console.log(this.spectatorPlayers, this.inGamePlayers, this.queuedPlayers);
     this.queuedUpdates.push({
       type: "player-left",
       player: {

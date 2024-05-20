@@ -6,6 +6,7 @@ import * as PokerLogic from "..//party/src/game-logic/poker";
 import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 
 import '@static/styles/styles.css'
+import { PARTYKIT_URL } from '@app/constants/partykit';
 
 export type ClientState = {
   isConnected: boolean;
@@ -31,7 +32,7 @@ export default function PokerClient({ gameId }: { gameId?: string }) {
   useEffect(() => {
     const roomId = Math.round(Math.random() * 10000);
     const socket = new PartySocket({
-      host: "ws.turingpoker.com",
+      host: PARTYKIT_URL,
       room: gameId ?? roomId.toString(),
       party: "poker",
     });
