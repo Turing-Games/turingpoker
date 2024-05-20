@@ -62,6 +62,7 @@ export default class PartyServer implements Party.Server {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
+    console.log(ctx.request.cf);
     if (this.inGamePlayers.length < 2) {
       this.updateRoomList("enter", conn);
       this.serverState.gamePhase = "pending";
