@@ -114,6 +114,10 @@ export default class TablesServer implements Party.Server {
             ? { ...u, present: false, leftAt: new Date().toISOString() }
             : u
         );
+        if (info.users.filter((u) => u.present).length === 0) {
+          // if no users are present, delete the room
+          await this.party.storage.delete(update.id);
+          return this.getActiveRooms();
       }
     }
 
