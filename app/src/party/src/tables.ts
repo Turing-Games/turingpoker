@@ -118,6 +118,7 @@ export default class TablesServer implements Party.Server {
           // if no users are present, delete the room
           await this.party.storage.delete(update.id);
           return this.getActiveRooms();
+        }
       }
     }
 
