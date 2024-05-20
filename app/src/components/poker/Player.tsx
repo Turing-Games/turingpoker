@@ -41,11 +41,11 @@ const Player = ({ player, hand, hands, className, style, title, showCards, deale
       ]);
     }
     else {
-      const yoff = -25;
-      const xoff = -25;
+      const yoff = -140;
+      const xoff = 25;
       const x1 = xoff + Math.random() * 8, x2 = xoff + Math.random() * 8;
       const y1 = yoff + Math.random() * 8, y2 = yoff + Math.random() * 8;
-      const r1 = 5 + Math.random() * 20, r2 = 5 + Math.random() * 20;
+      const r1 = 10 + Math.random() * 15, r2 = 10 + Math.random() * 15;
       if (smallScreen) {
         setCardEffects([{
           transform: `rotate(-${r1.toFixed(2)}deg) translate(${x1.toFixed(2)}%, ${y1.toFixed(2)}%)`,

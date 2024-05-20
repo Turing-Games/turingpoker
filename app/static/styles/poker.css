@@ -45,8 +45,7 @@
   padding: 0;
   display: flex;
   flex-direction: row;
-  height: 100%;
-  width: 100%;
+  flex-grow: 1;
   align-items: stretch;
   justify-content: space-between;
   color: rgb(92, 193, 51);
@@ -195,6 +194,13 @@
   }
 }
 
+@media (max-width: 700px) {
+  .tg-poker__table__dealer {
+    border-radius: 32px;
+    width: 40%;
+  }
+}
+
 .tg-poker__table__dealer__cards {
   display: flex;
   gap: 8px;
@@ -212,15 +218,6 @@
 
 .tg-poker__table__dealer__placeholder-card {
   opacity: 0;
-}
-
-.tg-poker__dealer-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(5, 1fr);
-  position: absolute;
-  width: 100%;
-  height: 100%;
 }
 
 .tg-poker__winner {
@@ -263,7 +260,7 @@
   background: black;
   border-radius: 4px;
   width: fit-content;
-  margin: 16px;
+  margin: 0px;
   display: flex;
   flex-direction: row;
   gap: 8px;
@@ -278,8 +275,6 @@
 }
 
 .tg-poker__table__player-container {
-  width: 200px;
-  height: 150px;
   position: absolute;
   /* no idea why the second dimension needs to be positive */
   transform: translate(-50%, 50%);
@@ -342,5 +337,12 @@
 @media (max-width: 700px) {
   .card {
     height: 50px;
+  }
+}
+
+
+@media (max-height: 300px) {
+  .card {
+    height: 40px;
   }
 }

@@ -117,10 +117,10 @@ const Poker = ({ clientState, previousActions }: Props) => {
     </button>;
 
   const verticalScreen = useSmallScreen(500, 1e9);
-  const getPlayerPosition: (index: number, button?: boolean) => {
+  const getPlayerPosition: (index: number) => {
     left: string;
     bottom: string;
-  } = (index: number, button: boolean=false) => {
+  } = (index: number) => {
     const cnt = inGamePlayers?.length ?? 1;
     const angle =
       (index / cnt) * Math.PI * 2 + angleOffset;
@@ -135,11 +135,11 @@ const Poker = ({ clientState, previousActions }: Props) => {
     }
 
     const scaleX = smallScreen ? 70 : 65;
-    let scaleY = button ? 70 : (smallScreen ? 75 : 65);
+    let scaleY = smallScreen ? 75 : 65;
 
     const offsetX = 0;
-    let offsetY = (smallScreen && !button) ? 20 : 0;
-    const scale = button ? 0.55 : 1;
+    let offsetY = smallScreen ? -15 : 0;
+    const scale = 1;
     if (verticalScreen) {
       scaleY *= 0.9;
       offsetY *= 0.9;

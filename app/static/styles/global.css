@@ -26,8 +26,13 @@ a:visited {
   height: 100%;
 }
 
+html {
+  height: 100%;
+}
+
 body {
   font-family: sans-serif;
+  height: 100%;
   font-size: 12px;
   line-height: 1.5;
   color: #333;

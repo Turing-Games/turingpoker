@@ -86,6 +86,9 @@ export default function Main({ children }: Props) {
       </header >
       <main style={{
         position: 'relative',
+        display: 'flex',
+        alignItems: 'stretch',
+        justifyContent: 'stretch',
         flexGrow: 1
       }}>
         {children}
