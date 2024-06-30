@@ -1,0 +1,9 @@
+{
+  "short_name": "Turing Poker",
+  "name": "Turing Poker",
+  "icons": [
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "landscape"
+}

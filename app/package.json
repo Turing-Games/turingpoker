@@ -1,0 +1,42 @@
+{
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" --kill-others --prefix app",
+    "build": "vite build --mode client && vite build",
+    "dev:hono": "vite --host",
+    "dev:wrangler": "wrangler dev src/index.tsx",
+    "test": "jest",
+    "dev:partykit": "npx partykit dev --live",
+    "deploy:pages": "npm run build && wrangler pages deploy dist",
+    "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com"
+  },
+  "dependencies": {
+    "@clerk/clerk-react": "^5.1.0",
+    "@radix-ui/react-icons": "^1.3.0",
+    "@radix-ui/react-navigation-menu": "^1.1.4",
+    "@radix-ui/themes": "^3.0.4",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.12",
+    "@vitejs/plugin-react": "^4.2.1",
+    "hono": "^4.3.6",
+    "partykit": "^0.0.105",
+    "partysocket": "^1.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.23.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240403.0",
+    "@hono/vite-cloudflare-pages": "^0.4.0",
+    "@hono/vite-dev-server": "^0.12.1",
+    "@types/jest": "^29.5.12",
+    "@types/react": "^18.3.2",
+    "@types/react-dom": "^18.3.0",
+    "concurrently": "^8.2.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "vite": "^5.2.11",
+    "vite-tsconfig-paths": "^4.3.2",
+    "wrangler": "^3.47.0"
+  }
+}

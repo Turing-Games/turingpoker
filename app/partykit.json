@@ -1,0 +1,10 @@
+{
+  "$schema": "https://www.partykit.io/schema.json",
+  "name": "turinggames-poker",
+  "main": "src/party/src/main.ts",
+  "parties": {
+    "poker": "src/party/src/poker.ts",
+    "tables": "src/party/src/tables.ts"
+  },
+  "compatibilityDate": "2024-04-08"
+}
