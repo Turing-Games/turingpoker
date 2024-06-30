@@ -1,4 +1,4 @@
-name = "my-app"
+name = "turing-games"
 pages_build_output_dir = "./dist"
 
 compatibility_date = "2024-05-14"
