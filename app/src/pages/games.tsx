@@ -4,7 +4,6 @@ import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
-import { useAuth } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
 
@@ -19,7 +18,7 @@ export function TableCard({
 }) {
 
   const spectatorCount = table.spectatorPlayers.length + table.queuedPlayers.length;
-  
+
   return <div style={{ position: 'relative' }}>
     {isAdmin &&
       <div
@@ -40,9 +39,9 @@ export function TableCard({
       <p>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</p>
       <p>{spectatorCount} spectator{spectatorCount > 1 ? 's' : ''} in the room</p>
       {table.gameState && <>
-          <p>Players:</p>
-          {table.gameState.players.map(player => <p>{player.id}: ${player.stack}</p>)}
-        </>}
+        <p>Players:</p>
+        {table.gameState.players.map(player => <p key={player.id}>{player.id}: ${player.stack}</p>)}
+      </>}
     </Link>
   </div>
 

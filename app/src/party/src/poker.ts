@@ -39,7 +39,7 @@ export default class PartyServer implements Party.Server {
 
   public queuedUpdates: ServerUpdateMessage[] = [];
 
-  constructor(public readonly party: Party.Party) {}
+  constructor(public readonly party: Party.Party) { }
 
   onStart(): void | Promise<void> {
     this.timeoutLoopInterval = setInterval(() => {
@@ -62,7 +62,6 @@ export default class PartyServer implements Party.Server {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    console.log(ctx.request.cf);
     if (this.inGamePlayers.length < 2) {
       this.serverState.gamePhase = "pending";
     }
@@ -245,7 +244,6 @@ export default class PartyServer implements Party.Server {
   getStateMessage(playerId: string): ServerStateMessage {
     const isSpectator =
       this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
-    console.log(this.gameState?.hands);
     return {
       gameState: this.gameState?.state ?? null,
       hand: this.gameState?.hands?.[playerId] ?? null,
@@ -357,11 +355,11 @@ export default class PartyServer implements Party.Server {
   playerExists(playerId: string) {
     return (
       this.inGamePlayers.find((player) => player.playerId === playerId) !==
-        undefined ||
+      undefined ||
       this.spectatorPlayers.find((player) => player.playerId === playerId) !==
-        undefined ||
+      undefined ||
       this.queuedPlayers.find((player) => player.playerId === playerId) !==
-        undefined
+      undefined
     );
   }
 

@@ -1,5 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
-import { SignedIn, SignedOut, SignInButton, UserButton, useAuth, useUser } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo-dark.png'
 import MobileLogo from '../../static/images/logo.png'
 import { ReactNode } from 'react';

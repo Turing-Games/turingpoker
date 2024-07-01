@@ -62,23 +62,23 @@ function GameControls({ clientState, joinLeave }: { clientState: ClientState, jo
             }}>
             {isPlayerEvenWithBet ? "Check" : "Call"}
           </button>
-            {/* Raise button */}
+          {/* Raise button */}
           <button
-          disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < (minRaiseAmount ?? 0) || !isPlayerInGame}
+            disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || currentPlayer?.stack < (minRaiseAmount ?? 0) || !isPlayerInGame}
             onClick={handleRaise}
           >
             Raise
           </button>
-            {/* Fold button */}
+          {/* Fold button */}
           <button
-          disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || !isPlayerInGame}
+            disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || !isPlayerInGame}
             onClick={() =>
-            sendMessage(socket, {
-              type: "action",
-              action: { type: "fold" },
-            })
+              sendMessage(socket, {
+                type: "action",
+                action: { type: "fold" },
+              })
             }
-            >
+          >
             Fold
           </button>
         </div>
@@ -95,8 +95,8 @@ function GameControls({ clientState, joinLeave }: { clientState: ClientState, jo
           {isPlayerSpectating
             ? "Join game"
             : isPlayerInGame
-            ? "Leave game"
-            : "Queued to join game"}
+              ? "Leave game"
+              : "Queued to join game"}
         </button>}
       </div>
     </div>

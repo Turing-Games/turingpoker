@@ -38,7 +38,6 @@ export default function PokerClient({ gameId }: { gameId?: string }) {
     });
 
     socket.addEventListener("open", () => {
-      console.log('connect', socket)
       setClientState((prevState) => ({
         ...prevState,
         isConnected: true,

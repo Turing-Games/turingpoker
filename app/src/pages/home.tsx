@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 
 
 export default function Home() {
-  console.log('main')
 
   let { gameId } = useParams();
 

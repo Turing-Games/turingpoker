@@ -19,7 +19,6 @@ interface Props {
 
 const Poker = ({ clientState, previousActions }: Props) => {
   const serverState = clientState.serverState;
-  console.log({ serverState })
   if (!serverState) {
     return <div style={{
       display: 'flex',
@@ -89,32 +88,32 @@ const Poker = ({ clientState, previousActions }: Props) => {
   hands[serverState.clientId] = serverState.hand ?? [];
 
   const currentPlayerIndex = gameState?.players.findIndex(player => player.id === clientState.playerId) ?? 0
-  const angleOffset = -currentPlayerIndex * Math.PI*2 / (inGamePlayers?.length ?? 1);
+  const angleOffset = -currentPlayerIndex * Math.PI * 2 / (inGamePlayers?.length ?? 1);
   const dealerIndex = (gameState?.dealerPosition ?? 0)
 
   const joinButton = <button
-      style={{
-        position: "absolute",
-        ...(
-          smallScreen
-            ? { top: "12px", right: "12px" }
-            : { bottom: "12px", left: "50%", transform: "translateX(-50%)", width: '100%' }
-        ),
-      }}
-      onClick={() => {
-        if (isPlayerSpectating) {
-          sendMessage(socket, { type: "join-game" });
-        } else {
-          sendMessage(socket, { type: "spectate" });
-        }
-      }}
-    >
-      {isPlayerSpectating
-        ? "Join game"
-        : isPlayerInGame
+    style={{
+      position: "absolute",
+      ...(
+        smallScreen
+          ? { top: "12px", right: "12px" }
+          : { bottom: "12px", left: "50%", transform: "translateX(-50%)", width: '100%' }
+      ),
+    }}
+    onClick={() => {
+      if (isPlayerSpectating) {
+        sendMessage(socket, { type: "join-game" });
+      } else {
+        sendMessage(socket, { type: "spectate" });
+      }
+    }}
+  >
+    {isPlayerSpectating
+      ? "Join game"
+      : isPlayerInGame
         ? "Leave game"
         : "Queued to join game"}
-    </button>;
+  </button>;
 
   const verticalScreen = useSmallScreen(500, 1e9);
   const getPlayerPosition: (index: number) => {
@@ -145,8 +144,8 @@ const Poker = ({ clientState, previousActions }: Props) => {
       offsetY *= 0.9;
     }
     return {
-      left: ((x*scaleX + offsetX)*scale + 50) + "%",
-      bottom: ((-y*scaleY + offsetY)*scale + 50) + "%",
+      left: ((x * scaleX + offsetX) * scale + 50) + "%",
+      bottom: ((-y * scaleY + offsetY) * scale + 50) + "%",
     }
   }
 
@@ -195,9 +194,8 @@ const Poker = ({ clientState, previousActions }: Props) => {
                     hand={hands[opp.id]}
                     isCurrentPlayerTurn={opp.id === currentTurn}
                     showCards
-                    title={`Player ${index + 1}${
-                      clientState.playerId === opp.id ? " (You)" : ""
-                    }`}
+                    title={`Player ${index + 1}${clientState.playerId === opp.id ? " (You)" : ""
+                      }`}
                     dealer={index === gameState?.dealerPosition}
                   />
                 </div>
