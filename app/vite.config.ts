@@ -1,11 +1,12 @@
 import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import adapter from "@hono/vite-dev-server/cloudflare";
 import tsconfigPaths from "vite-tsconfig-paths";
 // import react from '@vitejs/plugin-react'
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ command, mode }) => {
   const paths = tsconfigPaths();
+  const env = loadEnv(mode, process.cwd(), '');
   if (mode === "client") {
     return {
       plugins: [paths],
@@ -19,6 +20,11 @@ export default defineConfig(({ mode }) => {
           },
         },
       },
+      define: {
+        'process.env.VITE_ENV': JSON.stringify(env.VITE_ENV),
+        // If you want to exposes all env variables, which is not recommended
+        // 'process.env': env
+      },
     };
   } else {
     return {
@@ -31,6 +37,11 @@ export default defineConfig(({ mode }) => {
           adapter
         }),
       ],
+      define: {
+        'process.env.VITE_ENV': JSON.stringify(env.VITE_ENV),
+        // If you want to exposes all env variables, which is not recommended
+        // 'process.env': env
+      },
     };
   }
 });

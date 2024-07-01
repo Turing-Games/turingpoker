@@ -1,4 +1,5 @@
 import PartySocket from "partysocket";
+import { PARTYKIT_URL } from "@app/constants/partykit";
 
 export const sendMessage = (socket: PartySocket | null, message: any) => {
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -11,8 +12,7 @@ export const sendMessage = (socket: PartySocket | null, message: any) => {
 export const connect = (socket: PartySocket | null) => {
   const roomId = Math.round(Math.random() * 10000)
   socket = new PartySocket({
-    host: 'ws.turingpoker.com',
-    // host: 'localhost:1999',
+    host: PARTYKIT_URL,
     room: `tgpoker-${roomId}`,
     party: 'poker'
   });

@@ -6,9 +6,11 @@ compatibility_date = "2024-05-14"
 
 [env.preview.vars]
 HONO_ENV = "development"
+VITE_ENV = "production"
 
 [env.production.vars]
 HONO_ENV = "production"
+VITE_ENV = "production"
 
 # [[kv_namespaces]]
 binding = "turingpoker_dev"
