@@ -71,7 +71,8 @@ export default function Games() {
     const getData = async () => {
       const res = await fetch(partyUrl);
       const rooms = ((await res.json()) ?? []) as TableState[];
-      setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
+      setTables(rooms)
+      // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     }
     getData()
   }, [])
