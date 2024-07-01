@@ -7,10 +7,12 @@ compatibility_date = "2024-05-14"
 [env.preview.vars]
 HONO_ENV = "development"
 VITE_ENV = "production"
+VITE_CLERK_PUBLISHABLE_KEY = "pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA"
 
 [env.production.vars]
 HONO_ENV = "production"
 VITE_ENV = "production"
+VITE_CLERK_PUBLISHABLE_KEY = "pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA"
 
 # [[kv_namespaces]]
 binding = "turingpoker_dev"

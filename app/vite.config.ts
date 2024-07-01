@@ -22,6 +22,7 @@ export default defineConfig(({ command, mode }) => {
       },
       define: {
         'process.env.VITE_ENV': JSON.stringify(env.VITE_ENV),
+        'process.env.VITE_CLERK_PUBLISHABLE_KEY': JSON.stringify(env.VITE_CLERK_PUBLISHABLE_KEY)
         // If you want to exposes all env variables, which is not recommended
         // 'process.env': env
       },
@@ -39,6 +40,7 @@ export default defineConfig(({ command, mode }) => {
       ],
       define: {
         'process.env.VITE_ENV': JSON.stringify(env.VITE_ENV),
+        'process.env.VITE_CLERK_PUBLISHABLE_KEY': JSON.stringify(env.VITE_CLERK_PUBLISHABLE_KEY)
         // If you want to exposes all env variables, which is not recommended
         // 'process.env': env
       },
