@@ -19,7 +19,7 @@ describe('Poker server', () => {
     });
 
     test('If autoStart then game starts when 2 players join', () => {
-        (server.autoStart as any) = true;
+        (server.autoStart as any) = true
         expect(server.serverState.gamePhase).toBe('pending');
         server.onConnect({ id: '1' } as any, {} as any);
         server.playerJoinGame('1');

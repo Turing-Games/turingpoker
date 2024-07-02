@@ -30,6 +30,7 @@ export default class PartyServer implements Party.Server {
   public spectatorPlayers: IPlayer[] = [];
   public queuedPlayers: IPlayer[] = [];
   public stacks: Record<string, number> = {};
+  public autoStart: boolean = AUTO_START;
   public serverState: IPartyServerState = {
     gamePhase: "pending",
   };
