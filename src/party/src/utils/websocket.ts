@@ -1,5 +1,5 @@
 import PartySocket from "partysocket";
-import { PARTYKIT_URL } from "@app/constants/partykit";
+import { PARTYKIT_URL } from "../../../constants/partykit";
 
 export const sendMessage = (socket: PartySocket | null, message: any) => {
   if (socket && socket.readyState === WebSocket.OPEN) {
