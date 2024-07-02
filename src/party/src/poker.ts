@@ -36,7 +36,7 @@ export default class PartyServer implements Party.Server {
   };
   public lastActed: Record<string, number> = {};
 
-  public timeoutLoopInterval: NodeJS.Timeout | null = null;
+  public timeoutLoopInterval: ReturnType<typeof setTimeout> | null = null;
 
   public queuedUpdates: ServerUpdateMessage[] = [];
 

@@ -1,4 +1,5 @@
 const PROD = import.meta?.env?.PROD
+console.log('env...')
 console.log(import.meta?.env)
 console.log(process.env)
 const PARTYKIT_HOST = PROD ? 'ws.turingpoker.com' : 'localhost:1999'
