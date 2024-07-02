@@ -6,7 +6,7 @@ import * as PokerLogic from "../party/src/game-logic/poker";
 import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 
 import '@static/styles/styles.css'
-import { PARTYKIT_URL } from '@app/constants/partykit';
+import { PARTYKIT_URL } from '../constants/partykit';
 
 export type ClientState = {
   isConnected: boolean;

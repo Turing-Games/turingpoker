@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { ServerUpdateMessage } from "@app/party/src/shared";
-import * as Poker from '@app/party/src/game-logic/poker';
+import { ServerUpdateMessage } from "@party/src/shared";
+import * as Poker from '@party/src/game-logic/poker';
 
 function describeAction(action: Poker.Action): string {
     switch (action.type) {

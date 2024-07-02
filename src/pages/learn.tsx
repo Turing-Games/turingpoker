@@ -1,4 +1,4 @@
-import Main from '@app/layouts/main'
+import Main from '../layouts/main'
 import React from 'react'
 
 export default function Learn() {

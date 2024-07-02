@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
-import { ClientState } from "@app/client";
+import { ClientState } from "../../client";
 import card from "../Card";
 import CardLoader from "../Loader";
 import Player from "./Player";
-import * as Poker from '@app/party/src/game-logic/poker'
+import * as Poker from '@party/src/game-logic/poker'
 import GameControls from "./GameControls";
 import Card from "../Card";
 import GameStatus from "./GameStatus";
 import Cards from "./Cards";
 import { GameInfo } from "./GameInfo";
 import { sendMessage } from "@tg/utils/websocket";
-import useSmallScreen from "@app/hooks/useSmallScreen";
+import useSmallScreen from "../../hooks/useSmallScreen";
 
 interface Props {
   clientState: ClientState;

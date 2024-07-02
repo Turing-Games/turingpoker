@@ -20,8 +20,8 @@
       "@tg/*": [
         "src/party/src/*"
       ],
-      "@app/*": [
-        "src/*"
+      "@party/*": [
+        "src/party/*"
       ],
       "@static/*": [
         "static/*"

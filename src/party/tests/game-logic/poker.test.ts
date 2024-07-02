@@ -1,5 +1,5 @@
-import * as poker from '@app/party/src/game-logic/poker';
-import combinations from '@app/party/src/utils/combinations';
+import * as poker from '@party/src/game-logic/poker';
+import combinations from '@party/src/utils/combinations';
 const { handCmp } = poker;
 
 //const Hand = require('pokersolver').Hand;
@@ -76,7 +76,7 @@ describe("Poker logic", () => {
 
     test("Folding gets turn skipped in subsequent rounds", () => {
         let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
-        
+
         // player 3 is bb, so 4 should go first
         expect(game.state.whoseTurn).toBe('4');
 
@@ -182,7 +182,7 @@ describe("Poker logic", () => {
     test("Going to showdown causes payout to best hand", () => {
         for (let i = 0; i < 1000; i++) {
             let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
-            
+
             let iters = 0;
             while (!game.state.done) {
                 // obviously it should never reach 1000 iterations
@@ -194,10 +194,10 @@ describe("Poker logic", () => {
                 game = poker.step(game, { type: 'call' }).next;
                 game = poker.step(game, { type: 'call' }).next;
             }
-            expect(game.state.pot).toBe((5*4+2)*5);
-            
+            expect(game.state.pot).toBe((5 * 4 + 2) * 5);
+
             const payouts = poker.payout(game.state, game.hands).payouts;
-            
+
             // find the best hand
             let best = [];
             for (let i = 0; i < 5; i++) {
@@ -274,7 +274,7 @@ describe("Poker logic", () => {
 
         game = poker.step(game, { type: 'call' }).next;
         game = poker.step(game, { type: 'call' }).next;
-        
+
         game.hands['1'] = [{ rank: 1, suit: 'clubs' }, { rank: 1, suit: 'diamonds' }];
 
         game.hands['2'] = [{ rank: 2, suit: 'hearts' }, { rank: 7, suit: 'spades' }];

@@ -1,5 +1,5 @@
-import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/server";
-import combinations from "@app/party/src/utils/combinations";
+import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@party/src/server";
+import combinations from "@party/src/utils/combinations";
 
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
@@ -206,7 +206,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
 
         const groups: IPokerPlayer[][] = [];
         for (let i = 0; i < players.length; i++) {
-            if (i == 0 || cmp(players[i-1], players[i]) != 0) {
+            if (i == 0 || cmp(players[i - 1], players[i]) != 0) {
                 groups.push([]);
             }
             groups[groups.length - 1].push(players[i]);
@@ -249,7 +249,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
         }
         else {
             for (let pot = 0; pot < pots.length; pot++) {
-                log.push(`Pot ${pot+1} is won by ${pots[pot].join(', ')} (worth ${potVals[pot].toFixed(2)})`);
+                log.push(`Pot ${pot + 1} is won by ${pots[pot].join(', ')} (worth ${potVals[pot].toFixed(2)})`);
             }
         }
 
@@ -400,7 +400,7 @@ export function forcedFold(game: IPokerGame, playerId: PlayerID): {
     log: GameLog
 } {
     const player = game.state.players.find(p => p.id == playerId);
-    if (player == undefined) return {next: game, log: []};
+    if (player == undefined) return { next: game, log: [] };
     if (player.id == game.state.whoseTurn) {
         return step(game, { type: 'fold' });
     }

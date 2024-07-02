@@ -1,7 +1,7 @@
 import Logo from '@static/images/logo.png'
 import React, { forwardRef } from 'react';
 import Loader from "./Loader";
-import { IPlayer } from "@app/party/src/game";
+import { IPlayer } from "@party/src/poker";
 
 export default function Header(props: {
   players: IPlayer[]

@@ -3,7 +3,7 @@ import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-reac
 import Logo from '../../static/images/logo-dark.png'
 import MobileLogo from '../../static/images/logo.png'
 import { ReactNode } from 'react';
-import useSmallScreen from '@app/hooks/useSmallScreen';
+import useSmallScreen from '../hooks/useSmallScreen';
 import { DiscordLogoIcon } from '@radix-ui/react-icons';
 
 type Props = {

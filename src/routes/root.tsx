@@ -8,9 +8,9 @@ import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 import { ClerkProvider } from '@clerk/clerk-react'
 import '@static/styles/styles.css'
 import Home from '../pages/home';
-import Games from '@app/pages/games';
-import { SocketContext } from '@app/components/SocketContext';
-import Learn from '@app/pages/learn';
+import Games from '../pages/games';
+import { SocketContext } from '../components/SocketContext';
+import Learn from '../pages/learn';
 
 export type ClientState = {
   isConnected: boolean;

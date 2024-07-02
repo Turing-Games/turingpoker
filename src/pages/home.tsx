@@ -1,5 +1,5 @@
-import PokerClient from '@app/components/PokerClient';
-import Main from '@app/layouts/main';
+import PokerClient from '../components/PokerClient';
+import Main from '../layouts/main';
 import { useParams } from 'react-router-dom';
 
 

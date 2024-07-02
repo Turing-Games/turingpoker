@@ -1,6 +1,6 @@
 import * as React from 'react'
-import Main from '@app/layouts/main';
-import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
+import Main from '../layouts/main';
+import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '../constants/partykit';
 import { TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';

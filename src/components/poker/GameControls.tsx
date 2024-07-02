@@ -1,6 +1,6 @@
 import React from "react";
-import { ClientState } from "@app/client";
-import { sendMessage } from "@app/party/src/utils/websocket";
+import { ClientState } from "../../client";
+import { sendMessage } from "@party/src/utils/websocket";
 import { useAuth } from "@clerk/clerk-react";
 
 function GameControls({ clientState, joinLeave }: { clientState: ClientState, joinLeave: boolean }) {
