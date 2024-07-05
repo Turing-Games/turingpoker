@@ -11,13 +11,12 @@ app.get("*", (c) => {
         <meta name="viewport" content="width=device-width">
         <link rel="manifest" href="${assetsFolder}/manifest.json" />
 
-        ${
-          c?.env?.HONO_ENV === "production"
-            ? `<script type="module" src="/assets/client.js"></script>
+        ${c?.env?.HONO_ENV === "production"
+        ? `<script type="module" src="/assets/client.js"></script>
             <link href="/assets/client.css" rel="stylesheet" />`
-            : `<script type="module" src="/src/client.tsx"></script>
+        : `<script type="module" src="/src/client.tsx"></script>
             <link href="/static/styles/styles.css" rel="stylesheet" />`
-        }
+      }
       </head>
       <body>
         <div id="root"></div>

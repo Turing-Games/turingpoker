@@ -7,7 +7,7 @@
     "dev:wrangler": "wrangler dev src/index.tsx",
     "test": "jest",
     "dev:partykit": "npx partykit dev --live",
-    "deploy:pages": "npm run build && wrangler pages deploy dist",
+    "deploy:pages": "npm run build && wrangler pages deploy",
     "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com"
   },
   "dependencies": {

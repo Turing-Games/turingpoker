@@ -7,9 +7,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig(({ command, mode }) => {
   const paths = tsconfigPaths();
   const env = loadEnv(mode, process.cwd(), '');
-  console.log({ env })
-  console.log(env.VITE_ENV)
-  console.log(env.VITE_CLERK_PUBLISHABLE_KEY)
+
   if (mode === "client") {
     return {
       plugins: [paths],

@@ -11,6 +11,7 @@ import Home from '../pages/home';
 import Games from '../pages/games';
 import { SocketContext } from '../components/SocketContext';
 import Learn from '../pages/learn';
+import Account from 'src/pages/account';
 
 export type ClientState = {
   isConnected: boolean;
@@ -20,11 +21,13 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-const PUBLISHABLE_KEY = import.meta?.env?.PROD ? 'pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA' : 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
 
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key")
-}
+const PROD = import.meta?.env?.PROD
+const PUBLISHABLE_KEY = PROD ? 'pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA' : 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
+
+// if (!PUBLISHABLE_KEY) {
+//   throw new Error("Missing Publishable Key")
+// }
 
 const router = createBrowserRouter([
   {
@@ -42,6 +45,10 @@ const router = createBrowserRouter([
   {
     path: "/learn",
     element: <Learn />,
+  },
+  {
+    path: "/account",
+    element: <Account />,
   },
 ]);
 

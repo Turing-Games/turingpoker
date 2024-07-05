@@ -20,16 +20,16 @@ export function TableCard({
   const spectatorCount = table.spectatorPlayers.length + table.queuedPlayers.length;
 
   return <div style={{ position: 'relative' }}>
-    {isAdmin &&
-      <div
-        className="tg-poker__games-list__card__delete"
-        onClick={() => {
-          onDelete(table.id)
-        }}
-      >
-        <TrashIcon />
-      </div>
-    }
+    {/* {isAdmin && */}
+    <div
+      className="tg-poker__games-list__card__delete"
+      onClick={() => {
+        onDelete(table.id)
+      }}
+    >
+      <TrashIcon />
+    </div>
+    {/* } */}
     <Link
       className="tg-poker__games-list__card"
       to={`/games/${table.id}`}
@@ -71,8 +71,8 @@ export default function Games() {
     const getData = async () => {
       const res = await fetch(partyUrl);
       const rooms = ((await res.json()) ?? []) as TableState[];
-      // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
-      setTables(rooms)
+      setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
+      // setTables(rooms)
     }
     getData()
   }, [])
@@ -84,7 +84,8 @@ export default function Games() {
         <div className="tg-poker__games-list">
           {
             tables.map((table, i) => {
-              return <TableCard table={table} isAdmin={isAdmin} onDelete={deleteTable} />
+
+              return <TableCard key={table.id} table={table} isAdmin={isAdmin} onDelete={deleteTable} />
             })
           }
         </div>
