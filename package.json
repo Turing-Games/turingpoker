@@ -2,7 +2,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" --kill-others --prefix app",
-    "build": "NODE_ENV=production vite build --mode client && NODE_ENV=production vite build",
+    "build": "vite build",
     "dev:hono": "vite --host",
     "dev:wrangler": "wrangler dev src/index.tsx",
     "test": "jest",
