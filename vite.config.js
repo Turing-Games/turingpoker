@@ -11,8 +11,8 @@ export default defineConfig(({ command, mode }) => {
   if (mode === "production") {
     return {
       plugins: [
-        paths,
-        pages()
+        pages(),
+        paths
       ],
       build: {
         rollupOptions: {
