@@ -10,7 +10,10 @@ export default defineConfig(({ command, mode }) => {
 
   if (mode === "production") {
     return {
-      plugins: [paths],
+      plugins: [
+        paths,
+        pages()
+      ],
       build: {
         rollupOptions: {
           input: "./src/client.tsx",
