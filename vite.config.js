@@ -7,7 +7,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 export default defineConfig(({ command, mode }) => {
   const paths = tsconfigPaths();
   const env = loadEnv(mode, process.cwd(), '');
-
+  console.log({ env })
   if (mode === "client") {
     return {
       plugins: [paths],

@@ -4,6 +4,11 @@ pages_build_output_dir = "./dist"
 compatibility_date = "2024-05-14"
 # node_compat = true
 
+[vars]
+HONO_ENV = "development"
+VITE_ENV = "production"
+VITE_CLERK_PUBLISHABLE_KEY = "pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA"
+
 [env.preview.vars]
 HONO_ENV = "development"
 VITE_ENV = "production"

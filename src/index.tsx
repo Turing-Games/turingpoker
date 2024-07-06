@@ -3,6 +3,7 @@ import { Hono } from 'hono'
 const app = new Hono()
 
 app.get("*", (c) => {
+  console.log(c.env)
   const assetsFolder = c?.env?.HONO_ENV === "production" ? "/assets" : "/static";
   return c.html(
     `

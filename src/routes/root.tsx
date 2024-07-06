@@ -23,8 +23,6 @@ export type ClientState = {
 
 
 const PROD = import.meta?.env?.PROD
-console.log('env...2')
-console.log(import.meta?.env)
 const PUBLISHABLE_KEY = PROD ? 'pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA' : 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
 
 // if (!PUBLISHABLE_KEY) {
