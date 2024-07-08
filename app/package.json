@@ -8,6 +8,7 @@
     "test": "jest",
     "dev:partykit": "npx partykit dev --live",
     "deploy:pages": "npm run build && wrangler pages deploy dist",
+    "deploy:dev": "npm run build && wrangler pages deploy --branch=staging",
     "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com"
   },
   "dependencies": {
