@@ -20,7 +20,7 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-const PUBLISHABLE_KEY = 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
+const PUBLISHABLE_KEY = process.env.VITE_CLERK_PUBLISHABLE_KEY
 
 if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key")
