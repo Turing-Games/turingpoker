@@ -8,7 +8,7 @@ import path from "path";
 export default defineConfig(({ command, mode }) => {
   const paths = tsconfigPaths();
   const env = loadEnv(mode, process.cwd(), '');
-  console.log({ env })
+
   if (mode === "client") {
     return {
       plugins: [
