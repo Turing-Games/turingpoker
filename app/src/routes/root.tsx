@@ -11,6 +11,7 @@ import Home from '../pages/home';
 import Games from '@app/pages/games';
 import { SocketContext } from '@app/components/SocketContext';
 import Learn from '@app/pages/learn';
+import Profile from '@app/layouts/profile';
 
 export type ClientState = {
   isConnected: boolean;
@@ -46,7 +47,11 @@ const router = createBrowserRouter([
   },
   {
     path: '/user',
-    element: <UserProfile />
+    element: <Profile />,
+    children: [
+      { path: 'keys', element: <div>test</div> }
+    ]
+
   }
 ]);
 
