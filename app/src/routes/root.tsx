@@ -21,10 +21,13 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-const PUBLISHABLE_KEY = process.env.VITE_ENV === 'production' && location.host.split('.')[0] === 'play' ? 'pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA' : 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
+let PUBLISHABLE_KEY = ''
+if (typeof location !== 'undefined') {
+  PUBLISHABLE_KEY = process.env.VITE_ENV === 'production' && location.host.split('.')[0] === 'play' ? 'pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA' : 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
 
-if (!PUBLISHABLE_KEY) {
-  throw new Error("Missing Publishable Key")
+  if (!PUBLISHABLE_KEY) {
+    throw new Error("Missing Publishable Key")
+  }
 }
 
 const router = createBrowserRouter([
