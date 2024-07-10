@@ -25,13 +25,13 @@ app.post("/webhooks/clerk/user", async (c) => {
 });
 
 // api routes
-app.get("/users", async (c) => {
+app.get("/api/users", async (c) => {
   let usrStmt = await c.env.DB.prepare('SELECT * from users')
   try {
     const { results } = await usrStmt.all()
     return c.json(results);
   } catch (e) {
-    return c.json({ err: e }, 500);
+    return c.json({ err: JSON.stringify(e) }, 500);
   }
 });
 
