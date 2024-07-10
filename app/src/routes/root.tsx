@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 import PartySocket from "partysocket";
 import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
-import { ClerkProvider } from '@clerk/clerk-react'
+import { ClerkProvider, UserProfile } from '@clerk/clerk-react'
 import '@static/styles/styles.css'
 import Home from '../pages/home';
 import Games from '@app/pages/games';
@@ -44,6 +44,10 @@ const router = createBrowserRouter([
     path: "/learn",
     element: <Learn />,
   },
+  {
+    path: '/user',
+    element: <UserProfile />
+  }
 ]);
 
 export default function Root() {

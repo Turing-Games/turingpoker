@@ -80,7 +80,7 @@ export default function Main({ children }: Props) {
             <SignInButton />
           </SignedOut>
           <SignedIn>
-            <UserButton />
+            <UserButton userProfileMode='navigation' userProfileUrl='/user' />
           </SignedIn>
         </div>
       </header >
