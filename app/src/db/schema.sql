@@ -1,5 +1,21 @@
-DROP TABLE users;
 CREATE TABLE IF NOT EXISTS users (
   id TEXT PRIMARY KEY UNIQUE NOT NULL, 
   clerk_id TEXT UNIQUE NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS api_keys (
+  id TEXT PRIMARY KEY UNIQUE NOT NULL,
+  api_key TEXT UNIQUE NOT NULL,
+  user_id TEXT,
+  bot_id TEXT,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+);
+
+CREATE TABLE IF NOT EXISTS bots (
+  id TEXT PRIMARY KEY UNIQUE NOT NULL,
+  api_token TEXT UNIQUE NOT NULL,
+  user_id TEXT,
+  api_key_id TEXT,
+  FOREIGN KEY(user_id) REFERENCES users(id),
+  FOREIGN KEY(api_key_id) REFERENCES api_keys(id)
 );

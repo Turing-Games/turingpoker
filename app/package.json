@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "npm run db:setup && concurrently \"npm run dev:partykit\" \"npm run dev:hono\" \"npm run dev:wrangler\" --kill-others --prefix app",
+    "dev": "npm run db:local && concurrently \"npm run dev:partykit\" \"npm run dev:hono\" \"npm run dev:wrangler\" --kill-others --prefix app",
     "build": "vite build --mode client && vite build && cp -r ./static/favico/ ./dist/assets/",
     "dev:hono": "vite --host",
     "dev:wrangler": "wrangler dev src/index.tsx",
@@ -11,7 +11,10 @@
     "deploy:dev": "npm run build && wrangler pages deploy --branch=staging",
     "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com",
     "ngrok": "ngrok http http://localhost:5173",
-    "db:setup": "npx wrangler d1 execute DB --local --file=./src/db/schema.sql"
+    "db:local": "npx wrangler d1 execute DB --local --file=./src/db/schema.sql",
+    "db:dev": "npx wrangler d1 execute turinggames_dev --remote --file=./src/db/schema.sql",
+    "db:prod": "npx wrangler d1 execute turinggames_prod --remote --file=./src/db/schema.sql",
+    "db:clean": "npx wrangler d1 execute DB --local --file=./src/db/clean.sql"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.1.0",

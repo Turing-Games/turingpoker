@@ -10,6 +10,11 @@ HONO_ENV = "production"
 [env.production.vars]
 HONO_ENV = "production"
 
+[[d1_databases]]
+binding = "DB"
+database_name = "turinggames"
+database_id = "bbb9dcef-4175-4cbe-b26e-e2bf75852ea5"
+
 [env.preview]
 d1_databases = [
     { binding = "DB", database_name = "turinggames_dev", database_id = "bbb9dcef-4175-4cbe-b26e-e2bf75852ea5" },
