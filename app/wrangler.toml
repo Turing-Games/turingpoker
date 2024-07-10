@@ -11,11 +11,12 @@ HONO_ENV = "production"
 HONO_ENV = "production"
 
 # [[kv_namespaces]]
-binding = "turinggames_dev"
-id = "d32c16c2fa6b4d2099cdcbd5d023662f"
+#binding = "turinggames_dev"
+# id = "d32c16c2fa6b4d2099cdcbd5d023662f"
 
-# [[d1_databases]]
-# binding = "DB"
+[[d1_databases]]
+binding = "DB"
 database_name = "turinggames"
 database_id = "054c910b-1580-4cfc-8ea4-1874bb729251"
 preview_database_id = "bbb9dcef-4175-4cbe-b26e-e2bf75852ea5"
+# preview_database_id = "DB"

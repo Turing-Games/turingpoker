@@ -1,7 +1,41 @@
+import { D1Database } from '@cloudflare/workers-types';
 import { Hono } from 'hono'
 
-const app = new Hono()
+// This ensures c.env.DB is correctly typed
+export type Bindings = {
+  DB: D1Database;
+};
 
+const app = new Hono<{ Bindings: Bindings }>()
+
+// Webhooks (clerk)
+app.post("/webhooks/clerk/user", async (c) => {
+  const uuid = crypto.randomUUID()
+  const clerkUser = await c.req.json()
+  try {
+    let { results } = await c.env.DB.prepare(
+      'INSERT into users (id, clerk_id) VALUES (?, ?)'
+    )
+      .bind(`${uuid}`, clerkUser.data.id)
+      .all();
+    return c.json(results);
+  } catch (e) {
+    return c.json({ err: e }, 500);
+  }
+});
+
+// api routes
+app.get("/users", async (c) => {
+  let usrStmt = await c.env.DB.prepare('SELECT * from users')
+  try {
+    const { results } = await usrStmt.all()
+    return c.json(results);
+  } catch (e) {
+    return c.json({ err: e }, 500);
+  }
+});
+
+// handles assets, serving client
 app.get("*", (c) => {
   const assetsFolder = c?.env?.HONO_ENV === "production" ? "/assets" : "/static";
   return c.html(
