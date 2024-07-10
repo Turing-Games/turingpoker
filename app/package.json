@@ -2,12 +2,12 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" --kill-others --prefix app",
-    "build": "vite build --mode client && vite build",
+    "build": "vite build --mode client && vite build && cp -r ./static/favico/ ./dist/assets/",
     "dev:hono": "vite --host",
     "dev:wrangler": "wrangler dev src/index.tsx",
     "test": "jest",
     "dev:partykit": "npx partykit dev --live",
-    "deploy:prod": "npm run build && wrangler pages deploy dist",
+    "deploy:prod": "NODE_ENV=production npm run build && NODE_ENV=production wrangler pages deploy dist",
     "deploy:dev": "npm run build && wrangler pages deploy --branch=staging",
     "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com"
   },
