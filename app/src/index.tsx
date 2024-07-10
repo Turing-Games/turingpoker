@@ -25,7 +25,7 @@ app.post("/webhooks/clerk/user", async (c) => {
 });
 
 // api routes
-app.get("/api/users", async (c) => {
+app.get("/api/v1/users", async (c) => {
   let usrStmt = await c.env.DB.prepare('SELECT * from users')
   try {
     const { results } = await usrStmt.all()
