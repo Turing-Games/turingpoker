@@ -1,7 +1,7 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" --kill-others --prefix app",
+    "dev": "concurrently \"npm run dev:partykit\" \"npm run dev:hono\" \"npm run dev:wrangler --local\" --kill-others --prefix app",
     "build": "vite build --mode client && vite build && cp -r ./static/favico/ ./dist/assets/",
     "dev:hono": "vite --host",
     "dev:wrangler": "wrangler dev src/index.tsx",
