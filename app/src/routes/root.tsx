@@ -22,7 +22,6 @@ export type ClientState = {
 };
 
 const PUBLISHABLE_KEY = process.env.VITE_ENV === 'production' && location.host.split('.')[0] === 'play' ? 'pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA' : 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
-console.log({ PUBLISHABLE_KEY })
 
 if (!PUBLISHABLE_KEY) {
   throw new Error("Missing Publishable Key")
