@@ -16,11 +16,11 @@ app.post("/webhooks/clerk/user", async (c) => {
     let { results } = await c.env.DB.prepare(
       'INSERT into users (id, clerk_id) VALUES (?, ?)'
     )
-      .bind(`${uuid}`, clerkUser.data.id)
+      .bind(`${uuid}`, clerkUser.data?.id)
       .all();
     return c.json(results);
   } catch (e) {
-    return c.json({ err: e }, 500);
+    return c.json({ message: 'Error signing up', error: e }, 500);
   }
 });
 
@@ -31,7 +31,7 @@ app.get("/api/v1/users", async (c) => {
     const { results } = await usrStmt.all()
     return c.json(results);
   } catch (e) {
-    return c.json({ err: JSON.stringify(e) }, 500);
+    return c.json({ message: JSON.stringify(e) }, 500);
   }
 });
 
@@ -41,7 +41,7 @@ app.get("/api/v1/keys", async (c) => {
     const { results } = await usrStmt.all()
     return c.json(results);
   } catch (e) {
-    return c.json({ err: JSON.stringify(e) }, 500);
+    return c.json({ message: JSON.stringify(e) }, 500);
   }
 });
 
