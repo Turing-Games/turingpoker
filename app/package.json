@@ -9,7 +9,8 @@
     "dev:partykit": "npx partykit dev --live",
     "deploy:prod": "NODE_ENV=production npm run build && NODE_ENV=production wrangler pages deploy dist",
     "deploy:dev": "npm run build && wrangler pages deploy --branch=staging",
-    "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com"
+    "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com",
+    "ngrok": "ngrok http http://localhost:5173"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.1.0",
