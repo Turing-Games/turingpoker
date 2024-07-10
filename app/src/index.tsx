@@ -35,6 +35,16 @@ app.get("/api/v1/users", async (c) => {
   }
 });
 
+app.get("/api/v1/keys", async (c) => {
+  let usrStmt = await c.env.DB.prepare('SELECT * from api_keys where user_id = ? ').bind(1)
+  try {
+    const { results } = await usrStmt.all()
+    return c.json(results);
+  } catch (e) {
+    return c.json({ err: JSON.stringify(e) }, 500);
+  }
+});
+
 // handles assets, serving client
 app.get("*", (c) => {
   const assetsFolder = c?.env?.HONO_ENV === "production" ? "/assets" : "/static";
@@ -57,7 +67,7 @@ app.get("*", (c) => {
             <meta name="theme-color" content="#ffffff">
             `
         : `<script type="module" src="/src/client.tsx"></script>
-            <link href="/static/styles/styles.css" rel="stylesheet" />
+            
             <link rel="apple-touch-icon" sizes="180x180" href="/static/favico/apple-touch-icon.png">
             <link rel="icon" type="image/png" sizes="32x32" href="/static/favico/favicon-32x32.png">
             <link rel="icon" type="image/png" sizes="16x16" href="/static/favico/favicon-16x16.png">

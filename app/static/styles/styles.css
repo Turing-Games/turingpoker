@@ -1,3 +1,6 @@
 @import './global.css';
 @import './header.css';
 @import './poker.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -12,6 +12,8 @@ import Games from '@app/pages/games';
 import { SocketContext } from '@app/components/SocketContext';
 import Learn from '@app/pages/learn';
 import Profile from '@app/layouts/profile';
+import '@radix-ui/themes/styles.css';
+import { Theme } from '@radix-ui/themes';
 
 export type ClientState = {
   isConnected: boolean;
@@ -60,11 +62,13 @@ const router = createBrowserRouter([
 export default function Root() {
   return (
     <React.StrictMode>
-      <SocketContext.Provider value={{}}>
-        <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-          <RouterProvider router={router} />
-        </ClerkProvider>
-      </SocketContext.Provider>
+      <Theme>
+        <SocketContext.Provider value={{}}>
+          <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+            <RouterProvider router={router} />
+          </ClerkProvider>
+        </SocketContext.Provider>
+      </Theme>
     </React.StrictMode>
   )
 };
