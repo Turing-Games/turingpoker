@@ -2,6 +2,7 @@ import Logo from '@static/images/logo.png'
 import React, { forwardRef } from 'react';
 import Loader from "./Loader";
 import { IPlayer } from "@app/party/src/game";
+import { Text } from '@radix-ui/themes';
 
 export default function Header(props: {
   players: IPlayer[]
@@ -20,7 +21,7 @@ export default function Header(props: {
         {/* text */}
         <div className='tg-header__title' >
           <h2>{gameType ? `Table: ${gameType}` : 'Welcome!'}</h2>
-          <p>Turing Games</p>
+          <Text>Turing Games</Text>
         </div>
         <div className='tg-header__logo'>
           <img src={Logo} alt="Logo" />

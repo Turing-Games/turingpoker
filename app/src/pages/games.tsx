@@ -6,7 +6,7 @@ import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
 import { Link } from 'react-router-dom';
 import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
-import { Heading } from '@radix-ui/themes';
+import { Heading, Text } from '@radix-ui/themes';
 
 export function TableCard({
   table,
@@ -23,7 +23,7 @@ export function TableCard({
   return <div style={{ position: 'relative' }}>
     {isAdmin &&
       <div
-        className="tg-poker__games-list__card__delete"
+        className="cursor-pointer border border-black rounded-[50px] inline-block justify-end p-[4px] abslute top-[-10px] right-[-10px] bg-white"
         onClick={() => {
           onDelete(table.id)
         }}
@@ -32,20 +32,19 @@ export function TableCard({
       </div>
     }
     <Link
-      className="tg-poker__games-list__card"
+      className="bg-white border border-black rounded-[4px] grid gap-[8px] p-[12px]"
       to={`/games/${table.id}`}
       key={table.id}
     >
-      <p>Table: {table.id}</p>
-      <p>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</p>
-      <p>{spectatorCount} spectator{spectatorCount > 1 ? 's' : ''} in the room</p>
+      <Text>Table: {table.id}</Text>
+      <Text>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</Text>
+      <Text>{spectatorCount} spectator{spectatorCount > 1 ? 's' : ''} in the room</Text>
       {table.gameState && <>
-        <p>Players:</p>
-        {table.gameState.players.map(player => <p key={player.id}>{player.id}: ${player.stack}</p>)}
+        <Text>Players:</Text>
+        {table.gameState.players.map(player => <Text key={player.id}>{player.id}: ${player.stack}</Text>)}
       </>}
     </Link>
   </div>
-
 }
 
 export default function Games() {
@@ -70,9 +69,11 @@ export default function Games() {
 
   React.useEffect(() => {
     const getData = async () => {
+      setLoading(true)
       const res = await fetch(partyUrl);
       const rooms = ((await res.json()) ?? []) as TableState[];
       setTables(rooms)
+      setLoading(false)
       // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     }
     getData()
@@ -82,13 +83,19 @@ export default function Games() {
     <Main>
       <div style={{ padding: 20 }}>
         <Heading mb="2" size="4">Tables ({tables.length})</Heading>
-        <div className="tg-poker__games-list">
-          {
-            tables.map((table, i) => {
-              return <TableCard table={table} isAdmin={isAdmin} onDelete={deleteTable} />
-            })
-          }
-        </div>
+        {
+          loading ?
+            <Text>Loading...</Text> :
+            tables.length > 0 ?
+              <div className="flex flex-wrap gap-[16px]">
+                {
+                  tables.map((table, i) => {
+                    return <TableCard table={table} isAdmin={isAdmin} onDelete={deleteTable} />
+                  })
+                }
+              </div> :
+              <Text>No tables found</Text>
+        }
       </div>
       <style>{`#root{overflow:auto!important`}</style>
     </Main >
