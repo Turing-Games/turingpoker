@@ -49,18 +49,30 @@ app.get("/api/v1/keys", async (c) => {
   }
 });
 
+app.delete("/api/v1/keys/:id", async (c) => {
+  const id = c.req.param('id')
+  let usrStmt = c.env.DB.prepare('DELETE from api_keys where id = ? ').bind(id)
+  try {
+    const { results } = await usrStmt.all()
+    return c.json(results);
+  } catch (e) {
+    return c.json({ message: JSON.stringify(e) }, 500);
+  }
+});
+
 app.post("/api/v1/keys", async (c) => {
   const { name, user_id } = await c.req.json()
   try {
     // generate key
+    const uuid = crypto.randomUUID()
     const key = `turing_${crypto.randomUUID()}`
     const hash = createHash('sha256')
     hash.update(key)
     // hash key and store in db
     let { results } = await c.env.DB.prepare(
-      'INSERT into api_keys (user_id, name, key) VALUES (?, ?, ?)'
+      'INSERT into api_keys (id, user_id, name, key) VALUES (?, ?, ?, ?)'
     )
-      .bind(user_id, name, hash.digest('hex'))
+      .bind(uuid, user_id, name, hash.digest('hex'))
       .all()
     return c.json(results);
   } catch (e) {
