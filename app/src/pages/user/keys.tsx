@@ -77,7 +77,14 @@ export default function Keys() {
         </button>
       </div>
       <div>
-        <Text className="block my-[16px]">Once generated, API Key will not be visible again.</Text>
+        <Text className="text-sm block my-[16px]">Once generated, API Key will not be visible again.</Text>
+        <Text className="text-sm block mb-[32px]">
+          To authenticate with the API, please use the headers:<br />
+          <code>
+            {`API_ID: <API_ID>`}<br />
+            {`API_SECRET: <API_KEY>`}
+          </code>
+        </Text>
         {
           loading ?
             <Text>Loading...</Text> :
@@ -87,35 +94,40 @@ export default function Keys() {
                   keys.map((key, i) => {
                     console.log(key)
                     return (
-                      <div className={`p-[4px] flex items-center justify-between gap-[16px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`} key={i}>
-                        <input
-                          type="text"
-                          placeholder={key.name || 'Name for key (optional)'}
-                          defaultValue={key.name || ''}
-                          onChange={e => setName(e.target.value)}
-                          className="bg-transparent"
-                        />
-                        {
-                          key.viewed ?
-                            <input className="bg-transparent" type="password" disabled value={key.key} /> :
-                            <p className="block text-xs p-[4px]">{key.key}</p>
-                        }
-                        <div className="flex items-center gap-[8px]">
-                          {!key.viewed &&
-                            <div
-                              className="cursor-pointer"
-                              onClick={() => {
-                                updateApiKey(key.id, {
-                                  ...key,
-                                  viewed: true
-                                }, true)
-                              }}
-                            >
-                              <EyeOpenIcon />
-                            </div>
+                      <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`}>
+                        <p className="mb-[8px] text-xs">ID: {key.id}</p>
+                        <div className={`flex items-center justify-between gap-[16px]`} key={i}>
+                          <input
+                            type="text"
+                            placeholder={key.name || 'Name for key (optional)'}
+                            defaultValue={key.name || ''}
+                            onChange={e => setName(e.target.value)}
+                            className="bg-transparent"
+                          />
+                          {
+                            key.viewed ?
+                              <input className="bg-transparent" type="password" disabled value={key.key} /> :
+                              <p className="block text-xs p-[4px]">{key.key}</p>
                           }
-                          <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
-                            <TrashIcon className="text-[red]" />
+                          <div>
+                            <div className="flex items-center gap-[8px]">
+                              {!key.viewed &&
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() => {
+                                    updateApiKey(key.id, {
+                                      ...key,
+                                      viewed: true
+                                    }, true)
+                                  }}
+                                >
+                                  <EyeOpenIcon />
+                                </div>
+                              }
+                              <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
+                                <TrashIcon className="text-[red]" />
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -126,6 +138,6 @@ export default function Keys() {
               <Text>No keys found</Text>
         }
       </div>
-    </div>
+    </div >
   )
 }

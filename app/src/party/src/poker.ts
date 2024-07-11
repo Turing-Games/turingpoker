@@ -74,7 +74,6 @@ export default class PartyServer implements Party.Server {
   }
 
   onMessage(message: string, websocket: Party.Connection): void {
-    // verify api key or user here
     try {
       let data: ClientMessage;
 
