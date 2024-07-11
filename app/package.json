@@ -13,7 +13,9 @@
     "db:local": "npx wrangler d1 execute DB --local --file=./src/db/schema.sql",
     "db:dev": "npx wrangler d1 execute turinggames_dev --remote --file=./src/db/schema.sql",
     "db:prod": "npx wrangler d1 execute turinggames_prod --remote --file=./src/db/schema.sql",
-    "db:clean": "npx wrangler d1 execute DB --local --file=./src/db/clean.sql"
+    "db:clean": "npx wrangler d1 execute DB --local --file=./src/db/clean.sql",
+    "migration:create": "npx wrangler d1 migrations create DB",
+    "migration:run": "npx wrangler d1 migrations run DB"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.1.0",

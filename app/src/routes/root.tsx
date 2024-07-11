@@ -5,7 +5,7 @@ import {
 } from "react-router-dom";
 import PartySocket from "partysocket";
 import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
-import { ClerkProvider, UserProfile } from '@clerk/clerk-react'
+import { ClerkProvider, UserProfile, useUser } from '@clerk/clerk-react'
 import '@static/styles/styles.css'
 import Home from '../pages/home';
 import Games from '@app/pages/games';
@@ -14,6 +14,8 @@ import Learn from '@app/pages/learn';
 import Profile from '@app/layouts/profile';
 import '@radix-ui/themes/styles.css';
 import { Theme } from '@radix-ui/themes';
+import { UserContext } from '@app/context/UserContext';
+import User from '@app/components/User';
 
 export type ClientState = {
   isConnected: boolean;
@@ -60,15 +62,20 @@ const router = createBrowserRouter([
 ]);
 
 export default function Root() {
+
   return (
     <React.StrictMode>
+
       <Theme hasBackground={false}>
         <SocketContext.Provider value={{}}>
           <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
-            <RouterProvider router={router} />
+            <User>
+              <RouterProvider router={router} />
+            </User>
           </ClerkProvider>
         </SocketContext.Provider>
       </Theme>
+
     </React.StrictMode>
   )
 };

@@ -39,10 +39,10 @@ app.get("/api/v1/users", async (c) => {
 });
 
 app.get("/api/v1/users/:id", async (c) => {
-  let usrStmt = c.env.DB.prepare('SELECT * from users WHERE id = ?').bind(c.req.param('id'))
+  let usrStmt = c.env.DB.prepare('SELECT * from users WHERE clerk_id = ?').bind(c.req.param('id'))
   try {
     const { results } = await usrStmt.all()
-    return c.json(results);
+    return c.json({ data: results[0] });
   } catch (e) {
     return c.json({ message: JSON.stringify(e) }, 500);
   }
@@ -62,28 +62,45 @@ app.get("/api/v1/users/:id/keys", async (c) => {
 
 app.post("/api/v1/keys", async (c) => {
   const { userId = null, botId = null, name = '' } = await c.req.json()
-  const userStmt = c.env.DB.prepare('SELECT * from users where clerk_id = ?').bind(userId)
-  const { results } = await userStmt.all()
-  const userIdFromDb = results[0].id
   try {
     // generate key
     const uuid = crypto.randomUUID()
     const key = `turing_${crypto.randomUUID()}`
-    const hash = createHash('sha256')
-    hash.update(key)
-    // hash key and store in db
     let { results } = await c.env.DB.prepare(
       'INSERT into api_keys (id, user_id, bot_id, name, key) VALUES (?, ?, ?, ?, ?)'
     )
-      .bind(uuid, userIdFromDb, botId, name, hash.digest('hex'))
+      .bind(uuid, userId, botId, name, key)
+      .all()
+    return c.json(results);
+  } catch (e) {
+    return c.json({ message: 'Error creating key', error: e }, 500);
+  }
+});
+
+// update key hash/viewed columns
+app.put("/api/v1/keys/:id", async (c) => {
+  const { key, name, viewed } = await c.req.json()
+  let keyToSave = key
+  const id = c.req.param('id')
+
+  if (key.startsWith('turing')) {
+    const hash = createHash('sha256')
+    hash.update(key)
+    keyToSave = hash.digest('hex')
+  }
+
+  try {
+    let { results } = await c.env.DB.prepare(
+      'UPDATE api_keys SET key = ?, name = ?, viewed = ? where id = ?'
+    )
+      .bind(keyToSave, name, viewed, id)
       .all()
     return c.json(results);
   } catch (e) {
     console.log(e)
-    return c.json({ message: 'Error creating key', error: e }, 500);
+    return c.json({ message: 'Error updating key', error: e }, 500);
   }
-  // return c.json({})
-});
+})
 
 app.delete("/api/v1/keys/:id", async (c) => {
   const id = c.req.param('id')
