@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS api_keys (
   key TEXT UNIQUE NOT NULL,
   user_id TEXT,
   bot_id TEXT,
+  FOREIGN KEY(bot_id) REFERENCES bots(id),
   FOREIGN KEY(user_id) REFERENCES users(id)
 );
 

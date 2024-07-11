@@ -1,8 +1,12 @@
+import { useUser } from '@clerk/clerk-react';
 import { PlusIcon } from '@radix-ui/react-icons'
 import { Heading, Text } from '@radix-ui/themes'
 import * as React from 'react'
 
 export default function Keys() {
+
+  const { user } = useUser();
+  console.log(user)
 
   const [loading, setLoading] = React.useState(true)
   const [keys, setKeys] = React.useState<any[]>([])
@@ -10,7 +14,8 @@ export default function Keys() {
   React.useEffect(() => {
     const getKeys = async () => {
       setLoading(true)
-      const res = await fetch('/api/v1/keys')
+      const res = await fetch(`/api/v1/users/${user.id}/keys`)
+      console.log(res)
       const keys = await res.json()
       console.log(keys)
       setLoading(false)

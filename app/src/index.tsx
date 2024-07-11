@@ -38,15 +38,51 @@ app.get("/api/v1/users", async (c) => {
   }
 });
 
-// API KEYS
-app.get("/api/v1/keys", async (c) => {
-  let usrStmt = c.env.DB.prepare('SELECT * from api_keys where user_id = ? ').bind(1)
+app.get("/api/v1/users/:id", async (c) => {
+  let usrStmt = c.env.DB.prepare('SELECT * from users WHERE id = ?').bind(c.req.param('id'))
   try {
     const { results } = await usrStmt.all()
     return c.json(results);
   } catch (e) {
     return c.json({ message: JSON.stringify(e) }, 500);
   }
+});
+
+// API KEYS
+app.get("/api/v1/users/:id/keys", async (c) => {
+  const id = c.req.param('id')
+  let usrStmt = c.env.DB.prepare('SELECT * from api_keys where user_id = ? ').bind(id)
+  try {
+    const { results } = await usrStmt.all()
+    return c.json(results);
+  } catch (e) {
+    return c.json({ message: JSON.stringify(e) }, 500);
+  }
+});
+
+app.post("/api/v1/keys", async (c) => {
+  const { userId = null, botId = null, name = '' } = await c.req.json()
+  const userStmt = c.env.DB.prepare('SELECT * from users where clerk_id = ?').bind(userId)
+  const { results } = await userStmt.all()
+  const userIdFromDb = results[0].id
+  try {
+    // generate key
+    const uuid = crypto.randomUUID()
+    const key = `turing_${crypto.randomUUID()}`
+    const hash = createHash('sha256')
+    hash.update(key)
+    // hash key and store in db
+    let { results } = await c.env.DB.prepare(
+      'INSERT into api_keys (id, user_id, bot_id, name, key) VALUES (?, ?, ?, ?, ?)'
+    )
+      .bind(uuid, userIdFromDb, botId, name, hash.digest('hex'))
+      .all()
+    return c.json(results);
+  } catch (e) {
+    console.log(e)
+    return c.json({ message: 'Error creating key', error: e }, 500);
+  }
+  // return c.json({})
 });
 
 app.delete("/api/v1/keys/:id", async (c) => {
@@ -57,27 +93,6 @@ app.delete("/api/v1/keys/:id", async (c) => {
     return c.json(results);
   } catch (e) {
     return c.json({ message: JSON.stringify(e) }, 500);
-  }
-});
-
-app.post("/api/v1/keys", async (c) => {
-  const { name, user_id } = await c.req.json()
-  try {
-    // generate key
-    const uuid = crypto.randomUUID()
-    const key = `turing_${crypto.randomUUID()}`
-    const hash = createHash('sha256')
-    hash.update(key)
-    // hash key and store in db
-    let { results } = await c.env.DB.prepare(
-      'INSERT into api_keys (id, user_id, name, key) VALUES (?, ?, ?, ?)'
-    )
-      .bind(uuid, user_id, name, hash.digest('hex'))
-      .all()
-    return c.json(results);
-  } catch (e) {
-    console.log(e)
-    return c.json({ message: 'Error creating key', error: e }, 500);
   }
 });
 
