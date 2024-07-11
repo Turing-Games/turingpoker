@@ -1,30 +1,29 @@
 import React, { useEffect, useState } from "react";
-import "@static/styles/collapse.css";
 
-export default function Collapse({collapsed, children}: {
+export default function Collapse({ collapsed, children }: {
     children: React.ReactNode;
     collapsed: boolean;
 }) {
     return (
-        <div className="tg-collapse" style={{
+        <div className="transition duration-200 ease-out relative z-[2] h-full" style={{
             maxWidth: collapsed ? "0" : "100%",
             zIndex: 100
         }}>
-            <div className="tg-poker__collapse__content">
+            <div className="overflow-hidden h-full">
                 {children}
             </div>
         </div>
     );
 }
 
-export function CollapseToggle({collapsed, setCollapsed, content, style}: {
+export function CollapseToggle({ collapsed, setCollapsed, content, style }: {
     collapsed: boolean;
     setCollapsed: (collapsed: boolean) => void;
     content: string;
     style: React.CSSProperties;
 }) {
     return (
-        <button style={style} className="tg-collapse__toggle" onClick={() => setCollapsed(!collapsed)}>
+        <button style={style} className="absolute z-[10]" onClick={() => setCollapsed(!collapsed)}>
             {content}
         </button>
     );

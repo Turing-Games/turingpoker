@@ -18,7 +18,7 @@ export default function Keys() {
   return (
     <div>
       <h2>API Keys {keys.length > 0 ? `(${keys.length})` : ''}</h2>
-      <div className="text-center">
+      <div className="mb-[33px]">
         {
           loading ?
             <p>Loading...</p> :

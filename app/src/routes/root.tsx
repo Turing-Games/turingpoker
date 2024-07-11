@@ -62,7 +62,7 @@ const router = createBrowserRouter([
 export default function Root() {
   return (
     <React.StrictMode>
-      <Theme>
+      <Theme hasBackground={false}>
         <SocketContext.Provider value={{}}>
           <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
             <RouterProvider router={router} />

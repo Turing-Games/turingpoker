@@ -6,6 +6,7 @@ import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
 import { Link } from 'react-router-dom';
 import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
+import { Heading } from '@radix-ui/themes';
 
 export function TableCard({
   table,
@@ -80,7 +81,7 @@ export default function Games() {
   return (
     <Main>
       <div style={{ padding: 20 }}>
-        <h2>Tables ({tables.length})</h2>
+        <Heading mb="2" size="4">Tables ({tables.length})</Heading>
         <div className="tg-poker__games-list">
           {
             tables.map((table, i) => {
