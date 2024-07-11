@@ -1,5 +1,6 @@
 import { D1Database } from '@cloudflare/workers-types';
 import { Hono } from 'hono'
+import { createHash } from 'node:crypto';
 
 // This ensures c.env.DB is correctly typed
 export type Bindings = {
@@ -25,8 +26,10 @@ app.post("/webhooks/clerk/user", async (c) => {
 });
 
 // api routes
+
+// USERS
 app.get("/api/v1/users", async (c) => {
-  let usrStmt = await c.env.DB.prepare('SELECT * from users')
+  let usrStmt = c.env.DB.prepare('SELECT * from users')
   try {
     const { results } = await usrStmt.all()
     return c.json(results);
@@ -35,8 +38,9 @@ app.get("/api/v1/users", async (c) => {
   }
 });
 
+// API KEYS
 app.get("/api/v1/keys", async (c) => {
-  let usrStmt = await c.env.DB.prepare('SELECT * from api_keys where user_id = ? ').bind(1)
+  let usrStmt = c.env.DB.prepare('SELECT * from api_keys where user_id = ? ').bind(1)
   try {
     const { results } = await usrStmt.all()
     return c.json(results);
@@ -44,6 +48,35 @@ app.get("/api/v1/keys", async (c) => {
     return c.json({ message: JSON.stringify(e) }, 500);
   }
 });
+
+app.post("/api/v1/keys", async (c) => {
+  const { name, user_id } = await c.req.json()
+  try {
+    // generate key
+    const key = `turing_${crypto.randomUUID()}`
+    const hash = createHash('sha256')
+    hash.update(key)
+    // hash key and store in db
+    let { results } = await c.env.DB.prepare(
+      'INSERT into api_keys (user_id, name, key) VALUES (?, ?, ?)'
+    )
+      .bind(user_id, name, hash.digest('hex'))
+      .all()
+    return c.json(results);
+  } catch (e) {
+    console.log(e)
+    return c.json({ message: 'Error creating key', error: e }, 500);
+  }
+});
+
+const verifyApiKey = (key: string, hash: string) => {
+  const hashedKey = createHash('sha256')
+  hashedKey.update(key)
+  return hashedKey.digest('hex') === hash
+}
+
+// user has unhashed key
+// compare key to hashed key
 
 // handles assets, serving client
 app.get("*", (c) => {

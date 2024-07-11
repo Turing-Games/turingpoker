@@ -2,6 +2,7 @@ import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
 import { defineConfig, loadEnv } from "vite";
 import adapter from "@hono/vite-dev-server";
+import cloudflareAdapter from '@hono/vite-dev-server/cloudflare'
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
 
@@ -46,7 +47,7 @@ export default defineConfig(({ command, mode }) => {
         pages(),
         devServer({
           entry: "./src/index.tsx",
-          adapter
+          adapter: cloudflareAdapter
         }),
       ],
       // resolve: {

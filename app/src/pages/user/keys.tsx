@@ -1,3 +1,5 @@
+import { PlusIcon } from '@radix-ui/react-icons'
+import { Heading, Text } from '@radix-ui/themes'
 import * as React from 'react'
 
 export default function Keys() {
@@ -13,16 +15,39 @@ export default function Keys() {
       console.log(keys)
       setLoading(false)
     }
+
+    getKeys()
   }, [])
 
   return (
     <div>
-      <h2>API Keys {keys.length > 0 ? `(${keys.length})` : ''}</h2>
+      <div className="flex items-center justify-between">
+        <Heading mb="2" size="4">API Keys {keys.length > 0 ? `(${keys.length})` : ''}</Heading>
+        <button
+          className="flex items-center gap-[4px]"
+        >
+          <PlusIcon />
+          Create New API Key
+        </button>
+      </div>
       <div className="mb-[33px]">
         {
           loading ?
-            <p>Loading...</p> :
-            <></>
+            <Text>Loading...</Text> :
+            keys.length > 0 ?
+              <div className="flex flex-col gap-[8px]">
+                {
+                  keys.map((key, i) => {
+                    return (
+                      <div className="flex items-center justify-between" key={i}>
+                        <h3>{key.name}</h3>
+                        <p>{key.key}</p>
+                      </div>
+                    )
+                  })
+                }
+              </div> :
+              <Text>No keys found</Text>
         }
       </div>
     </div>
