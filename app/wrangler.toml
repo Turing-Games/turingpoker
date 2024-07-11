@@ -13,7 +13,8 @@ HONO_ENV = "production"
 [[d1_databases]]
 binding = "DB"
 database_name = "turinggames"
-database_id = "bbb9dcef-4175-4cbe-b26e-e2bf75852ea5"
+database_id = "054c910b-1580-4cfc-8ea4-1874bb729251"
+preview_database_id = "bbb9dcef-4175-4cbe-b26e-e2bf75852ea5"
 
 [env.preview]
 d1_databases = [

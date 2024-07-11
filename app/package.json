@@ -10,12 +10,10 @@
     "deploy:prod": "NODE_ENV=production npm run build && NODE_ENV=production wrangler pages deploy dist",
     "deploy:dev": "npm run build && wrangler pages deploy --branch=staging",
     "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com",
-    "db:local": "npx wrangler d1 execute DB --local --file=./src/db/schema.sql",
-    "db:dev": "npx wrangler d1 execute turinggames_dev --remote --file=./src/db/schema.sql",
-    "db:prod": "npx wrangler d1 execute turinggames_prod --remote --file=./src/db/schema.sql",
-    "db:clean": "npx wrangler d1 execute DB --local --file=./src/db/clean.sql",
-    "migration:create": "npx wrangler d1 migrations create DB",
-    "migration:run": "npx wrangler d1 migrations run DB"
+    "migrations:local": "npx wrangler d1 migrations apply DB --local",
+    "migrations:dev": "npx wrangler d1 migrations apply DB --remote --preview",
+    "migrations:prod": "npx wrangler d1 migrations apply DB --remote",
+    "migrations:create": "npx wrangler d1 migrations create DB"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.1.0",
