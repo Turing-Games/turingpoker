@@ -9,6 +9,7 @@ import { ClerkProvider, UserProfile, useUser } from '@clerk/clerk-react'
 import '@static/styles/styles.css'
 import Home from '../pages/home';
 import Games from '@app/pages/games';
+import _404 from '@app/pages/_404';
 import { SocketContext } from '@app/components/SocketContext';
 import Learn from '@app/pages/learn';
 import Profile from '@app/layouts/profile';
@@ -57,7 +58,10 @@ const router = createBrowserRouter([
     children: [
       { path: 'keys', element: <div>test</div> }
     ]
-
+  },
+  {
+    path: '*',
+    element: <_404 />
   }
 ]);
 
