@@ -20,7 +20,7 @@ export default function User({ children }: { children: React.ReactNode }) {
       clerk_id: dbUser?.data?.clerk_id,
       id: dbUser?.data?.id
     }
-    console.log({ mergedUser })
+
     setTgUser(mergedUser)
   }
 

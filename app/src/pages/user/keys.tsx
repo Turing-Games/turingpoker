@@ -51,10 +51,8 @@ export default function Keys() {
   }
 
   const getKeys = async () => {
-    console.log(user.id)
     setLoading(true)
     const res = await fetch(`/api/v1/users/${user.id}/keys`)
-    console.log(res)
     const keys = await res.json()
     setLoading(false)
     setKeys(keys)
@@ -92,7 +90,6 @@ export default function Keys() {
               <div className="flex flex-col gap-[8px]">
                 {
                   keys.map((key, i) => {
-                    console.log(key)
                     return (
                       <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`}>
                         <p className="mb-[8px] text-xs">ID: {key.id}</p>

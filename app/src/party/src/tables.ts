@@ -29,6 +29,26 @@ export default class TablesServer implements Party.Server {
 
   constructor(public party: Party.Party) { }
 
+  static async onBeforeRequest(request: Party.Request) {
+    console.log("onBeforeRequest tables")
+    // try {
+    //   // get authentication server url from environment variables (optional)
+    //   const issuer = lobby.env.CLERK_ENDPOINT || DEFAULT_CLERK_ENDPOINT;
+    //   // get token from request headers
+    //   const token = request.headers.get("Authorization") ?? "";
+    //   // verify the JWT (in this case using clerk)
+    //   await verifyToken(token, { issuer });
+    //   // forward the request onwards on onRequest
+
+    // } catch (e) {
+    //   // authentication failed!
+    //   // short-circuit the request before it's forwarded to the party
+    return new Response("Unauthorized", { status: 401 });
+    // }
+
+    // return request;
+  }
+
   async onConnect(connection: Party.Connection) {
     // when a websocket connection is established, send them a list of rooms
     connection.send(JSON.stringify(await this.getActiveRooms()));

@@ -28,16 +28,6 @@ app.post("/webhooks/clerk/user", async (c) => {
 // api routes
 
 // USERS
-app.get("/api/v1/users", async (c) => {
-  let usrStmt = c.env.DB.prepare('SELECT * from users')
-  try {
-    const { results } = await usrStmt.all()
-    return c.json(results);
-  } catch (e) {
-    return c.json({ message: JSON.stringify(e) }, 500);
-  }
-});
-
 app.get("/api/v1/users/:id", async (c) => {
   let usrStmt = c.env.DB.prepare('SELECT * from users WHERE clerk_id = ?').bind(c.req.param('id'))
   try {
@@ -59,6 +49,35 @@ app.get("/api/v1/users/:id/keys", async (c) => {
     return c.json({ message: JSON.stringify(e) }, 500);
   }
 });
+
+// LOCAL DEVELOPMENT ROUTES
+app.get('/api/dev/keys', async (c) => {
+  if (c.env.HONO_ENV !== 'production') {
+    let usrStmt = c.env.DB.prepare('SELECT * from api_keys;')
+    try {
+      const { results } = await usrStmt.all()
+      return c.json(results);
+    } catch (e) {
+      return c.json({ message: JSON.stringify(e) }, 500);
+    }
+  } else {
+    return c.json({}, 401);
+  }
+})
+
+app.get('/api/dev/users', async (c) => {
+  if (c.env.HONO_ENV !== 'production') {
+    let usrStmt = c.env.DB.prepare('SELECT * from users;')
+    try {
+      const { results } = await usrStmt.all()
+      return c.json(results);
+    } catch (e) {
+      return c.json({ message: JSON.stringify(e) }, 500);
+    }
+  } else {
+    return c.json({}, 401);
+  }
+})
 
 // app.get("/api/v1/keys", async (c) => {
 //   let usrStmt = c.env.DB.prepare('SELECT * from api_keys;')
