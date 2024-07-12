@@ -18,7 +18,7 @@ export function TableCard({
   isAdmin: boolean
 }) {
 
-  const spectatorCount = table.spectatorPlayers.length + table.queuedPlayers.length;
+  const spectatorCount = table?.spectatorPlayers?.length + table?.queuedPlayers?.length;
 
   return <div style={{ position: 'relative' }}>
     {isAdmin &&
@@ -38,7 +38,7 @@ export function TableCard({
     >
       <Text>Table: {table.id}</Text>
       <Text>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</Text>
-      <Text>{spectatorCount} spectator{spectatorCount > 1 ? 's' : ''} in the room</Text>
+      <Text>{spectatorCount || 0} spectator{spectatorCount > 1 ? 's' : ''} in the room</Text>
       {table.gameState && <>
         <Text>Players:</Text>
         {table.gameState.players.map(player => <Text key={player.id}>{player.id}: ${player.stack}</Text>)}
