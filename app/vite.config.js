@@ -5,6 +5,7 @@ import adapter from "@hono/vite-dev-server";
 import cloudflareAdapter from '@hono/vite-dev-server/cloudflare'
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
+import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ command, mode }) => {
   const paths = tsconfigPaths();
@@ -13,6 +14,7 @@ export default defineConfig(({ command, mode }) => {
   if (mode === "client") {
     return {
       plugins: [
+        react(),
         pages(),
         paths
       ],
@@ -43,7 +45,7 @@ export default defineConfig(({ command, mode }) => {
     return {
       plugins: [
         paths,
-        // react(),
+        react(),
         pages(),
         devServer({
           entry: "./src/index.tsx",
