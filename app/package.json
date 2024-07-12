@@ -10,7 +10,6 @@
     "dev:partykit": "npx partykit dev --live",
     "deploy:prod": "NODE_ENV=production npm run build && NODE_ENV=production wrangler pages deploy dist",
     "deploy:dev": "npm run build && wrangler pages deploy --branch=staging",
-    "deploy:test": "npm run build && wrangler pages deploy --branch=test-preview-deployment",
     "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com",
     "migrations:local": "npx wrangler d1 migrations apply DB --local",
     "migrations:dev": "npx wrangler d1 migrations apply DB --remote --preview",
