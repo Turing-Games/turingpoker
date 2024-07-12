@@ -5,6 +5,7 @@ import adapter from "@hono/vite-dev-server";
 import cloudflareAdapter from '@hono/vite-dev-server/cloudflare'
 import tsconfigPaths from "vite-tsconfig-paths";
 import path from "path";
+import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ command, mode }) => {
   const paths = tsconfigPaths();
@@ -13,7 +14,7 @@ export default defineConfig(({ command, mode }) => {
   if (mode === "client") {
     return {
       plugins: [
-        pages(),
+        // pages(),
         paths
       ],
       build: {
@@ -26,12 +27,6 @@ export default defineConfig(({ command, mode }) => {
           },
         },
       },
-      // resolve: {
-      //   alias: {
-      //     '@public': path.resolve(__dirname, 'public'),
-      //     // Add more aliases as needed for different asset types or directories
-      //   },
-      // },
       define: {
         'process.env.VITE_ENV': JSON.stringify(env.VITE_ENV),
         'process.env.VITE_CLERK_PUBLISHABLE_KEY': JSON.stringify(env.VITE_CLERK_PUBLISHABLE_KEY)
@@ -43,19 +38,12 @@ export default defineConfig(({ command, mode }) => {
     return {
       plugins: [
         paths,
-        // react(),
         pages(),
         devServer({
           entry: "./src/index.tsx",
           adapter: cloudflareAdapter
         }),
       ],
-      // resolve: {
-      //   alias: {
-      //     '@public': path.resolve(__dirname, 'public'),
-      //     // Add more aliases as needed for different asset types or directories
-      //   },
-      // },
       define: {
         'process.env.VITE_ENV': JSON.stringify(env.VITE_ENV),
         'process.env.VITE_CLERK_PUBLISHABLE_KEY': JSON.stringify(env.VITE_CLERK_PUBLISHABLE_KEY),

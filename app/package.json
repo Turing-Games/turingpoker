@@ -2,7 +2,8 @@
   "type": "module",
   "scripts": {
     "dev": "npm run migrations:local && concurrently \"npm run dev:partykit\" \"npm run dev:hono\" \"npm run dev:wrangler\" --kill-others --prefix app",
-    "build": "vite build --mode client && vite build && cp -r ./static/favico/ ./dist/assets/",
+    "clean": "rm -rf ./dist/",
+    "build": "npm run clean && vite build --mode client && vite build",
     "dev:hono": "vite --host",
     "dev:wrangler": "wrangler dev src/index.tsx",
     "test": "jest",

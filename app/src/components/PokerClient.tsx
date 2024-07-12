@@ -1,7 +1,7 @@
 import { useState, useEffect, startTransition } from 'react'
 import * as React from 'react';
 import PartySocket from "partysocket";
-import Poker from "./poker/Poker";
+import Poker from "./poker/PokerGame";
 import * as PokerLogic from "..//party/src/game-logic/poker";
 import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 
