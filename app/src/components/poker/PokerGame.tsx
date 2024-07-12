@@ -17,7 +17,7 @@ interface Props {
   previousActions: Record<string, Poker.Action>;
 }
 
-const Poker = ({ clientState, previousActions }: Props) => {
+const PokerGame = ({ clientState, previousActions }: Props) => {
   const serverState = clientState.serverState;
   if (!serverState) {
     return <div style={{
@@ -214,4 +214,4 @@ const Poker = ({ clientState, previousActions }: Props) => {
   );
 };
 
-export default Poker;
+export default PokerGame;

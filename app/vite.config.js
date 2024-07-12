@@ -14,7 +14,7 @@ export default defineConfig(({ command, mode }) => {
   if (mode === "client") {
     return {
       plugins: [
-        react(),
+        // react(),
         pages(),
         paths
       ],
@@ -45,7 +45,7 @@ export default defineConfig(({ command, mode }) => {
     return {
       plugins: [
         paths,
-        react(),
+        // react(),
         pages(),
         devServer({
           entry: "./src/index.tsx",
