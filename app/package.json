@@ -14,8 +14,7 @@
     "migrations:local": "npx wrangler d1 migrations apply DB --local",
     "migrations:dev": "npx wrangler d1 migrations apply DB --remote --preview",
     "migrations:prod": "npx wrangler d1 migrations apply DB --remote",
-    "migrations:create": "npx wrangler d1 migrations create DB",
-    "logs:partykit": "npx partykit tail"
+    "migrations:create": "npx wrangler d1 migrations create DB"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.1.0",
