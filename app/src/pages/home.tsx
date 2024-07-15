@@ -2,6 +2,7 @@ import React from 'react'
 import GameClient from '@app/components/GameClient';
 import Main from '@app/layouts/main';
 import { useParams } from 'react-router-dom';
+import LogoDark from '@static/images/logo-dark.png';
 
 
 export default function Home() {
@@ -23,15 +24,16 @@ export default function Home() {
         game?.value && join === true ?
           <GameClient gameId={gameId} gameType={game.value} /> :
           // select game type of poker or kuhn
-          <div className="bg-white p-[16px] border flex flex-col items-center justify-center w-full gap-[8px] h-[300px] max-w-[300px] m-auto">
+          <div className="bg-white p-[16px] border flex flex-col items-center justify-center w-full max-w-[300px] m-auto">
+            <img src={LogoDark} className="w-[150px] mx-auto mb-[32px]" />
             <div className="relative w-full max-w-[250px]">
               <div
-                className="cursor-pointer border rounded-lg p-[8px] w-full"
+                className="p-[8px] cursor-pointer border rounded-lg w-full h-[40px]"
                 onClick={() => setIsOpen(!isOpen)}
               >{game?.label || 'Select a game to start:'}
               </div>
               {isOpen &&
-                <div className="bg-white border absolute top-[40px] left-0 shadow-md rounded-lg w-full">
+                <div className="bg-white border absolute top-[45px] left-0 shadow-md rounded-lg w-full">
                   {games.map(game => (
                     <div
                       key={game.value}
