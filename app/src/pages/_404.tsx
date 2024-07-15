@@ -1,4 +1,4 @@
-import PokerClient from '@app/components/PokerClient';
+import GameClient from '@app/components/GameClient';
 import Main from '@app/layouts/main';
 import { Heading } from '@radix-ui/themes';
 import { useParams } from 'react-router-dom';

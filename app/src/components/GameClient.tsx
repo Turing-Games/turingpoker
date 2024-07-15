@@ -1,8 +1,8 @@
 import { useState, useEffect, startTransition } from 'react'
 import * as React from 'react';
 import PartySocket from "partysocket";
-import Poker from "./poker/PokerGame";
-import * as PokerLogic from "..//party/src/game-logic/poker";
+import PokerGame from "./poker/PokerGame";
+import * as PokerLogic from "../party/src/game-logic/poker";
 import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 
 import '@static/styles/styles.css'
@@ -17,7 +17,7 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-export default function PokerClient({ gameId }: { gameId?: string }) {
+export default function GameClient({ gameId, gameType }: { gameId?: string, gameType?: string }) {
   let [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
     serverState: null,
@@ -99,6 +99,6 @@ export default function PokerClient({ gameId }: { gameId?: string }) {
   }, [setClientState]);
 
   return (
-    <Poker clientState={clientState} previousActions={previousActions} />
+    <PokerGame clientState={clientState} previousActions={previousActions} />
   );
 };

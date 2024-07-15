@@ -25,6 +25,7 @@ export default class PartyServer implements Party.Server {
     smallBlind: 50,
     autoStart: AUTO_START,
     minPlayers: MIN_PLAYERS_AUTO_START,
+    type: ""
   };
   public inGamePlayers: IPlayer[] = [];
   public spectatorPlayers: IPlayer[] = [];
