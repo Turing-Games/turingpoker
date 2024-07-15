@@ -7,6 +7,7 @@ import { sendMessage } from '@tg/utils/websocket';
 import { Link } from 'react-router-dom';
 import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
 import { Heading, Text } from '@radix-ui/themes';
+import PartySocket from 'partysocket';
 
 export function TableCard({
   table,
@@ -70,12 +71,22 @@ export default function Games() {
   React.useEffect(() => {
     const getData = async () => {
       setLoading(true)
-      const res = await fetch(partyUrl);
-      const rooms = ((await res.json()) ?? []) as TableState[];
-      setTables(rooms)
+      try {
+        const res = await PartySocket.fetch(
+          {
+            host: PARTYKIT_URL,
+            room: SINGLETON_ROOM_ID,
+            party: 'tables'
+          })
+        const rooms = ((await res.json()) ?? []) as TableState[];
+        setTables(rooms)
+        // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
+      } catch (err) {
+        console.log(err)
+      }
       setLoading(false)
-      // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     }
+
     getData()
   }, [])
 

@@ -89,29 +89,27 @@ app.get('/api/dev/users', async (c) => {
 //   }
 // });
 
-// app.get("/api/v1/keys/verify", async (c) => {
-//   // const key = c.req.header('API_KEY')
-//   const key = 'turing_6e0c00bc-dba1-4c3c-922d-4d9b683fe8a6'
-//   // const apiId = c.req.header('API_ID')
-//   const apiId = '09812eca-11bf-4b97-841b-8397efb5be89'
-//   let apiKeyStmt = c.env.DB.prepare('SELECT * from api_keys where id = ? ').bind(apiId)
-//   try {
-//     const { results } = await apiKeyStmt.all()
-//     const hash = results[0]?.key
-//     if (!hash) {
-//       return c.json({ message: 'Key not found' }, 404)
-//     }
+app.get("/api/v1/auth", async (c) => {
+  const key = c.req.header('API_SECRET')
+  const apiId = c.req.header('API_ID')
+  let apiKeyStmt = c.env.DB.prepare('SELECT * from api_keys where id = ? ').bind(apiId)
+  try {
+    const { results } = await apiKeyStmt.all()
+    const hash = results[0]?.key
+    if (!hash) {
+      return c.json({ message: 'Key not found' }, 404)
+    }
 
-//     const isValid = verifyApiKey(key, hash as string)
-//     if (!isValid) {
-//       return c.json({ message: 'Invalid key' }, 401)
-//     } else {
-//       return c.json({});
-//     }
-//   } catch (e) {
-//     return c.json({ message: JSON.stringify(e) }, 500);
-//   }
-// });
+    const isValid = verifyApiKey(key, hash as string)
+    if (!isValid) {
+      return c.json({ message: 'Invalid key' }, 401)
+    } else {
+      return c.json({});
+    }
+  } catch (e) {
+    return c.json({ message: JSON.stringify(e) }, 500);
+  }
+});
 
 app.post("/api/v1/keys", async (c) => {
   const { userId = null, botId = null, name = '' } = await c.req.json()
@@ -171,6 +169,13 @@ const verifyApiKey = (key: string, hash: string) => {
   hashedKey.update(key)
   return hashedKey.digest('hex') === hash
 }
+
+// games api
+app.post('/api/v1/games', async (c) => {
+  const params = await c.req.json()
+  let usrStmt = c.env.DB.prepare('INSERT into games (id, name, autostart, minPlayers, maxPlayers, tournament_id) VALUES (?, ?, ?, ?, ?) ').bind(id, name, autostart, minPlayers, maxPlayers, tournamentId)
+
+})
 
 // user has unhashed key
 // compare key to hashed key

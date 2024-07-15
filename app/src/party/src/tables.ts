@@ -1,6 +1,7 @@
 import type * as Party from "partykit/server";
 import { json, notFound } from "./utils/response";
 import { TableState } from "./shared";
+import PartyServer from "./main";
 
 /**
  * The tables party's purpose is to keep track of all chat rooms, so we want
@@ -20,33 +21,15 @@ export type RoomDeleteRequest = {
   action: "delete";
 };
 
-export default class TablesServer implements Party.Server {
+export default class TablesServer extends PartyServer {
   options: Party.ServerOptions = {
     hibernate: true,
     // this opts the chat room into hibernation mode, which
     // allows for a higher number of concurrent connections
   };
 
-  constructor(public party: Party.Party) { }
-
-  static async onBeforeRequest(request: Party.Request) {
-    console.log("onBeforeRequest tables")
-    // try {
-    //   // get authentication server url from environment variables (optional)
-    //   const issuer = lobby.env.CLERK_ENDPOINT || DEFAULT_CLERK_ENDPOINT;
-    //   // get token from request headers
-    //   const token = request.headers.get("Authorization") ?? "";
-    //   // verify the JWT (in this case using clerk)
-    //   await verifyToken(token, { issuer });
-    //   // forward the request onwards on onRequest
-
-    // } catch (e) {
-    //   // authentication failed!
-    //   // short-circuit the request before it's forwarded to the party
-    return new Response("Unauthorized", { status: 401 });
-    // }
-
-    // return request;
+  constructor(public party: Party.Party) {
+    super(party)
   }
 
   async onConnect(connection: Party.Connection) {
@@ -55,6 +38,18 @@ export default class TablesServer implements Party.Server {
   }
 
   async onRequest(req: Party.Request) {
+    // const token = req.headers.get("Authorization")
+    // const res = await fetch('http://localhost:5173/api/v1/auth', {
+    //   headers: {
+    //     'API_ID': '123',
+    //     'API_SECRET': '123'
+    //   }
+    // })
+    // const data = await res.json()
+    // console.log({ data })
+    // return new Response("Unauthorized", { status: 401 });
+    // return request
+
     // we only allow one instance of chatRooms party
     if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
