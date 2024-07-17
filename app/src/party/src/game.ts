@@ -1,5 +1,6 @@
 import type * as Party from 'partykit/server';
 import * as Poker from '@app/party/src/game-logic/poker'
+import * as Kuhn from '@app/party/src/game-logic/kuhn'
 import { ClientMessage, ServerStateMessage, ServerUpdateMessage, TABLE_STATE_VERSION, TableState } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 
