@@ -15,12 +15,14 @@ export default function Select({
   const [option, setOption] = React.useState(options.find(o => o.value === selected)?.value || options[0].value)
   const [isOpen, setIsOpen] = React.useState(false)
 
+  const selectedOption = options.find(o => o.value === option)
+
   return (
     <div>
       <div
         className="p-[8px] cursor-pointer border rounded-lg w-full h-[40px]"
         onClick={() => setIsOpen(!isOpen)}
-      >{option?.label || placeholder}
+      >{selectedOption?.label || placeholder}
       </div>
       {isOpen &&
         <div className="bg-white border absolute top-[45px] left-0 shadow-md rounded-lg w-full">
@@ -29,7 +31,7 @@ export default function Select({
               key={option.value}
               className="w-full p-[8px] hover:bg-gray-100 cursor-pointer w-full"
               onClick={() => {
-                setOption(option)
+                setOption(option.value)
                 if (onChange) {
                   onChange(option.value)
                 }
