@@ -77,11 +77,8 @@ export default function Keys() {
       <div>
         <Text className="text-sm block my-[16px]">Once generated, API Key will not be visible again.</Text>
         <Text className="text-sm block mb-[32px]">
-          To authenticate with the API, please use the headers:<br />
-          <code>
-            {`API_ID: <API_ID>`}<br />
-            {`API_SECRET: <API_KEY>`}
-          </code>
+          To authenticate with the API, the following data will be included in the request as parameters:<br />
+          <code>{`?api_token={api_token}`}</code>
         </Text>
         {
           loading ?
