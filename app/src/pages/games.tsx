@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
 import { Heading, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';
+import Select from '@app/components/Select';
 
 export function TableCard({
   table,
@@ -52,6 +53,8 @@ export default function Games() {
 
   const [loading, setLoading] = React.useState(false)
   const [tables, setTables] = React.useState<TableState[]>([])
+  const [gameType, setGameType] = React.useState('all')
+  const [gameStatus, setGameStatus] = React.useState('all')
 
   const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
@@ -90,10 +93,37 @@ export default function Games() {
     getData()
   }, [])
 
+  const gameTypeFilters = [
+    { label: 'All', value: 'all' },
+    { label: 'Poker', value: 'poker' },
+    { label: 'Kuhn', value: 'kuhn' },
+  ]
+
+  const gameStatusFilters = [
+    { label: 'All', value: 'all' },
+    { label: 'Pending', value: 'pending' },
+    { label: 'Active', value: 'active' },
+  ]
+
   return (
     <Main>
       <div style={{ padding: 20 }}>
         <Heading mb="2" size="4">Tables ({tables.length})</Heading>
+        {/* filters */}
+        <div className="flex items-center gap-[8px] mt-[16px] mb-[32px]">
+          <Select
+            options={gameTypeFilters}
+            selected={gameType}
+            placeholder="Game type"
+            onChange={(value) => setGameType(value)}
+          ></Select>
+          <Select
+            options={gameStatusFilters}
+            selected={gameStatus}
+            placeholder="Game status"
+            onChange={(value) => setGameStatus(value)}
+          ></Select>
+        </div>
         {
           loading ?
             <Text>Loading...</Text> :
