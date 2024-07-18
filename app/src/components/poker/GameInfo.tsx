@@ -23,7 +23,7 @@ export function GameInfo({
     <Collapse collapsed={collapsible && collapsed}>
       <div className="tg-poker__table__gameinfo">
         <Header
-          gameType="No Limit Texas Hold'em"
+          // gameType={gameType}
           players={clientState.serverState?.inGamePlayers || []}
           playerId={clientState.playerId}
           minPlayers={clientState.serverState?.config?.minPlayers || 2} />
