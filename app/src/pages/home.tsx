@@ -21,7 +21,7 @@ export default function Home() {
   return (
     <Main>
       {
-        game?.value && join === true ?
+        game && join ?
           <GameClient gameId={gameId} gameType={game.value} /> :
           // select game type of poker or kuhn
           <div className="bg-white p-[16px] border flex flex-col items-center justify-center w-full max-w-[300px] m-auto">
