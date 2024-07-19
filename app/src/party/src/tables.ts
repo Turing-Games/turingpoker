@@ -7,7 +7,7 @@ import PartyServer from "./main";
  * The tables party's purpose is to keep track of all games, so we want
  * every client to connect to the same room instance by sharing the same room id.
  */
-export const SINGLETON_ROOM_ID = "games";
+export const SINGLETON_ROOM_ID = "tables";
 
 /** Poker room sends an update whenever server state changes */
 export type RoomInfoUpdateRequest = {
@@ -72,6 +72,7 @@ export default class TablesServer extends PartyServer {
 
     return notFound();
   }
+
   /** Fetches list of active rooms */
   async getActiveRooms(): Promise<TableState[]> {
     const rooms = await this.party.storage.list<TableState>();

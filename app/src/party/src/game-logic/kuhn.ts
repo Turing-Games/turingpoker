@@ -1,12 +1,12 @@
 import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/games";
 import combinations from "@app/party/src/utils/combinations";
 
-export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
-export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
+export type Rank = 11 | 12 | 13;
+export type Suit = 'hearts';
 export type Card = { rank: Rank, suit: Suit };
 
-const cardNames = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
-const cardVals = { 'A': 1, 'T': 10, 'J': 11, 'Q': 12, 'K': 13 }
+const cardNames = ['J', 'Q', 'K'];
+const cardVals = { 'J': 11, 'Q': 12, 'K': 13 }
 
 const eps = 1e-9;
 
@@ -14,15 +14,12 @@ export function parseCard(card: string): Card {
   const rank = card[0];
   const suit = card[1];
 
-  let rankNum: Rank = 1;
+  let rankNum: Rank = 11;
   // Why is this casting bs necessary, 'in' should act as a type guard???
   if (rank in cardVals) rankNum = cardVals[rank as (keyof typeof cardVals)] as Rank;
   else rankNum = parseInt(rank) as Rank;
 
   let suitName: Suit = 'hearts';
-  if (suit == 'c') suitName = 'clubs';
-  else if (suit == 'd') suitName = 'diamonds';
-  else if (suit == 's') suitName = 'spades';
   return { rank: rankNum, suit: suitName };
 }
 export function formatCard(card: Card): string {
@@ -97,7 +94,7 @@ export interface IPokerSharedState {
 export interface IPokerGame {
   state: IPokerSharedState;
   config: IPokerConfig;
-  hands: Record<PlayerID, [Card, Card]>;
+  hands: Record<PlayerID, [Card]>;
   deck: Card[];
 }
 
@@ -120,10 +117,10 @@ function shuffleDeck(deck: Card[]): Card[] {
   return shuffledDeck;
 }
 
-function dealHands(players: PlayerID[], deck: Card[]): Record<PlayerID, [Card, Card]> {
-  const hands: Record<PlayerID, [Card, Card]> = {};
+function dealHands(players: PlayerID[], deck: Card[]): Record<PlayerID, [Card]> {
+  const hands: Record<PlayerID, [Card]> = {};
   for (const player of players) {
-    hands[player] = [deck.pop()!, deck.pop()!];
+    hands[player] = [deck.pop()!];
   }
   return hands;
 }
@@ -183,7 +180,7 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
  * @param hands 
  * @returns A record of player ids to the number of chips they won, and any new lines that should be added to a log. Payouts will be null if the game is not over.
  */
-export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): {
+export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card]>): {
   payouts: Record<PlayerID, number>,
   log: GameLog
 } {
@@ -425,7 +422,7 @@ function lexicoCompare(a: number[], b: number[]): number {
   return 0;
 }
 
-export type Hand = [Card, Card, Card, Card, Card];
+export type Hand = [Card];
 type HandVal = {
   handRank: number;
   counts: number[];

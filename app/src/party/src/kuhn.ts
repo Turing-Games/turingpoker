@@ -14,19 +14,18 @@ export interface IPartyServerState {
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
-export const MAX_PLAYERS = 8
+export const MAX_PLAYERS = 2
 
 const defaultStack = 1000;
 export default class PartyServer implements Party.Server {
   public gameState: Poker.IPokerGame | null = null;
   public gameConfig: Poker.IPokerConfig = {
     dealerPosition: 0,
-    bigBlind: 100,
+    bigBlind: 1,
     maxPlayers: MAX_PLAYERS,
-    smallBlind: 50,
+    smallBlind: 1,
     autoStart: AUTO_START,
-    minPlayers: MIN_PLAYERS_AUTO_START,
-    type: ""
+    minPlayers: MIN_PLAYERS_AUTO_START
   };
   public inGamePlayers: IPlayer[] = [];
   public spectatorPlayers: IPlayer[] = [];
@@ -283,7 +282,7 @@ export default class PartyServer implements Party.Server {
       version: TABLE_STATE_VERSION
     }
 
-    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.party.context.parties.kuhn.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id: this.party.id,

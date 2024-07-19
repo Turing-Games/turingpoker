@@ -35,7 +35,7 @@ export function TableCard({
     }
     <Link
       className="bg-white border border-black rounded-[4px] grid gap-[8px] p-[12px]"
-      to={`/games/${table.id}`}
+      to={`/games/${table.id}/${table.gameType}`}
       key={table.id}
     >
       <Text>Table: {table.id}</Text>
@@ -53,7 +53,7 @@ export default function Games() {
 
   const [loading, setLoading] = React.useState(false)
   const [tables, setTables] = React.useState<TableState[]>([])
-  const [gameType, setGameType] = React.useState('all')
+  const [gameType, setGameType] = React.useState('poker')
   const [gameStatus, setGameStatus] = React.useState('all')
 
   const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
@@ -79,10 +79,9 @@ export default function Games() {
           {
             host: PARTYKIT_URL,
             room: SINGLETON_ROOM_ID,
-            party: 'tables'
+            party: gameType
           })
         const rooms = ((await res.json()) ?? []) as TableState[];
-        console.log(rooms[0])
         setTables(rooms)
         // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
       } catch (err) {

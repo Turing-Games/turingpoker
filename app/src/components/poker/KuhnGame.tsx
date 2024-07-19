@@ -3,7 +3,6 @@ import { ClientState } from "@app/client";
 import card from "../Card";
 import CardLoader from "../Loader";
 import Player from "./Player";
-import * as Poker from '@app/party/src/game-logic/poker'
 import * as Kuhn from '@app/party/src/game-logic/kuhn'
 import GameControls from "./GameControls";
 import Card from "../Card";
@@ -181,6 +180,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
             }}
           >
             {inGamePlayers?.map((opp, index) => {
+              console.log(hands)
               return (
                 <div
                   key={index}

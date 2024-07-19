@@ -7,4 +7,4 @@ if (typeof location !== 'undefined') {
 
 
 export const PARTYKIT_URL = `${PARTYKIT_PROTOCOL}://${PARTYKIT_HOST}`;
-export const SINGLETON_ROOM_ID = 'games'
+export const SINGLETON_ROOM_ID = 'tables'

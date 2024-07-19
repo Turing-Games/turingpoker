@@ -17,7 +17,7 @@ interface PlayerProps {
   dealer: boolean;
 }
 
-const Player = ({ player, hand, hands, className, style, title, showCards, dealer}: PlayerProps) => {
+const Player = ({ player, hand, hands, className, style, title, showCards, dealer }: PlayerProps) => {
   const handToRender = hand || (hands && hands[player.id]) || [];
   const [cardEffects, setCardEffects] = useState<[CSSProperties, CSSProperties]>([{}, {}]);
   const smallScreen = useSmallScreen();
@@ -28,13 +28,13 @@ const Player = ({ player, hand, hands, className, style, title, showCards, deale
       setCardEffects([
         {
           transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
-          transform: `translate(${Math.random() * 600-300}px, ${Math.random() * 600-300}px) rotate(${Math.random() * 360}deg)`,
+          transform: `translate(${Math.random() * 600 - 300}px, ${Math.random() * 600 - 300}px) rotate(${Math.random() * 360}deg)`,
           opacity: 0,
           position: 'absolute'
         },
         {
           transition: 'transform 0.2s ease-out, opacity 0.2s ease-out',
-          transform: `translate(${Math.random() * 600-300}px, ${Math.random() * 600-300}px) rotate(${Math.random() * 360}deg)`,
+          transform: `translate(${Math.random() * 600 - 300}px, ${Math.random() * 600 - 300}px) rotate(${Math.random() * 360}deg)`,
           opacity: 0,
           position: 'absolute'
         },
@@ -73,14 +73,15 @@ const Player = ({ player, hand, hands, className, style, title, showCards, deale
 
         {dealer && <div className="tg-poker__table__dealer_marker">D</div>}
       </div>
-      <div style={{ display: 'flex', gap: '6px', margin: '16px 0',
+      <div style={{
+        display: 'flex', gap: '6px', margin: '16px 0',
         flexDirection: 'row', justifyContent: 'center',
         width: '100%',
-       }}>
+      }}>
         {showCards && (
           handToRender.length ? handToRender.map((c, i) => <Card style={cardEffects[i]} key={i} value={c} />) : <>
-            <Card style={cardEffects[0]}/>
-            <Card style={cardEffects[1]}/>
+            <Card style={cardEffects[0]} />
+            <Card style={cardEffects[1]} />
           </>
         )}
       </div>

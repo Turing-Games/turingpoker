@@ -10,19 +10,18 @@ export default function Home() {
 
   const [game, setGame] = React.useState<string>('');
   const [join, setJoin] = React.useState<boolean>(false);
-  let { gameId } = useParams();
+  let { gameId, gameType } = useParams();
 
   const games = [
     { label: 'Poker', value: 'poker' },
     { label: 'Kuhn', value: 'kuhn' }
   ]
 
-
   return (
     <Main>
       {
         (game && join) || gameId ?
-          <GameClient gameId={gameId} gameType={game} /> :
+          <GameClient gameId={gameId} gameType={game || gameType} /> :
           // select game type of poker or kuhn
           <div className="bg-white p-[16px] border flex flex-col items-center justify-center w-full max-w-[300px] m-auto">
             <img src={LogoDark} className="w-[150px] mx-auto mb-[32px]" />

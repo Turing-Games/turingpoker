@@ -16,6 +16,7 @@ export type ClientState = {
   socket: PartySocket | null;
   playerId: string | null;
   updateLog: ServerUpdateMessage[];
+  gameType?: string;
 };
 
 export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: string, gameType?: string }) {
@@ -26,12 +27,13 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     lastServerState: null,
     playerId: null,
     updateLog: [],
+    gameType: ''
   });
 
   const games = {
     'poker': PokerGame,
     'kuhn': KuhnGame,
-  }
+  } as any
 
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
@@ -39,9 +41,14 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     const roomId = Math.round(Math.random() * 10000);
     const socket = new PartySocket({
       host: PARTYKIT_URL,
-      room: gameId ?? roomId.toString(),
-      party: "games",
+      // room: gameId ?? roomId.toString(),
+      room: 'tables',
+      party: gameType,
+      query: async () => ({
+        gameType: gameType
+      })
     });
+
 
     socket.addEventListener("open", () => {
       setClientState((prevState) => ({
@@ -49,6 +56,7 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
         isConnected: true,
         playerId: socket.id,
         socket: socket,
+        gameType: gameType
       }));
     });
 
@@ -104,10 +112,11 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     };
   }, [setClientState]);
 
-  console.log(clientState)
-
-  return (
-    // <PokerGame clientState={clientState} previousActions={previousActions} />
-    React.createElement(games[gameType], { clientState, previousActions })
-  );
+  if (games[gameType]) {
+    return (
+      React.createElement(games[gameType], { clientState, previousActions })
+    );
+  } else {
+    return <p className="m-[8px]">Invalid game selected</p>
+  }
 };
