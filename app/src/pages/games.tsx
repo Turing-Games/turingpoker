@@ -82,7 +82,7 @@ export default function Games() {
             party: 'tables'
           })
         const rooms = ((await res.json()) ?? []) as TableState[];
-        console.log(rooms)
+        console.log(rooms[0])
         setTables(rooms)
         // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
       } catch (err) {

@@ -2,6 +2,7 @@ import { useState, useEffect, startTransition } from 'react'
 import * as React from 'react';
 import PartySocket from "partysocket";
 import PokerGame from "./poker/PokerGame";
+import KuhnGame from "./poker/KuhnGame";
 import * as PokerLogic from "../party/src/game-logic/poker";
 import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 
@@ -17,7 +18,7 @@ export type ClientState = {
   updateLog: ServerUpdateMessage[];
 };
 
-export default function GameClient({ gameId, gameType }: { gameId?: string, gameType?: string }) {
+export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: string, gameType?: string }) {
   let [clientState, setClientState] = useState<ClientState>({
     isConnected: false,
     serverState: null,
@@ -26,6 +27,11 @@ export default function GameClient({ gameId, gameType }: { gameId?: string, game
     playerId: null,
     updateLog: [],
   });
+
+  const games = {
+    'poker': PokerGame,
+    'kuhn': KuhnGame,
+  }
 
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
@@ -98,7 +104,10 @@ export default function GameClient({ gameId, gameType }: { gameId?: string, game
     };
   }, [setClientState]);
 
+  console.log(clientState)
+
   return (
-    <PokerGame clientState={clientState} previousActions={previousActions} />
+    // <PokerGame clientState={clientState} previousActions={previousActions} />
+    React.createElement(games[gameType], { clientState, previousActions })
   );
 };

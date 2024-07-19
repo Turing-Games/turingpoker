@@ -1,4 +1,4 @@
-import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/server";
+import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/games";
 import combinations from "@app/party/src/utils/combinations";
 
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
@@ -104,8 +104,8 @@ export interface IPokerGame {
 export type GameLog = string[];
 
 function createDeck(): Card[] {
-  const suits: Suit[] = ['hearts', 'diamonds', 'clubs', 'spades'];
-  const ranks: Rank[] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+  const suits: Suit[] = ['hearts'];
+  const ranks: Rank[] = [11, 12, 13];
   return suits.flatMap(suit => ranks.map(rank => ({ suit, rank })));
 }
 
@@ -131,7 +131,7 @@ function dealHands(players: PlayerID[], deck: Card[]): Record<PlayerID, [Card, C
 export function createPokerGame(config: IPokerConfig, players: PlayerID[], stacks: number[]): IPokerGame {
   if (players.length != stacks.length) throw new Error("Number of players and stacks must be equal")
   if (players.length < 2) throw new Error("Must have at least 2 players");
-  if (players.length > config.maxPlayers) throw new Error("Too many players");
+  if (players.length > 2) throw new Error("Too many players");
   const deck = shuffleDeck(createDeck());
   const hands = dealHands(players, deck);
   const playerCompletedRound: Record<PlayerID, PokerRound> = {};
