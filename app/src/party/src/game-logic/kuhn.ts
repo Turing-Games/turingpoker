@@ -1,4 +1,4 @@
-import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/games";
+import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/kuhn";
 import combinations from "@app/party/src/utils/combinations";
 
 export type Rank = 11 | 12 | 13;
@@ -192,7 +192,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card]>
     const players = [...state.players];
     const bestHands: Record<PlayerID, Hand> = {};
     for (const player of players) {
-      bestHands[player.id] = best5(hands[player.id].concat(state.cards));
+      bestHands[player.id] = hands[player.id];
     }
     const cmp = (a: IPokerPlayer, b: IPokerPlayer) => {
       if (a.folded && !b.folded) return -1;
@@ -312,23 +312,12 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
   else if (move.type == 'call' || move.type == 'raise') {
     let target = state.targetBet;
     if (move.type == 'raise') {
-      if (move.amount < 0) throw new Error("Raise amount must be non-negative");
-      let oldTarget = target;
-      target = Math.max(target, Math.min(move.amount + target, player.stack + player.currentBet));
-      if (target > oldTarget) {
-        // update everyone's lastRound to the previous round
-        for (const p of state.players) {
-          p.shouldMove = true;
-        }
-      }
       state.targetBet = target;
       log.push(`Player ${who} raises ${move.amount.toFixed(2)}`);
-    }
-    else {
+    } else {
       if (state.targetBet - player.currentBet > eps) {
         log.push(`Player ${who} calls ${(state.targetBet - player.currentBet).toFixed(2)}`);
-      }
-      else {
+      } else {
         log.push(`Player ${who} checks`);
       }
     }
@@ -352,30 +341,8 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
 
   let roundOver = !nextPlayer.shouldMove;
   if (roundOver) {
-    // move the round forward
-    if (state.round == 'pre-flop') {
-      state.round = 'flop';
-      for (let i = 0; i < 3; i++) state.cards.push(deck.pop() as Card)
-    }
-    else if (state.round == 'flop') {
-      state.round = 'turn';
-      state.cards.push(deck.pop() as Card)
-    }
-    else if (state.round == 'turn') {
-      state.round = 'river';
-      state.cards.push(deck.pop() as Card)
-    }
-    else if (state.round == 'river') {
-      state.round = 'showdown';
-      state.done = true;
-    }
-    if (state.round != 'showdown') {
-      let idx = state.players.length - 1;
-      while (state.players[idx].folded) {
-        idx = (idx + 1) % state.players.length;
-      }
-      out.next.state.whoseTurn = out.next.state.players[idx].id;
-    }
+    state.round = 'showdown';
+    state.done = true;
     for (const p of state.players) {
       p.shouldMove = true;
     }
@@ -484,15 +451,4 @@ export function handCmp(a: Hand, b: Hand): number {
   const valA = handVal(a), valB = handVal(b);
   if (valA.handRank != valB.handRank) return valA.handRank - valB.handRank;
   return lexicoCompare(valA.counts, valB.counts) || lexicoCompare(valA.vals, valB.vals);
-}
-
-export function best5(cards: Card[]): Hand {
-  if (cards.length < 5) throw new Error("Not enough cards to make a hand");
-  let best: Hand = cards.slice(0, 5) as Hand;
-  for (const comb of combinations(cards, 5)) {
-    if (handCmp(comb as Hand, best) > 0) {
-      best = comb as Hand;
-    }
-  }
-  return best;
 }

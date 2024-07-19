@@ -1,8 +1,9 @@
 import type * as Party from 'partykit/server';
-import * as Poker from '@app/party/src/game-logic/poker'
 import * as Kuhn from '@app/party/src/game-logic/kuhn'
 import { ClientMessage, ServerStateMessage, ServerUpdateMessage, TABLE_STATE_VERSION, TableState } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
+import { json, notFound } from './utils/response';
+import { RoomDeleteRequest, RoomInfoUpdateRequest } from './tables';
 
 export interface IPlayer {
   playerId: string;
@@ -18,8 +19,8 @@ export const MAX_PLAYERS = 2
 
 const defaultStack = 1000;
 export default class PartyServer implements Party.Server {
-  public gameState: Poker.IPokerGame | null = null;
-  public gameConfig: Poker.IPokerConfig = {
+  public gameState: Kuhn.IPokerGame | null = null;
+  public gameConfig: Kuhn.IPokerConfig = {
     dealerPosition: 0,
     bigBlind: 1,
     maxPlayers: MAX_PLAYERS,
@@ -70,6 +71,27 @@ export default class PartyServer implements Party.Server {
     this.addPlayer(conn.id);
   }
 
+  async onRequest(req: Party.Request) {
+    // Clients fetch list of rooms for server rendering pages via HTTP GET
+    if (req.method === "GET") return json(await this.getActiveRooms());
+
+    // Chatrooms report their connections via HTTP POST
+    // update room info and notify all connected clients
+    if (req.method === "POST") {
+      const roomList = await this.updateRoomInfo(req);
+      this.party.broadcast(JSON.stringify(roomList));
+      return json(roomList);
+    }
+
+    // admin api for clearing all rooms (not used in UI)
+    if (req.method === "DELETE") {
+      await this.party.storage.deleteAll();
+      return json({ message: "All room history cleared" });
+    }
+
+    return notFound();
+  }
+
   onClose(conn: Party.Connection) {
     this.removePlayer(conn.id);
   }
@@ -87,7 +109,7 @@ export default class PartyServer implements Party.Server {
       }
 
       // TODO: you shouldn't be able to start/reset game unless you are an admin
-      if (data.type == "action" && Poker.isAction(data.action)) {
+      if (data.type == "action" && Kuhn.isAction(data.action)) {
         this.handlePlayerAction(websocket.id, data.action);
       } else if (data.type == "join-game") {
         this.playerJoinGame(websocket.id);
@@ -112,7 +134,7 @@ export default class PartyServer implements Party.Server {
     }
   }
 
-  handlePlayerAction(playerId: string, action: Poker.Action) {
+  handlePlayerAction(playerId: string, action: Kuhn.Action) {
     const player = this.inGamePlayers.find((p) => p.playerId === playerId);
     if (!player) {
       console.log(
@@ -138,7 +160,7 @@ export default class PartyServer implements Party.Server {
     }
 
     try {
-      const { next, log } = Poker.step(this.gameState, action);
+      const { next, log } = Kuhn.step(this.gameState, action);
       for (const message of log) {
         this.queuedUpdates.push({
           type: "engine-log",
@@ -155,6 +177,8 @@ export default class PartyServer implements Party.Server {
       console.log(err);
     }
     if (this.gameState.state.done) {
+      console.log('endgame')
+      console.log(this.gameState.state.round, this.gameState.state.done)
       this.endGame(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );
@@ -187,7 +211,7 @@ export default class PartyServer implements Party.Server {
       }
     }
     this.processQueuedPlayers();
-    this.gameState = Poker.createPokerGame(
+    this.gameState = Kuhn.createPokerGame(
       this.gameConfig,
       this.inGamePlayers.map((p) => p.playerId),
       this.inGamePlayers.map((p) => this.stacks[p.playerId])
@@ -212,7 +236,7 @@ export default class PartyServer implements Party.Server {
     }
     this.processQueuedPlayers();
 
-    const { payouts, log } = Poker.payout(
+    const { payouts, log } = Kuhn.payout(
       this.gameState.state,
       this.gameState.hands
     );
@@ -279,10 +303,11 @@ export default class PartyServer implements Party.Server {
       config: this.gameConfig,
       gameState: this.gameState?.state ?? null,
       id: this.party.id,
-      version: TABLE_STATE_VERSION
+      version: TABLE_STATE_VERSION,
+      gameType: 'kuhn'
     }
 
-    return this.party.context.parties.kuhn.get(SINGLETON_ROOM_ID).fetch({
+    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id: this.party.id,
@@ -369,7 +394,7 @@ export default class PartyServer implements Party.Server {
     // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
     if (this.serverState.gamePhase == "active" && this.gameState) {
       try {
-        const { next, log } = Poker.forcedFold(this.gameState, playerId);
+        const { next, log } = Kuhn.forcedFold(this.gameState, playerId);
         this.gameState = next;
         for (const message of log) {
           this.queuedUpdates.push({
@@ -431,5 +456,35 @@ export default class PartyServer implements Party.Server {
       // await this.removeRoomMessages();
       // await this.removeRoomFromRoomList(id);
     }
+  }
+
+  /** Fetches list of active rooms */
+  async getActiveRooms(): Promise<TableState[]> {
+    const rooms = await this.party.storage.list<TableState>();
+    return [...rooms.values()];
+  }
+
+  /** Updates list of active rooms with information received from chatroom */
+  async updateRoomInfo(req: Party.Request) {
+    const update = (await req.json()) as
+      | RoomInfoUpdateRequest
+      | RoomDeleteRequest;
+
+    if (update.action === "delete") {
+      await this.party.storage.delete(update.id);
+      return this.getActiveRooms();
+    }
+
+    const info = update.tableState;
+    if (info.queuedPlayers.length + info.spectatorPlayers.length + info.inGamePlayers.length == 0) {
+      // if no users are present, delete the room
+      await this.party.storage.delete(update.id);
+      return this.getActiveRooms();
+    }
+
+    this.party.storage.put(update.id, info);
+
+    await this.party.storage.put(update.id, info);
+    return this.getActiveRooms();
   }
 }

@@ -7,7 +7,7 @@ import PartyServer from "./main";
  * The tables party's purpose is to keep track of all games, so we want
  * every client to connect to the same room instance by sharing the same room id.
  */
-export const SINGLETON_ROOM_ID = "tables";
+export const SINGLETON_ROOM_ID = "games";
 
 /** Poker room sends an update whenever server state changes */
 export type RoomInfoUpdateRequest = {
@@ -38,18 +38,6 @@ export default class TablesServer extends PartyServer {
   }
 
   async onRequest(req: Party.Request) {
-    // const token = req.headers.get("Authorization")
-    // const res = await fetch('http://localhost:5173/api/v1/auth', {
-    //   headers: {
-    //     'API_ID': '123',
-    //     'API_SECRET': '123'
-    //   }
-    // })
-    // const data = await res.json()
-    // console.log({ data })
-    // return new Response("Unauthorized", { status: 401 });
-    // return request
-
     // we only allow one instance of chatRooms party
     if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 

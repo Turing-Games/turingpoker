@@ -206,7 +206,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
           <Cards cards={gameState?.cards ?? []} />
         </div>
         <div className="tg-poker__table__controlpanel">
-          <GameControls clientState={clientState} joinLeave={!smallScreen} />
+          <GameControls clientState={clientState} joinLeave={!smallScreen} gameType={'poker'} />
         </div>
       </div>
       {smallScreen && joinButton}

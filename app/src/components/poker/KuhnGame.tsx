@@ -180,7 +180,6 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
             }}
           >
             {inGamePlayers?.map((opp, index) => {
-              console.log(hands)
               return (
                 <div
                   key={index}
@@ -203,10 +202,10 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
               );
             })}
           </div>
-          <GameStatus clientState={clientState} />
+          <GameStatus clientState={clientState} gameType={'kuhn'} />
         </div>
         <div className="tg-poker__table__controlpanel">
-          <GameControls clientState={clientState} joinLeave={!smallScreen} />
+          <GameControls clientState={clientState} joinLeave={!smallScreen} gameType={'kuhn'} />
         </div>
       </div>
       {smallScreen && joinButton}

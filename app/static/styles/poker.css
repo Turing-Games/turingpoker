@@ -123,7 +123,7 @@
   border-radius: 4px;
   padding: 8px;
   z-index: 5;
-  position: absolute;
+  position: relative;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);

@@ -41,8 +41,7 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     const roomId = Math.round(Math.random() * 10000);
     const socket = new PartySocket({
       host: PARTYKIT_URL,
-      // room: gameId ?? roomId.toString(),
-      room: 'tables',
+      room: gameId ?? roomId.toString(),
       party: gameType,
       query: async () => ({
         gameType: gameType

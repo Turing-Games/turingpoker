@@ -301,7 +301,8 @@ export default class PartyServer implements Party.Server {
       config: this.gameConfig,
       gameState: this.gameState?.state ?? null,
       id: this.party.id,
-      version: TABLE_STATE_VERSION
+      version: TABLE_STATE_VERSION,
+      gameType: 'poker'
     }
 
     return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
@@ -457,7 +458,6 @@ export default class PartyServer implements Party.Server {
 
   /** Fetches list of active rooms */
   async getActiveRooms(): Promise<TableState[]> {
-    console.log("Getting active rooms");
     const rooms = await this.party.storage.list<TableState>();
     return [...rooms.values()];
   }

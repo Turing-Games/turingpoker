@@ -14,7 +14,7 @@ const KV = ({ label, value }: { label: string, value: string }) => (
   </div>
 )
 
-function GameStatus({ clientState }: { clientState: ClientState }) {
+function GameStatus({ clientState, gameType = '' }: { clientState: ClientState, gameType?: string }) {
   const serverState = clientState?.serverState;
   const gameState = serverState?.gameState;
 
@@ -29,8 +29,13 @@ function GameStatus({ clientState }: { clientState: ClientState }) {
   return (
     <div className="tg-poker__table__gamestatus">
       <KV label="Pot" value={`$${gameState.pot.toFixed(2)}`} />
-      <KV label="Big blind" value={`$${gameState.bigBlind.toFixed(2)}`} />
-      <KV label="Small blind" value={`$${gameState.smallBlind.toFixed(2)}`} />
+      {
+        gameType !== 'kuhn' &&
+        <>
+          <KV label="Big blind" value={`$${gameState.bigBlind.toFixed(2)}`} />
+          <KV label="Small blind" value={`$${gameState.smallBlind.toFixed(2)}`} />
+        </>
+      }
     </div>
   )
 }

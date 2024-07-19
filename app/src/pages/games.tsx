@@ -38,6 +38,7 @@ export function TableCard({
       to={`/games/${table.id}/${table.gameType}`}
       key={table.id}
     >
+      <strong>{table.gameType.toUpperCase()}</strong>
       <Text>Table: {table.id}</Text>
       <Text>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</Text>
       <Text>{spectatorCount || 0} spectator{spectatorCount > 1 ? 's' : ''} in the room</Text>
@@ -79,7 +80,7 @@ export default function Games() {
           {
             host: PARTYKIT_URL,
             room: SINGLETON_ROOM_ID,
-            party: gameType
+            party: 'tables'
           })
         const rooms = ((await res.json()) ?? []) as TableState[];
         setTables(rooms)
@@ -131,7 +132,7 @@ export default function Games() {
               <div className="flex flex-wrap gap-[16px]">
                 {
                   tables.map((table, i) => {
-                    return <TableCard table={table} isAdmin={isAdmin} onDelete={deleteTable} />
+                    return <TableCard key={i} table={table} isAdmin={isAdmin} onDelete={deleteTable} />
                   })
                 }
               </div> :

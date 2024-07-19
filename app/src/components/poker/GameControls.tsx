@@ -3,7 +3,7 @@ import { ClientState } from "@app/client";
 import { sendMessage } from "@app/party/src/utils/websocket";
 import { useAuth } from "@clerk/clerk-react";
 
-function GameControls({ clientState, joinLeave }: { clientState: ClientState, joinLeave: boolean }) {
+function GameControls({ clientState, joinLeave, gameType }: { clientState: ClientState, joinLeave: boolean, gameType?: string }) {
   const serverState = clientState?.serverState;
   const gameState = serverState?.gameState;
 
@@ -22,11 +22,15 @@ function GameControls({ clientState, joinLeave }: { clientState: ClientState, jo
 
   // Function to handle raising
   const handleRaise = () => {
-    const amount = prompt(`Enter amount to raise (minimum: $${minRaiseAmount}):`, minRaiseAmount.toString());
-    if (amount && parseInt(amount, 10) >= minRaiseAmount) {
-      sendMessage(socket, { type: "action", action: { type: "raise", amount: parseInt(amount, 10) } });
+    if (gameType !== 'kuhn') {
+      const amount = prompt(`Enter amount to raise (minimum: $${minRaiseAmount}):`, minRaiseAmount.toString());
+      if (amount && parseInt(amount, 10) >= minRaiseAmount) {
+        sendMessage(socket, { type: "action", action: { type: "raise", amount: parseInt(amount, 10) } });
+      } else {
+        alert(`Invalid raise amount. You must raise at least $${minRaiseAmount}.`);
+      }
     } else {
-      alert(`Invalid raise amount. You must raise at least $${minRaiseAmount}.`);
+      sendMessage(socket, { type: "action", action: { type: "raise", amount: parseInt('1', 10) } });
     }
   };
 
