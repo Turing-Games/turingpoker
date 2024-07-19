@@ -322,7 +322,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
       }
     }
 
-    const toCall = target - player.currentBet;
+    const toCall = 1
     const amount = Math.min(toCall, player.stack);
     player.stack -= amount;
     player.currentBet += amount;
@@ -338,6 +338,9 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
     nextPlayerIndex = (nextPlayerIndex + 1) % state.players.length;
   }
   const nextPlayer = state.players[nextPlayerIndex];
+  if (move.type == 'raise') {
+    nextPlayer.shouldMove = true;
+  }
 
   let roundOver = !nextPlayer.shouldMove;
   if (roundOver) {

@@ -80,7 +80,13 @@ export default function Games() {
           {
             host: PARTYKIT_URL,
             room: SINGLETON_ROOM_ID,
-            party: 'tables'
+            party: 'tables',
+            query: async () => {
+              return {
+                gameType: gameType,
+                gameStatus: gameStatus,
+              }
+            }
           })
         const rooms = ((await res.json()) ?? []) as TableState[];
         setTables(rooms)
@@ -92,7 +98,7 @@ export default function Games() {
     }
 
     getData()
-  }, [])
+  }, [gameType, gameStatus])
 
   const gameTypeFilters = [
     { label: 'Game Type', value: '' },

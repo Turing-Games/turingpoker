@@ -42,7 +42,7 @@ export default class TablesServer extends PartyServer {
     if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
     // Clients fetch list of rooms for server rendering pages via HTTP GET
-    if (req.method === "GET") return json(await this.getActiveRooms());
+    if (req.method === "GET") return json(await this.getActiveRooms(req));
 
     // Chatrooms report their connections via HTTP POST
     // update room info and notify all connected clients
@@ -62,9 +62,15 @@ export default class TablesServer extends PartyServer {
   }
 
   /** Fetches list of active rooms */
-  async getActiveRooms(): Promise<TableState[]> {
+  async getActiveRooms(req?: any): Promise<TableState[]> {
+    const gameType = new URLSearchParams(req.url.split("?")[1]).get("gameType");
+    const gameStatus = new URLSearchParams(req.url.split("?")[1]).get("gameStatus");
     const rooms = await this.party.storage.list<TableState>();
-    return [...rooms.values()];
+    const filteredRooms = Array.from(rooms?.values())?.filter(room => {
+      if (gameType && room.gameType !== gameType) return false;
+      return true;
+    })
+    return [...filteredRooms];
   }
   /** Updates list of active rooms with information received from chatroom */
   async updateRoomInfo(req: Party.Request) {

@@ -177,8 +177,6 @@ export default class PartyServer implements Party.Server {
       console.log(err);
     }
     if (this.gameState.state.done) {
-      console.log('endgame')
-      console.log(this.gameState.state.round, this.gameState.state.done)
       this.endGame(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );
