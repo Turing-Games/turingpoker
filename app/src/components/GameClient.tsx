@@ -34,7 +34,7 @@ export default function GameClient({ gameId, gameType }: { gameId?: string, game
     const socket = new PartySocket({
       host: PARTYKIT_URL,
       room: gameId ?? roomId.toString(),
-      party: "poker",
+      party: "games",
     });
 
     socket.addEventListener("open", () => {

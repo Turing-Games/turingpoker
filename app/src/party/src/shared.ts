@@ -55,6 +55,7 @@ export type TableState = {
     inGamePlayers: IPlayer[];
     config: Poker.IPokerConfig;
     gameState: Poker.IPokerSharedState | null;
+    gameType: string;
     // bump this when making breaking changes so the client doesn't try to render it
     version: number;
 }

@@ -76,7 +76,6 @@ export interface IPokerConfig {
     maxPlayers: number;
     autoStart: boolean
     minPlayers: number
-    type: string;
 }
 
 export interface IPokerSharedState {

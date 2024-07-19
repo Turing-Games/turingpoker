@@ -82,6 +82,7 @@ export default function Games() {
             party: 'tables'
           })
         const rooms = ((await res.json()) ?? []) as TableState[];
+        console.log(rooms)
         setTables(rooms)
         // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
       } catch (err) {
@@ -94,13 +95,13 @@ export default function Games() {
   }, [])
 
   const gameTypeFilters = [
-    { label: 'All', value: 'all' },
+    { label: 'Game Type', value: '' },
     { label: 'Poker', value: 'poker' },
     { label: 'Kuhn', value: 'kuhn' },
   ]
 
   const gameStatusFilters = [
-    { label: 'All', value: 'all' },
+    { label: 'Game Status', value: '' },
     { label: 'Pending', value: 'pending' },
     { label: 'Active', value: 'active' },
   ]
