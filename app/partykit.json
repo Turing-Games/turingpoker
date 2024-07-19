@@ -1,7 +1,8 @@
 {
   "$schema": "https://www.partykit.io/schema.json",
-  "name": "turinggames-poker",
+  "name": "websockets",
   "main": "src/party/src/main.ts",
+  "domain": "ws.turingpoker.com",
   "parties": {
     "poker": "src/party/src/poker.ts",
     "kuhn": "src/party/src/kuhn.ts",
