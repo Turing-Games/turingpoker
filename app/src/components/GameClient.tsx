@@ -8,6 +8,7 @@ import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 
 import '@static/styles/styles.css'
 import { PARTYKIT_URL } from '@app/constants/partykit';
+import { DEFAULT_CLIENT_STATE } from '@app/constants/games/shared';
 
 export type ClientState = {
   isConnected: boolean;
@@ -20,15 +21,7 @@ export type ClientState = {
 };
 
 export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: string, gameType?: string }) {
-  let [clientState, setClientState] = useState<ClientState>({
-    isConnected: false,
-    serverState: null,
-    socket: null,
-    lastServerState: null,
-    playerId: null,
-    updateLog: [],
-    gameType: ''
-  });
+  let [clientState, setClientState] = useState<ClientState>(DEFAULT_CLIENT_STATE);
 
   const games = {
     'poker': PokerGame,

@@ -23,7 +23,7 @@ export default function Select({
   return (
     <div className="relative">
       <div
-        className="flex items-center gap-[6px] justify-between bg-white p-[8px] cursor-pointer border rounded-lg w-full h-[40px]"
+        className="flex items-center gap-[6px] justify-between bg-white p-[8px] cursor-pointer border rounded-lg w-full h-[40px] text-sm"
         onClick={() => setIsOpen(!isOpen)}
         style={{
           width: width
@@ -42,7 +42,7 @@ export default function Select({
           {options.map(option => (
             <div
               key={option.value}
-              className="w-full p-[8px] hover:bg-gray-100 cursor-pointer w-full"
+              className="w-full p-[8px] hover:bg-gray-100 cursor-pointer w-full text-sm"
               onClick={() => {
                 setOption(option.value)
                 if (onChange) {
