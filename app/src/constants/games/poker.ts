@@ -19,10 +19,10 @@ export const DEFAULT_TABLE_STATE = {
 }
 
 export const CONFIGURABLE_PROPERTIES = [
-  { label: 'Dealer Position', key: 'dealerPosition', type: 'number', default: 0 },
-  { label: 'Big Blind', key: 'bigBlind', type: 'number', default: 1 },
-  { label: 'Small Blind', key: 'smallBlind', type: 'number', default: 1 },
-  { label: 'Max Players', key: 'maxPlayers', type: 'number', default: 10 },
-  { label: 'Min Players', key: 'minPlayers', type: 'number', default: 2 },
-  { label: 'Auto Start', key: 'autoStart', type: 'checkbox', default: AUTO_START }
+  { label: 'Dealer Position', value: 'dealerPosition', type: 'number', default: 0 },
+  { label: 'Big Blind', value: 'bigBlind', type: 'number', default: 1 },
+  { label: 'Small Blind', value: 'smallBlind', type: 'number', default: 1 },
+  { label: 'Max Players', value: 'maxPlayers', type: 'number', default: 10 },
+  { label: 'Min Players', value: 'minPlayers', type: 'number', default: 2 },
+  { label: 'Auto Start', value: 'autoStart', type: 'checkbox', default: AUTO_START }
 ] as any

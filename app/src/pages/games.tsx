@@ -13,6 +13,8 @@ import Select from '@app/components/Select';
 import { GAMES, MODAL_STYLES } from '@app/constants/games/shared';
 import { CONFIGURABLE_PROPERTIES as POKER_CONFIG } from '@app/constants/games/poker';
 import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuhn';
+import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
+import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 
 
 export function TableCard({
@@ -131,6 +133,11 @@ export default function Games() {
     'kuhn': KUHN_CONFIG
   } as any
 
+  const defaultTableStates = {
+    'poker': POKER_DEFAULT_TABLE,
+    'kuhn': KUHN_DEFAULT_TABLE
+  } as any
+
   return (
     <Main>
       <div className="p-[20px] w-full">
@@ -196,15 +203,14 @@ export default function Games() {
               room: roomId.toString(),
               party: gameTypeForm
             });
-            const res = await fetch(partyUrl, {
-              method: "POST",
-              body: JSON.stringify({
-                action: "create",
-                gameType,
-                minPlayers,
-                maxPlayers
-              })
-            });
+            console.log(socket)
+            // const res = await fetch(partyUrl, {
+            //   method: "POST",
+            //   body: JSON.stringify({
+            //     action: "create",
+            //     ...gameConfig
+            //   })
+            // });
             // const rooms = ((await res.json()) ?? []) as TableState[];
             // setTables(rooms)
             setIsOpen(false)
@@ -223,52 +229,29 @@ export default function Games() {
                 placeholder="Game type"
                 onChange={(value) => {
                   setGameTypeForm(value)
-                  setGameConfig(configurableProperties[value])
+                  setGameConfig(defaultTableStates[value])
                 }}
               ></Select>
             </div>
-            {/* <div
-              className="flex gap-[8px] justify-between w-full"
-            >
-              <div>
-                <label htmlFor={'min-players'}>Minimum Players</label>
-                <input
-                  id="min-players"
-                  min={2}
-                  value={minPlayers}
-                  type="number"
-                  onChange={(e) => setMinPlayers(parseInt(e.target.value))}
-                  className="border border-black rounded-[4px] p-[8px] w-full text-sm"
-                  placeholder="Minimum Players"
-                />
-              </div>
-              <div>
-                <label htmlFor={'max-players'}>Maximum Players</label>
-                <input
-                  id="max-players"
-                  min={2}
-                  value={maxPlayers}
-                  type="number"
-                  onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
-                  className="border border-black rounded-[4px] p-[8px] w-full text-sm"
-                  placeholder="Maximum Players"
-                />
-              </div>
-            </div> */}
             <div className="grid grid-cols-2 gap-[8px]">
               {
                 configurableProperties[gameTypeForm]?.map((property, i) => {
                   return (
-                    <div>
+                    <div
+                      style={property.type === 'checkbox' ? {
+                        display: 'flex',
+                        gap: '8px',
+                        alignItems: 'center',
+                      } : {}}
+                    >
                       <label htmlFor={property.value}>{property.label}</label>
                       <input
                         id={property.value}
-                        min={2}
+                        min={0}
                         value={property.default}
                         type={property.type}
-                        onChange={(e) => setMaxPlayers(parseInt(e.target.value))}
+                        onChange={(e) => setGameConfig({ ...gameConfig, [property.value]: e.target.value })}
                         className="border border-black rounded-[4px] p-[8px] w-full text-sm"
-                        placeholder="Maximum Players"
                       />
                     </div>
                   )
