@@ -1,8 +1,9 @@
 import { CheckIcon, EyeOpenIcon, InfoCircledIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
-import { Callout, Flex, Heading, Text } from '@radix-ui/themes'
+import { Callout, Code, DataList, Flex, Heading, Text } from '@radix-ui/themes'
 import * as React from 'react'
 import { UserContext } from '@app/context/UserContext'
 import * as Form from '@radix-ui/react-form';
+import { Link } from 'react-router-dom';
 
 export default function Keys() {
 
@@ -86,14 +87,41 @@ export default function Keys() {
           className="flex items-center gap-[8px] mb-[16px] cursor-pointer"
           onClick={() => setOpenInfo(!openInfo)}
         >
-          <PlusIcon />
+          <PlusIcon
+            className='transition duration-300'
+            style={{
+              transform: openInfo ? 'rotate(45deg)' : 'rotate(0deg)'
+            }}
+          />
           <Heading size="4">Connecting a bot</Heading>
         </div>
-        <div>
-          <Text className="text-sm block mb-[32px]">
-            To authenticate with the API, the following data will be included in the request as parameters:<br />
-            <code>{`?key={api_key}`}</code>
-          </Text>
+        <div
+          className='transition duration-300 overflow-hidden'
+          style={{
+            height: openInfo ? 'auto' : 0,
+          }}
+        >
+          <div className="block mb-[32px] ml-[8px] pl-[16px] border-black border-l">
+            <p className="mb-[16px]">To connect a bot to the game, follow these steps:</p>
+            <ol className="list-decimal pl-[32px]">
+              <li className="mb-[8px]">
+                <Text>Create an API Key in your account.</Text>
+              </li>
+              <li className="mb-[8px]">
+                <Text>
+                  Provide the following arguments in your bot's Python template:<br />
+                  <Text className='block' weight={'bold'}>--host <Code>ws.turingpoker.com</Code></Text>
+                  <Text className='block' weight={'bold'}>--port <Code>1999</Code></Text>
+                  <Text className='block'><strong>--room</strong> Numerical ID listed on the <Link to='/games'>games</Link> page</Text>
+                  <Text className='block'><strong>--party</strong> Type of game {'(valid values are: "poker" or "kuhn")'}</Text>
+                  <Text className='block'><strong>--key</strong> API Key generated for bot</Text>
+                </Text>
+              </li>
+              <li>
+                <Text>Run the script using <Code>screen</Code> or as a background process</Text>
+              </li>
+            </ol>
+          </div>
         </div>
         {
           loading ?

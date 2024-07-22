@@ -48,11 +48,8 @@ export function TableCard({
       <strong>{table?.gameType?.toUpperCase()}</strong>
       <Text>Table: {table.id}</Text>
       <Text>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</Text>
-      <Text>{spectatorCount || 0} spectator{spectatorCount > 1 ? 's' : ''} in the room</Text>
-      {table.gameState && <>
-        <Text>Players: {table.gameState.players.length}</Text>
-        {/* {table.gameState.players.map(player => <Text key={player.id}>{player.id}: ${player.stack}</Text>)} */}
-      </>}
+      <Text>{spectatorCount || 0} spectator{spectatorCount > 1 || spectatorCount === 0 ? 's' : ''} in the room</Text>
+      <Text>Players: {table?.gameState?.players?.length || 0}</Text>
     </Link>
   </div>
 }
