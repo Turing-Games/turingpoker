@@ -38,6 +38,17 @@ app.get("/api/v1/users/:id", async (c) => {
   }
 });
 
+// GAMES
+app.get("/api/v1/games", async (c) => {
+  let usrStmt = c.env.DB.prepare('SELECT * from games;')
+  try {
+    const { results } = await usrStmt.all()
+    return c.json(results);
+  } catch (e) {
+    return c.json({ message: JSON.stringify(e) }, 500);
+  }
+})
+
 // API KEYS
 app.get("/api/v1/users/:id/keys", async (c) => {
   const id = c.req.param('id')

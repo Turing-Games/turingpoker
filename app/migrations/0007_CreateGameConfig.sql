@@ -1,0 +1,9 @@
+-- Migration number: 0007 	 2024-07-21T22:07:02.247Z
+CREATE TABLE IF NOT EXISTS game_configs (
+  id TEXT PRIMARY KEY UNIQUE NOT NULL,
+  game_id TEXT,
+  min_players INTEGER NOT NULL DEFAULT 2,
+  max_players INTEGER NOT NULL DEFAULT 8,
+  auto_start BOOLEAN NOT NULL DEFAULT FALSE,
+  FOREIGN KEY(game_id) REFERENCES games(id)
+);

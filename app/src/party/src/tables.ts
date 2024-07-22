@@ -63,14 +63,17 @@ export default class TablesServer extends PartyServer {
 
   /** Fetches list of active rooms */
   async getActiveRooms(req?: any): Promise<TableState[]> {
-    const gameType = new URLSearchParams(req.url.split("?")[1]).get("gameType");
-    const gameStatus = new URLSearchParams(req.url.split("?")[1]).get("gameStatus");
-    const rooms = await this.party.storage.list<TableState>();
-    const filteredRooms = Array.from(rooms?.values())?.filter(room => {
-      if (gameType && room.gameType !== gameType) return false;
-      return true;
-    })
-    return [...filteredRooms];
+    const gameType = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameType");
+    const gameStatus = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameStatus");
+    let rooms = await this.party.storage.list<TableState>();
+    if (gameType) {
+      rooms = Array.from(rooms?.values())?.filter(room => {
+        if (gameType && room.gameType !== gameType) return false;
+        return true;
+      })
+    }
+
+    return [...rooms];
   }
   /** Updates list of active rooms with information received from chatroom */
   async updateRoomInfo(req: Party.Request) {
@@ -84,15 +87,16 @@ export default class TablesServer extends PartyServer {
     }
 
     const info = update.tableState;
-    if (info.queuedPlayers.length + info.spectatorPlayers.length + info.inGamePlayers.length == 0) {
-      // if no users are present, delete the room
-      await this.party.storage.delete(update.id);
-      return this.getActiveRooms();
-    }
+    const totalPlayers = info?.queuedPlayers?.length + info?.spectatorPlayers?.length + info?.inGamePlayers?.length;
+
+    // if (totalPlayers === 0) {
+    //   // if no users are present, delete the room
+    //   await this.party.storage.delete(update.id);
+    //   return this.getActiveRooms();
+    // }
 
     this.party.storage.put(update.id, info);
-
-    await this.party.storage.put(update.id, info);
+    // await this.party.storage.put(update.id, info);
     return this.getActiveRooms();
   }
 }

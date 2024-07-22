@@ -32,7 +32,7 @@ export function TableCard({
   return <div style={{ position: 'relative' }}>
     {isAdmin &&
       <div
-        className="cursor-pointer border border-black rounded-[50px] inline-block justify-end p-[4px] abslute top-[-10px] right-[-10px] bg-white"
+        className="cursor-pointer border border-black rounded-[50px] inline-block justify-end p-[4px] absolute top-[-10px] right-[-10px] bg-white"
         onClick={() => {
           onDelete(table.id)
         }}
@@ -45,7 +45,7 @@ export function TableCard({
       to={`/games/${table.id}/${table.gameType}`}
       key={table.id}
     >
-      <strong>{table.gameType.toUpperCase()}</strong>
+      <strong>{table?.gameType?.toUpperCase()}</strong>
       <Text>Table: {table.id}</Text>
       <Text>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</Text>
       <Text>{spectatorCount || 0} spectator{spectatorCount > 1 ? 's' : ''} in the room</Text>
@@ -79,36 +79,37 @@ export default function Games() {
         id: id
       })
     });
-    const rooms = ((await res.json()) ?? []) as TableState[];
-    setTables(rooms)
+
+    getTables()
+  }
+
+  const getTables = async () => {
+    setLoading(true)
+    try {
+      const res = await PartySocket.fetch(
+        {
+          host: PARTYKIT_URL,
+          room: SINGLETON_ROOM_ID,
+          party: 'tables',
+          query: async () => {
+            return {
+              gameType: gameType,
+              gameStatus: gameStatus,
+            }
+          }
+        })
+      const rooms = ((await res.json()) ?? []) as TableState[];
+      console.log({ rooms })
+      setTables(rooms)
+      // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
+    } catch (err) {
+      console.log(err)
+    }
+    setLoading(false)
   }
 
   React.useEffect(() => {
-    const getData = async () => {
-      setLoading(true)
-      try {
-        const res = await PartySocket.fetch(
-          {
-            host: PARTYKIT_URL,
-            room: SINGLETON_ROOM_ID,
-            party: 'tables',
-            query: async () => {
-              return {
-                gameType: gameType,
-                gameStatus: gameStatus,
-              }
-            }
-          })
-        const rooms = ((await res.json()) ?? []) as TableState[];
-        setTables(rooms)
-        // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
-      } catch (err) {
-        console.log(err)
-      }
-      setLoading(false)
-    }
-
-    getData()
+    getTables()
   }, [gameType, gameStatus])
 
   const gameTypeFilters = [
@@ -181,7 +182,7 @@ export default function Games() {
         }
       </div>
       <Modal
-        isOpen={true}
+        isOpen={isOpen}
         onRequestClose={() => setIsOpen(false)}
         style={MODAL_STYLES}
       >
@@ -203,16 +204,16 @@ export default function Games() {
               room: roomId.toString(),
               party: gameTypeForm
             });
-            console.log(socket)
-            // const res = await fetch(partyUrl, {
-            //   method: "POST",
-            //   body: JSON.stringify({
-            //     action: "create",
-            //     ...gameConfig
-            //   })
-            // });
-            // const rooms = ((await res.json()) ?? []) as TableState[];
-            // setTables(rooms)
+            // console.log(socket)
+            await fetch(partyUrl, {
+              method: "POST",
+              body: JSON.stringify({
+                action: "create",
+                id: roomId,
+                ...gameConfig
+              })
+            });
+            getTables()
             setIsOpen(false)
           }}
           className="flex flex-col gap-[8px] mt-[16px]"
