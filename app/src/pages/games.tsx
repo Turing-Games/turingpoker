@@ -27,7 +27,8 @@ export function TableCard({
   isAdmin: boolean
 }) {
 
-  const spectatorCount = table?.spectatorPlayers?.length + table?.queuedPlayers?.length;
+  const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
+  const playerCount = table?.gameState?.players?.length || 0;
 
   return <div style={{ position: 'relative' }}>
     {isAdmin &&
@@ -47,9 +48,9 @@ export function TableCard({
     >
       <strong>{table?.gameType?.toUpperCase()}</strong>
       <Text>Table: {table.id}</Text>
-      <Text>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</Text>
-      <Text>{spectatorCount || 0} spectator{spectatorCount > 1 || spectatorCount === 0 ? 's' : ''} in the room</Text>
-      <Text>Players: {table?.gameState?.players?.length || 0}</Text>
+      <Text>Status: {table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`}</Text>
+      <Text>Spectators: {spectatorCount}</Text>
+      <Text>Players: {playerCount}</Text>
     </Link>
   </div>
 }
