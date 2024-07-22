@@ -73,7 +73,7 @@ export default class TablesServer extends PartyServer {
       })
     }
 
-    return [...rooms];
+    return [...rooms.values()];
   }
   /** Updates list of active rooms with information received from chatroom */
   async updateRoomInfo(req: Party.Request) {

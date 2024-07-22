@@ -50,8 +50,8 @@ export function TableCard({
       <Text>{table.gameState ? `In game: ${table.gameState.round}` : `Waiting to start`}</Text>
       <Text>{spectatorCount || 0} spectator{spectatorCount > 1 ? 's' : ''} in the room</Text>
       {table.gameState && <>
-        <Text>Players:</Text>
-        {table.gameState.players.map(player => <Text key={player.id}>{player.id}: ${player.stack}</Text>)}
+        <Text>Players: {table.gameState.players.length}</Text>
+        {/* {table.gameState.players.map(player => <Text key={player.id}>{player.id}: ${player.stack}</Text>)} */}
       </>}
     </Link>
   </div>

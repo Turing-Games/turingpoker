@@ -1,5 +1,5 @@
-import { CheckIcon, EyeOpenIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
-import { Heading, Text } from '@radix-ui/themes'
+import { CheckIcon, EyeOpenIcon, InfoCircledIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
+import { Callout, Flex, Heading, Text } from '@radix-ui/themes'
 import * as React from 'react'
 import { UserContext } from '@app/context/UserContext'
 import * as Form from '@radix-ui/react-form';
@@ -11,6 +11,7 @@ export default function Keys() {
   const [name, setName] = React.useState('')
   const [keys, setKeys] = React.useState<any[]>([])
   const [showKey, setShowKey] = React.useState(false)
+  const [openInfo, setOpenInfo] = React.useState(false)
 
   const { user } = React.useContext(UserContext)
 
@@ -75,11 +76,25 @@ export default function Keys() {
         </button>
       </div>
       <div>
-        <Text className="text-sm block my-[16px]">Once generated, API Key will not be visible again.</Text>
-        <Text className="text-sm block mb-[32px]">
-          To authenticate with the API, the following data will be included in the request as parameters:<br />
-          <code>{`?api_token={api_token}`}</code>
-        </Text>
+        <Callout.Root className="my-[32px]">
+          <Callout.Icon>
+            <InfoCircledIcon />
+          </Callout.Icon>
+          <Callout.Text>Once generated, API Key will not be visible again.</Callout.Text>
+        </Callout.Root>
+        <div
+          className="flex items-center gap-[8px] mb-[16px] cursor-pointer"
+          onClick={() => setOpenInfo(!openInfo)}
+        >
+          <PlusIcon />
+          <Heading size="4">Connecting a bot</Heading>
+        </div>
+        <div>
+          <Text className="text-sm block mb-[32px]">
+            To authenticate with the API, the following data will be included in the request as parameters:<br />
+            <code>{`?key={api_key}`}</code>
+          </Text>
+        </div>
         {
           loading ?
             <Text>Loading...</Text> :
