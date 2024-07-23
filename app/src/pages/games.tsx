@@ -97,7 +97,6 @@ export default function Games() {
           }
         })
       const rooms = ((await res.json()) ?? []) as TableState[];
-      console.log({ rooms })
       setTables(rooms)
       // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     } catch (err) {
@@ -202,7 +201,6 @@ export default function Games() {
               room: roomId.toString(),
               party: gameTypeForm
             });
-            // console.log(socket)
             await fetch(partyUrl, {
               method: "POST",
               body: JSON.stringify({

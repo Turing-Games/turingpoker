@@ -66,7 +66,10 @@ export default function Keys() {
         name
       })
       setTimeout(() => {
-        updateApiKey(selectedKey.id, selectedKey)
+        updateApiKey(selectedKey.id, {
+          ...selectedKey,
+          name
+        })
       }, 1500)
     }
   }
@@ -141,7 +144,6 @@ export default function Keys() {
               <div className="flex flex-col gap-[8px]">
                 {
                   keys.map((key, i) => {
-                    console.log(key)
                     return (
                       <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`} key={key.id}>
                         <div className={`flex items-center justify-between gap-[16px]`} key={i}>
@@ -156,11 +158,11 @@ export default function Keys() {
                           />
                           <div className="flex items-center gap-[16px]">
                             {
-                              key.viewed && key.id !== showKey ?
-                                <input className="bg-transparent" type="password" disabled value={key.key} /> :
+                              key.viewed || key.id !== showKey ?
+                                <input className="bg-transparent" type="password" disabled value={'1234567890123456789012345678901234567890'} /> :
                                 <p className="block text-xs p-[4px] max-w-[300px] w-full">{key.key}</p>
                             }
-                            {!key.viewed &&
+                            {!key.viewed ?
                               <div
                                 className="cursor-pointer"
                                 onClick={() => {
@@ -172,7 +174,11 @@ export default function Keys() {
                                 }}
                               >
                                 <EyeOpenIcon />
+                              </div> :
+                              <div>
+                                <EyeOpenIcon className="opacity-0" />
                               </div>
+
                             }
                           </div>
                           <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
