@@ -131,6 +131,7 @@ app.post("/api/v1/keys", async (c) => {
     const key = `turing_${crypto.randomUUID()}`
 
     const payload = {
+      id: uuid,
       key,
       role: 'bot'
     }
