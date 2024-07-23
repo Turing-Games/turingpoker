@@ -6,9 +6,11 @@ compatibility_flags = [ "nodejs_compat" ]
 
 [env.preview.vars]
 HONO_ENV = "production"
+BOT_SECRET_KEY = "95eff06e276944f587efa311d5b402b3da520af77cfaf3ca78bd7e6eb3776b04"
 
 [env.production.vars]
 HONO_ENV = "production"
+BOT_SECRET_KEY = "95eff06e276944f587efa311d5b402b3da520af77cfaf3ca78bd7e6eb3776b04"
 
 [[d1_databases]]
 binding = "DB"

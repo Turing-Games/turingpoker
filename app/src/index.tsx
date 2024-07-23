@@ -1,6 +1,7 @@
 import { D1Database } from '@cloudflare/workers-types';
 import { Hono } from 'hono'
 import { createHash } from 'node:crypto';
+import { decode, sign, verify } from 'hono/jwt'
 
 // This ensures c.env.DB is correctly typed
 export type Bindings = {
@@ -128,10 +129,19 @@ app.post("/api/v1/keys", async (c) => {
     // generate key
     const uuid = crypto.randomUUID()
     const key = `turing_${crypto.randomUUID()}`
+
+    const payload = {
+      key,
+      role: 'bot'
+    }
+    const secret = c.env.BOT_SECRET_KEY
+    const token = await sign(payload, secret)
+
+
     let { results } = await c.env.DB.prepare(
       'INSERT into api_keys (id, user_id, bot_id, name, key) VALUES (?, ?, ?, ?, ?)'
     )
-      .bind(uuid, userId, botId, name, key)
+      .bind(uuid, userId, botId, name, token)
       .all()
     return c.json(results);
   } catch (e) {
