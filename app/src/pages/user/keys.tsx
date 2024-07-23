@@ -9,9 +9,8 @@ export default function Keys() {
 
   const [loading, setLoading] = React.useState(true)
   const [updateLoading, setUpdateLoading] = React.useState(false)
-  const [name, setName] = React.useState('')
   const [keys, setKeys] = React.useState<any[]>([])
-  const [showKey, setShowKey] = React.useState(false)
+  const [showKey, setShowKey] = React.useState<string>('') // key id
   const [openInfo, setOpenInfo] = React.useState(false)
   const [selectedKey, setSelectedKey] = React.useState({})
 
@@ -29,13 +28,10 @@ export default function Keys() {
     getKeys()
   }
 
-  const updateApiKey = async (id = '', params = {}, reveal = false) => {
+  const updateApiKey = async (id = '', params = {}) => {
     await fetch(`/api/v1/keys/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({
-        ...params
-        // viewed: true,
-      })
+      body: JSON.stringify(params)
     })
   }
 
@@ -145,9 +141,9 @@ export default function Keys() {
               <div className="flex flex-col gap-[8px]">
                 {
                   keys.map((key, i) => {
+                    console.log(key)
                     return (
                       <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`} key={key.id}>
-                        <p className="mb-[8px] text-xs">ID: {key.id}</p>
                         <div className={`flex items-center justify-between gap-[16px]`} key={i}>
                           <input
                             type="text"
@@ -158,30 +154,29 @@ export default function Keys() {
                             onFocus={() => setSelectedKey(key)}
                             onBlur={() => setSelectedKey({})}
                           />
-                          {
-                            key.viewed ?
-                              <input className="bg-transparent" type="password" disabled value={key.key} /> :
-                              <p className="block text-xs p-[4px]">{key.key}</p>
-                          }
-                          <div>
-                            <div className="flex items-center gap-[8px]">
-                              {!key.viewed &&
-                                <div
-                                  className="cursor-pointer"
-                                  onClick={() => {
-                                    updateApiKey(key.id, {
-                                      ...key,
-                                      viewed: true
-                                    }, true)
-                                  }}
-                                >
-                                  <EyeOpenIcon />
-                                </div>
-                              }
-                              <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
-                                <TrashIcon className="text-[red]" />
+                          <div className="flex items-center gap-[16px]">
+                            {
+                              key.viewed && key.id !== showKey ?
+                                <input className="bg-transparent" type="password" disabled value={key.key} /> :
+                                <p className="block text-xs p-[4px] max-w-[300px] w-full">{key.key}</p>
+                            }
+                            {!key.viewed &&
+                              <div
+                                className="cursor-pointer"
+                                onClick={() => {
+                                  setShowKey(key.id)
+                                  updateApiKey(key.id, {
+                                    ...key,
+                                    viewed: true
+                                  })
+                                }}
+                              >
+                                <EyeOpenIcon />
                               </div>
-                            </div>
+                            }
+                          </div>
+                          <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
+                            <TrashIcon className="text-[red]" />
                           </div>
                         </div>
                       </div>
