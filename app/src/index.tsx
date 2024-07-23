@@ -139,7 +139,7 @@ app.post("/api/v1/keys", async (c) => {
   }
 });
 
-// update key hash/viewed columns
+// update key / hash
 app.put("/api/v1/keys/:id", async (c) => {
   const { key, name, viewed } = await c.req.json()
   let keyToSave = key

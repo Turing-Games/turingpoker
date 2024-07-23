@@ -13,6 +13,7 @@ export default function Keys() {
   const [keys, setKeys] = React.useState<any[]>([])
   const [showKey, setShowKey] = React.useState(false)
   const [openInfo, setOpenInfo] = React.useState(false)
+  const [selectedKey, setSelectedKey] = React.useState({})
 
   const { user } = React.useContext(UserContext)
 
@@ -29,19 +30,13 @@ export default function Keys() {
   }
 
   const updateApiKey = async (id = '', params = {}, reveal = false) => {
-    setLoading(true)
     await fetch(`/api/v1/keys/${id}`, {
       method: 'PUT',
       body: JSON.stringify({
-        ...params,
-        name: params.name || name,
-        viewed: true,
+        ...params
+        // viewed: true,
       })
     })
-
-    if (!reveal) {
-      getKeys()
-    }
   }
 
   const deleteApiKey = async (id = '') => {
@@ -58,6 +53,26 @@ export default function Keys() {
     const keys = await res.json()
     setLoading(false)
     setKeys(keys)
+  }
+
+  // const debouce = React.useCallback(() => {
+  //   const timer = setTimeout(() => {
+  //     updateApiKey(selectedKey.id, selectedKey)
+  //   }, 2000)
+
+  //   return () => clearTimeout(timer)
+  // }, [JSON.stringify(selectedKey)])
+
+  const updateKeyName = (name: any) => {
+    if (name !== selectedKey.name) {
+      setSelectedKey({
+        ...selectedKey,
+        name
+      })
+      setTimeout(() => {
+        updateApiKey(selectedKey.id, selectedKey)
+      }, 1500)
+    }
   }
 
   React.useEffect(() => {
@@ -131,15 +146,17 @@ export default function Keys() {
                 {
                   keys.map((key, i) => {
                     return (
-                      <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`}>
+                      <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`} key={key.id}>
                         <p className="mb-[8px] text-xs">ID: {key.id}</p>
                         <div className={`flex items-center justify-between gap-[16px]`} key={i}>
                           <input
                             type="text"
                             placeholder={key.name || 'Name for key (optional)'}
                             defaultValue={key.name || ''}
-                            onChange={e => setName(e.target.value)}
+                            onChange={e => updateKeyName(e.target.value)}
                             className="bg-transparent"
+                            onFocus={() => setSelectedKey(key)}
+                            onBlur={() => setSelectedKey({})}
                           />
                           {
                             key.viewed ?
