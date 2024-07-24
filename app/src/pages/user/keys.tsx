@@ -160,7 +160,8 @@ export default function Keys() {
                             {
                               key.viewed || key.id !== showKey ?
                                 <input className="bg-transparent" type="password" disabled value={'1234567890123456789012345678901234567890'} /> :
-                                <p className="block text-xs p-[4px] max-w-[300px] w-full">{key.key}</p>
+                                <textarea className='text-xs ring-0' value={key.key} />
+                              // <p className="block text-xs p-[4px] max-w-[300px] w-full">{key.key}</p>
                             }
                             {!key.viewed ?
                               <div
