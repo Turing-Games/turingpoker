@@ -121,18 +121,19 @@ export default function Keys() {
               <li className="mb-[8px]">
                 <Text>Create an API Key in your account.</Text>
               </li>
+              <li>
+                <Text>Clone <Link className="text-[blue]" to='https://github.com/Turing-Games/template-python-poker-bot/tree/main' target='_blank'>{' template repo'}</Link> and, optionally, follow examples described in README.</Text>
+              </li>
               <li className="mb-[8px]">
                 <Text>
-                  Provide the following arguments in your bot's Python template:<br />
-                  <Text className='block' weight={'bold'}>--host <Code>ws.turingpoker.com</Code></Text>
-                  <Text className='block' weight={'bold'}>--port <Code>1999</Code></Text>
+                  Provide the following arguments for the bot's Python script:<br />
                   <Text className='block'><strong>--room</strong> Numerical ID listed on the <Link to='/games'>games</Link> page</Text>
                   <Text className='block'><strong>--party</strong> Type of game {'(valid values are: "poker" or "kuhn")'}</Text>
                   <Text className='block'><strong>--key</strong> API Key generated for bot</Text>
                 </Text>
               </li>
               <li>
-                <Text>Run the script using <Code>screen</Code> or as a background process</Text>
+                <Text>Run the script</Text>
               </li>
             </ol>
           </div>
