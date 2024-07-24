@@ -1,4 +1,4 @@
-import { CheckIcon, EyeOpenIcon, InfoCircledIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
+import { CheckIcon, CopyIcon, EyeOpenIcon, InfoCircledIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
 import { Callout, Code, DataList, Flex, Heading, Text } from '@radix-ui/themes'
 import * as React from 'react'
 import { UserContext } from '@app/context/UserContext'
@@ -160,26 +160,36 @@ export default function Keys() {
                             {
                               key.viewed || key.id !== showKey ?
                                 <input className="bg-transparent" type="password" disabled value={'1234567890123456789012345678901234567890'} /> :
-                                <textarea className='text-xs ring-0' value={key.key} />
-                              // <p className="block text-xs p-[4px] max-w-[300px] w-full">{key.key}</p>
+                                <p className="block text-xs p-[4px] max-w-[177px] w-full truncate">{key.key}</p>
                             }
                             {!key.viewed ?
-                              <div
-                                className="cursor-pointer"
-                                onClick={() => {
-                                  setShowKey(key.id)
-                                  updateApiKey(key.id, {
-                                    ...key,
-                                    viewed: true
-                                  })
-                                }}
-                              >
+                              key.id === showKey ?
+                                // copy
+                                <div>
+                                  <CopyIcon
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(key.key)
+                                      alert('Copied API key to clipboard')
+                                    }}
+                                  />
+                                </div> :
+                                // view
+                                <div
+                                  className="cursor-pointer"
+                                  onClick={() => {
+                                    setShowKey(key.id)
+                                    updateApiKey(key.id, {
+                                      ...key,
+                                      viewed: true
+                                    })
+                                  }}
+                                >
+                                  <EyeOpenIcon />
+                                </div> :
+                              <div className="opacity-0">
                                 <EyeOpenIcon />
-                              </div> :
-                              <div>
-                                <EyeOpenIcon className="opacity-0" />
                               </div>
-
                             }
                           </div>
                           <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
