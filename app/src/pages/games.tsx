@@ -59,7 +59,7 @@ export default function Games() {
 
   const [loading, setLoading] = React.useState(false)
   const [tables, setTables] = React.useState<TableState[]>([])
-  const [gameType, setGameType] = React.useState('poker')
+  const [gameType, setGameType] = React.useState('')
   const [gameTypeForm, setGameTypeForm] = React.useState('')
   const [gameStatus, setGameStatus] = React.useState('all')
   const [isOpen, setIsOpen] = React.useState(false)
@@ -70,7 +70,7 @@ export default function Games() {
   const isAdmin = true
 
   const deleteTable = async (id: string) => {
-    const res = await fetch(partyUrl, {
+    await fetch(partyUrl, {
       method: "POST",
       body: JSON.stringify({
         action: "delete",
@@ -96,7 +96,16 @@ export default function Games() {
             }
           }
         })
-      const rooms = ((await res.json()) ?? []) as TableState[];
+      let rooms = ((await res.json()) ?? []) as TableState[];
+      if (gameStatus) {
+        if (gameStatus === 'pending') {
+          rooms = rooms.filter(room => !room.gameState)
+        }
+
+        if (gameStatus === 'active') {
+          rooms = rooms.filter(room => room.gameState)
+        }
+      }
       setTables(rooms)
       // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     } catch (err) {
