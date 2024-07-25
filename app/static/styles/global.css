@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* rgb(187, 39, 26) */
 /* 
   We've already included normalize.css. 
@@ -49,12 +53,6 @@ p {
   font-size: 1rem;
 }
 
-button {
-  display: inline-block;
-  /* Ensure buttons are visible */
-}
-
-
 h1,
 h2,
 h3,
@@ -75,6 +73,7 @@ p {
 button {
   padding: 10px 15px;
   color: white;
+  display: inline-block;
   border: none;
   border-radius: 5px;
   cursor: pointer;
