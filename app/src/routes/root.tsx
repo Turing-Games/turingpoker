@@ -49,8 +49,14 @@ const router = createBrowserRouter([
     element: <Games />,
   },
   {
-    path: "/learn",
-    element: <Learn />,
+    path: "/resources",
+    // element: <Learn />,
+    children: [
+      {
+        path: "learn",
+        element: <Learn />
+      }
+    ]
   },
   {
     path: '/user',

@@ -12,14 +12,14 @@ export default function Header() {
 
   const menuItems = [
     { link: "/games", label: "Games", include: isSignedIn },
-    { link: "/tournaments", label: "Tournaments", include: isSignedIn },
-    { link: "/leaderboard", label: "Leaderboard", include: true },
+    // { link: "/tournaments", label: "Tournaments", include: isSignedIn },
+    // { link: "/leaderboard", label: "Leaderboard", include: true },
     {
       link: "/resources",
       label: "Resources",
       submenu: [
         { link: "/resources/learn", label: "Learn" },
-        { link: "/resources/speakers", label: "Speakers" }
+        // { link: "/resources/speakers", label: "Speakers" }
       ],
       include: true
     },
