@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Main from '@app/layouts/main';
 import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { Cross1Icon, ExitIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { Cross1Icon, DotsHorizontalIcon, ExitIcon, GearIcon, PlusIcon, Share1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
 import { Link } from 'react-router-dom';
@@ -21,28 +21,90 @@ export function TableCard({
   table,
   onDelete,
   isAdmin,
+  selected = false,
+  setGameId = () => { },
 }: {
   table: TableState,
   onDelete: (id: string) => void,
   isAdmin: boolean
+  selected?: boolean
+  setGameId?: (game?: any) => void
 }) {
 
   const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
   const playerCount = table?.gameState?.players?.length || 0;
 
-  return <div style={{ position: 'relative' }}>
-    {isAdmin &&
-      <div
-        className="cursor-pointer border border-black rounded-[50px] inline-block justify-end p-[4px] absolute top-[-10px] right-[-10px] bg-white"
-        onClick={() => {
-          onDelete(table.id)
-        }}
-      >
-        <TrashIcon />
-      </div>
+  const cardMenuOptions = [
+    {
+      label: (
+        <>
+          <TrashIcon />
+          Delete
+        </>
+      ),
+      onClick: () => onDelete(table.id), include: isAdmin
+    },
+    {
+      label: (
+        <>
+          <Share1Icon />
+          Invite URL
+        </>
+      ),
+      onClick: () => {
+        navigator.clipboard.writeText(`${location.origin}/games/${table.id}/${table.gameType}`)
+      },
+      include: true
+    },
+    {
+      label: (
+        <>
+          <GearIcon />
+          CLI
+        </>
+      ),
+      onClick: () => {
+        navigator.clipboard.writeText(`${location.origin}/games/${table.id}/${table.gameType}`)
+      },
+      include: true
     }
+  ]
+
+  const handleClickCardMenu = (id: any) => {
+    if (selected) {
+      setGameId('')
+    } else {
+      setGameId(id)
+    }
+  }
+
+  return <div style={{ position: 'relative' }}>
+    <div
+      className={`
+        cursor-pointer border border-black inline-block justify-end p-[4px] absolute top-[-10px] right-[-10px] bg-white 
+        ${selected ? 'transition-[width,height] duration-300 w-[150px] h-[186px] rounded-[4px]' : 'w-[25px] h-[25px] rounded-[50px]'}
+      `}
+      onClick={() => handleClickCardMenu(table.id)}
+    >
+      {
+        selected ?
+          <div className="flex flex-col items-center gap-[8px]">
+            {true && (
+              <div
+                className="flex items-center gap-[4px]"
+                onClick={() => onDelete(table.id)}
+              >
+                <TrashIcon />
+                Delete
+              </div>
+            )}
+            <ExitIcon className="self-end" />
+          </div> :
+          <DotsHorizontalIcon />
+      }
+    </div>
     <Link
-      className="bg-white border border-black rounded-[4px] grid gap-[8px] p-[12px]"
+      className="bg-white border border-black rounded-[4px] grid gap-[8px] p-[12px] pt-[20px]"
       to={`/games/${table.id}/${table.gameType}`}
       key={table.id}
     >
@@ -64,10 +126,10 @@ export default function Games() {
   const [gameStatus, setGameStatus] = React.useState('all')
   const [isOpen, setIsOpen] = React.useState(false)
   const [gameConfig, setGameConfig] = React.useState({})
+  const [gameId, setGameId] = React.useState('')
 
   const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
-  // const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
-  const isAdmin = true
+  const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
 
   const deleteTable = async (id: string) => {
     await fetch(partyUrl, {
@@ -180,7 +242,16 @@ export default function Games() {
               <div className="flex flex-wrap gap-[16px]">
                 {
                   tables.map((table, i) => {
-                    return <TableCard key={i} table={table} isAdmin={isAdmin} onDelete={deleteTable} />
+                    return (
+                      <TableCard
+                        key={i}
+                        table={table}
+                        isAdmin={isAdmin}
+                        onDelete={deleteTable}
+                        selected={table.id === gameId}
+                        setGameId={setGameId}
+                      />
+                    )
                   })
                 }
               </div> :

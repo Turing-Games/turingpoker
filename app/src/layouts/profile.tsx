@@ -6,6 +6,7 @@ import { ReactNode } from 'react';
 import useSmallScreen from '@app/hooks/useSmallScreen';
 import { DiscordLogoIcon, GearIcon } from '@radix-ui/react-icons';
 import Keys from '@app/pages/user/keys';
+import Header from '@app/components/Header';
 
 const menuItems = [
   { link: "/games", label: "Games" },
@@ -30,57 +31,7 @@ export default function Profile() {
         flexDirection: 'column'
       })
     }}>
-      <header style={{
-        display: 'flex',
-        alignItems: 'left',
-        textAlign: 'left',
-        ...(smallScreen ? {
-          flexDirection: 'column',
-          padding: '8px',
-          borderBottom: 'none',
-          borderRight: '1px solid black',
-        } : {
-          flexDirection: 'row'
-        })
-      }}>
-        <Link to='/'>
-          <img src={Logo} alt="Logo" className="hidden sm:block" style={{ height: 40 }} />
-          <img src={MobileLogo} alt="Logo" className="block sm:hidden" style={{ height: 40 }} />
-        </Link>
-        <div style={{
-          gap: '8px',
-          display: 'flex',
-          textAlign: 'left',
-          ...(smallScreen ? {
-            alignItems: 'baseline',
-            flexDirection: 'column',
-          } : {
-            alignItems: 'center',
-            flexDirection: 'row'
-          })
-        }}>
-          {
-            menuItems.map((item) => {
-              return (
-                <NavLink
-                  key={item.link}
-                  to={item.link}
-                  target={item.target ?? '_self'}
-                  className={({ isActive, isPending }) => isActive ? "menu-active" : ""}
-                >
-                  {item.label}
-                </NavLink>
-              )
-            })
-          }
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton userProfileMode='navigation' userProfileUrl='/user' />
-          </SignedIn>
-        </div>
-      </header >
+      <Header />
       <main style={{
         position: 'relative',
         display: 'flex',
