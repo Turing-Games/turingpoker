@@ -57,3 +57,18 @@
   font-weight: 700;
   src: url('../fonts/Barlow/Barlow-Bold.ttf') format('truetype');
 }
+
+.radix-themes {
+  --default-font-family: 'Roboto', sans-serif !important;
+  /* Your custom default font */
+  --heading-font-family: 'Barlow', sans-serif !important;
+  /* Your custom font for <Heading> components */
+  --code-font-family: 'Roboto Mono', monospace !important;
+  /* Your custom font for <Code> components */
+  --strong-font-family: 'Roboto', sans-serif !important;
+  /* Your custom font for <Strong> components */
+  --em-font-family: 'Roboto', sans-serif !important;
+  /* Your custom font for <Em> components */
+  --quote-font-family: 'Roboto', sans-serif !important;
+  /* Your custom font for <Quote> components */
+}

@@ -1,19 +1,6 @@
 @import './typography.css';
-@import './global.css';
-@import './header.css';
 @import './poker.css';
+@import './global.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@layer components {
-  button {
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 12px;
-  }
-}

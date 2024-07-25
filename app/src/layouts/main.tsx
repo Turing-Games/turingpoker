@@ -42,35 +42,19 @@ export default function Main({ children }: Props) {
         flexDirection: 'column'
       })
     }}>
-      <header style={{
-        display: 'flex',
-        alignItems: 'left',
-        textAlign: 'left',
-        ...(smallScreen ? {
-          flexDirection: 'column',
-          padding: '8px',
-          borderBottom: 'none',
-          borderRight: '1px solid black',
-        } : {
-          flexDirection: 'row'
-        })
-      }}>
+      <header className={`
+        bg-white border-black items-center flex text-left p-[20px] justify-between
+        ${smallScreen ? 'flex-col p-[8px] border-r-1' : 'border-b'}
+      `}>
         <Link to='/'>
           <img src={Logo} alt="Logo" className="desktop" style={{ height: 40 }} />
           <img src={MobileLogo} alt="Logo" className="mobile" style={{ height: 40 }} />
         </Link>
-        <div style={{
-          gap: '8px',
-          display: 'flex',
-          textAlign: 'left',
-          ...(smallScreen ? {
-            alignItems: 'baseline',
-            flexDirection: 'column',
-          } : {
-            alignItems: 'center',
-            flexDirection: 'row'
-          })
-        }}>
+        <div
+          className={`
+            flex items-center gap-[8px] text-left
+            ${smallScreen ? 'flex-col' : 'flex-row items-center'}
+          `}>
           {
             menuItems.map((item) => {
               return (
@@ -78,7 +62,7 @@ export default function Main({ children }: Props) {
                   key={item.link}
                   to={item.link}
                   target={item.target ?? '_self'}
-                  className={({ isActive, isPending }) => isActive ? "menu-active" : ""}
+                  className={`text-[16px] ml-[8px] ${({ isActive, isPending }: any) => isActive ? "menu-active" : ""}`}
                 >
                   {item.label}
                 </NavLink>

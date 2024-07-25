@@ -10,19 +10,6 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: 'Roboto', sans-serif;
-}
-
-a {
-  /* color: #000; */
-  text-decoration: none;
-}
-
-a:visited {
-  /* color: inherit; */
-}
-
 #root {
   display: flex;
   flex-direction: column;
@@ -35,7 +22,7 @@ html {
 }
 
 body {
-  font-family: sans-serif;
+  font-family: 'Roboto', sans-serif;
   height: 100%;
   font-size: 16px;
   line-height: 1.5;
@@ -46,6 +33,15 @@ body {
   background-blend-mode: lighten;
   padding: 0;
   margin: 0;
+}
+
+a {
+  /* color: #000; */
+  text-decoration: none;
+}
+
+a:visited {
+  /* color: inherit; */
 }
 
 label,
@@ -78,11 +74,11 @@ p {
 
 button {
   padding: 10px 15px;
-  background-color: #4CAF50;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  @apply bg-green;
 }
 
 button:hover {
@@ -107,25 +103,6 @@ button:disabled {
   body {
     font-size: 10px;
   }
-}
-
-header {
-  background: #fff;
-  border-bottom: 1px solid #000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-}
-
-header>div {
-  align-items: center;
-  display: flex;
-}
-
-header>div>* {
-  font-size: 16px;
-  margin-left: 8px;
 }
 
 .desktop {

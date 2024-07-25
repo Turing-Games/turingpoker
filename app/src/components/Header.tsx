@@ -1,6 +1,4 @@
 import Logo from '@static/images/logo.png'
-import React, { forwardRef } from 'react';
-import Loader from "./Loader";
 import { IPlayer } from "@app/party/src/game";
 import { Text } from '@radix-ui/themes';
 
@@ -14,7 +12,7 @@ export default function Header(props: {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
-      <div className="tg-header" >
+      <div className="flex jsutify-left px-[12px] py-[8px] text-left relative bg-[black] left-0 border border-2 border-green" >
         <div className='tg-header__logo'>
           <img src={Logo} alt="Logo" />
         </div>
