@@ -152,7 +152,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
 
   // show game table
   return (
-    <div className="p-0 flex glex-grow items-stretch justify-between text-green-100 overflow-hidden">
+    <div className="p-0 flex flex-grow items-stretch justify-between text-green-100 overflow-hidden">
       <GameInfo
         clientState={clientState}
         serverState={serverState}
