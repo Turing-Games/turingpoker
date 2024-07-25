@@ -53,6 +53,7 @@ export function TableCard({
       ),
       onClick: () => {
         navigator.clipboard.writeText(`${location.origin}/games/${table.id}/${table.gameType}`)
+        alert('Copied invite URL to clipboard')
       },
       include: true
     },
@@ -60,11 +61,12 @@ export function TableCard({
       label: (
         <>
           <GearIcon />
-          CLI
+          Python CLI
         </>
       ),
       onClick: () => {
-        navigator.clipboard.writeText(`${location.origin}/games/${table.id}/${table.gameType}`)
+        navigator.clipboard.writeText(`python3 main.py --party ${table.gameType} --room ${table.id}`)
+        alert('Copied CLI command to clipboard')
       },
       include: true
     }
@@ -81,24 +83,35 @@ export function TableCard({
   return <div style={{ position: 'relative' }}>
     <div
       className={`
-        cursor-pointer border border-black inline-block justify-end p-[4px] absolute top-[-10px] right-[-10px] bg-white 
-        ${selected ? 'transition-[width,height] duration-300 w-[150px] h-[186px] rounded-[4px]' : 'w-[25px] h-[25px] rounded-[50px]'}
+        border border-black absolute top-[-10px] right-[-10px] bg-white 
+        ${selected ? 'transition-[width,height] duration-300 w-[150px] h-[186px] rounded-[4px] p-[8px]' :
+          'flex items-center justify-center w-[25px] h-[25px] rounded-[50px] cursor-pointer'
+        }
       `}
-      onClick={() => handleClickCardMenu(table.id)}
+      onClick={() => !selected ? handleClickCardMenu(table.id) : false}
     >
       {
         selected ?
-          <div className="flex flex-col items-center gap-[8px]">
-            {true && (
-              <div
-                className="flex items-center gap-[4px]"
-                onClick={() => onDelete(table.id)}
-              >
-                <TrashIcon />
-                Delete
+          <div className="flex flex-col gap-[8px]">
+            <div
+              className="flex justify-end gap-[4px]"
+            >
+              <div onClick={() => handleClickCardMenu('')} className="cursor-pointer">
+                <Cross1Icon />
               </div>
-            )}
-            <ExitIcon className="self-end" />
+            </div>
+            {
+              cardMenuOptions.filter(option => option.include).map((option, i) => {
+                return (
+                  <div
+                    className="flex gap-[4px] items-center cursor-pointer transition-[padding] duration-100 hover:pl-[4px]"
+                    onClick={option.onClick}
+                  >
+                    {option.label}
+                  </div>
+                )
+              })
+            }
           </div> :
           <DotsHorizontalIcon />
       }
