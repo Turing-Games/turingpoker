@@ -152,7 +152,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
 
   // show game table
   return (
-    <div className="tg-poker__table">
+    <div className="p-0 flex glex-grow items-stretch justify-between text-green-100 overflow-hidden">
       <GameInfo
         clientState={clientState}
         serverState={serverState}
@@ -172,7 +172,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
         <div style={{ height: '12px', width: '100%' }}></div>
         <div className="tg-poker__table__dealer">
           <div
-            className="opponents"
+            className="flex gap-[16px]"
             style={{
               position: "absolute",
               width: "100%",
@@ -183,8 +183,9 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
               return (
                 <div
                   key={index}
-                  className="tg-poker__table__player-container"
+                  className="absolute flex justify-center items-center"
                   style={{
+                    transform: 'translate(-50%, 50%)',
                     ...(getPlayerPosition(index))
                   }}
                 >
@@ -205,12 +206,12 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
           <GameStatus clientState={clientState} />
           <Cards cards={gameState?.cards ?? []} />
         </div>
-        <div className="tg-poker__table__controlpanel">
+        <div className="p-[8px]">
           <GameControls clientState={clientState} joinLeave={!smallScreen} gameType={'poker'} />
         </div>
       </div>
       {smallScreen && joinButton}
-    </div>
+    </div >
   );
 };
 

@@ -10,8 +10,8 @@ export default function Cards({ cards }: { cards: PokerLogic.Card[] }) {
   const allRef = useRef<HTMLDivElement>(null);
 
   for (let i = 0; i < PLACEHOLDER_CARDS; i++) {
-    if (i > 0) placeholderCards.push(<Card key={i} className="tg-poker__table__dealer__placeholder-card" />);
-    realCards.push(<Card key={i} className="tg-poker__table__dealer__card" value={i < cards.length ? cards[i] : undefined} />);
+    if (i > 0) placeholderCards.push(<Card key={i} className="opacity-0" />);
+    realCards.push(<Card key={i} className="absolute opacity-0 transition duration-[100] ease-out" value={i < cards.length ? cards[i] : undefined} />);
   }
   const [windowSz, setWindowSz] = useState({ width: window.innerWidth, height: window.innerHeight });
 
@@ -37,7 +37,7 @@ export default function Cards({ cards }: { cards: PokerLogic.Card[] }) {
       allRef.current.children[i].style.opacity = 0;
     }
     for (let i = 0; i < cards.length; i++) {
-      const child = allRef.current.children[i+PLACEHOLDER_CARDS]
+      const child = allRef.current.children[i + PLACEHOLDER_CARDS]
       const targetPos = {
         left: child.offsetLeft,
         top: child.offsetTop
@@ -50,11 +50,11 @@ export default function Cards({ cards }: { cards: PokerLogic.Card[] }) {
   }, [cards, deckRef.current, allRef.current, windowSz])
 
   return (
-    <div className="tg-poker__table__dealer__cards" ref={allRef}>
+    <div className="flex gap-[8px] justify-center items-center flex-wrap" ref={allRef}>
       {realCards}
       <Card style={{
         zIndex: 2,
-      }} ref={deckRef}/>
+      }} ref={deckRef} />
       {placeholderCards}
     </div>
   );

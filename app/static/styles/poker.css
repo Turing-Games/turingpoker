@@ -18,7 +18,7 @@
   }
 }
 
-.terminal_text {
+.text-green-100 font-mono {
   color: rgb(92, 193, 51);
   font-family: monospace;
 }
@@ -39,51 +39,6 @@
 
 .tg-poker__gamelog__log {
   color: rgb(92, 193, 51);
-}
-
-.tg-poker__table {
-  padding: 0;
-  display: flex;
-  flex-direction: row;
-  flex-grow: 1;
-  align-items: stretch;
-  justify-content: space-between;
-  color: rgb(92, 193, 51);
-  overflow: hidden;
-}
-
-.tg-poker__table__gameinfo {
-  display: flex;
-  flex-direction: column;
-  height: 0;
-  min-height: 100%;
-  padding: 0;
-  margin: 0;
-  gap: 8px;
-  max-width: 450px;
-  padding: 16px;
-  justify-content: space-between;
-  align-items: stretch;
-  background-color: black;
-  overflow-x: hidden;
-}
-
-.tg-poker__table__dealer_marker {
-  position: absolute;
-  background: white;
-  color: black;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-
-
-  top: 0px;
-  right: 0px;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
 }
 
 .tg-poker__overview {
@@ -158,17 +113,6 @@
   /* Adjust to move back by half of the element's dimensions */
 }
 
-
-.tg-poker__table__controlpanel {
-  padding: 8px;
-}
-
-.tg-poker__controls {
-  display: flex;
-  gap: 5px;
-  width: 200px;
-}
-
 .tg-poker__table__dealer {
   align-items: center;
   border-radius: 50%;
@@ -201,89 +145,10 @@
   }
 }
 
-.tg-poker__table__dealer__cards {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-  flex-wrap: wrap;
-}
-
-.tg-poker__table__dealer__card {
-  position: absolute;
-  opacity: 0;
-  transition: left 0.1s ease-out, top 0.1s ease-out;
-}
-
-.tg-poker__table__dealer__placeholder-card {
-  opacity: 0;
-}
-
-.tg-poker__winner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background: rgba(0, 0, 0, 0.2);
-  width: 100%;
-  height: 100%;
-  z-index: 10;
-}
-
-.tg-poker__winner>div {
-  background: #fff;
-  border-radius: 8px;
-  padding: 16px;
-  color: #000;
-}
-
 .tg-poker__card-loader>img {
   animation: spin 2s linear infinite;
   width: 50px;
 }
-
-.tg-poker__winner__buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.opponents {
-  display: flex;
-  gap: 16px;
-}
-
-.tg-poker__table__gamestatus {
-  padding: 8px;
-  background: black;
-  border-radius: 4px;
-  width: fit-content;
-  margin: 0px;
-  display: flex;
-  flex-direction: row;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-@media (max-width: 768px) {
-  .tg-poker__table__gamestatus {
-    grid-auto-rows: 32px;
-  }
-}
-
-.tg-poker__table__player-container {
-  position: absolute;
-  /* no idea why the second dimension needs to be positive */
-  transform: translate(-50%, 50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.opponents>div {}
 
 .card {
   pointer-events: none;
