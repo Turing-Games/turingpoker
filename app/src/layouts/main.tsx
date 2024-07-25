@@ -47,8 +47,8 @@ export default function Main({ children }: Props) {
         ${smallScreen ? 'flex-col p-[8px] border-r-1' : 'border-b'}
       `}>
         <Link to='/'>
-          <img src={Logo} alt="Logo" className="desktop" style={{ height: 40 }} />
-          <img src={MobileLogo} alt="Logo" className="mobile" style={{ height: 40 }} />
+          <img src={Logo} alt="Logo" className="hidden sm:block h-[40px] min-h-[40px]" />
+          <img src={MobileLogo} alt="Logo" className="block sm:hidden w-[35px] min-w-[35px]" />
         </Link>
         <div
           className={`
@@ -62,7 +62,7 @@ export default function Main({ children }: Props) {
                   key={item.link}
                   to={item.link}
                   target={item.target ?? '_self'}
-                  className={`text-[16px] ml-[8px] ${({ isActive, isPending }: any) => isActive ? "menu-active" : ""}`}
+                  className={({ isActive }: any) => isActive ? "font-bold text-[16px] ml-[8px]" : "text-[16px] ml-[8px]"}
                 >
                   {item.label}
                 </NavLink>

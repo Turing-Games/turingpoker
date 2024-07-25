@@ -13,9 +13,7 @@ export default function Header(props: {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
       <div className="flex jsutify-left px-[12px] py-[8px] text-left relative bg-[black] left-0 border border-2 border-green" >
-        <div className='tg-header__logo'>
-          <img src={Logo} alt="Logo" />
-        </div>
+        <img src={Logo} alt="Logo" className="h-[40px] min-h-[40px]" />
         {/* text */}
         <div className='tg-header__title' >
           <h2>{gameType ? `Table: ${gameType}` : 'Welcome!'}</h2>

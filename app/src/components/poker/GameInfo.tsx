@@ -31,7 +31,7 @@ export function GameInfo({
         <div className="flex flex-col items-center font-mono">
           <div className="flex justify-left px-[12px] py-[8px] text-left relative bg-[black] left-0 border border-2 border-green" >
             <div className='m-[8px] z-[2]'>
-              <img className="h-[40px]" src={Logo} alt="Logo" />
+              <img className="w-[35px] min-w-[35px]" src={Logo} alt="Logo" />
             </div>
             {/* text */}
             <div className='relative z-[3] text-center flex items-center flex-col' >
@@ -39,7 +39,7 @@ export function GameInfo({
               <Text>Turing Games</Text>
             </div>
             <div className='m-[8px] z-[2]'>
-              <img className="h-[40px]" src={Logo} alt="Logo" />
+              <img className="w-[35px] min-w-[35px]" src={Logo} alt="Logo" />
             </div>
             {
               Array(4).fill('_').map((_, i) => (

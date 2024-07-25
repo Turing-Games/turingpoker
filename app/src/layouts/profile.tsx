@@ -44,8 +44,8 @@ export default function Profile() {
         })
       }}>
         <Link to='/'>
-          <img src={Logo} alt="Logo" className="desktop" style={{ height: 40 }} />
-          <img src={MobileLogo} alt="Logo" className="mobile" style={{ height: 40 }} />
+          <img src={Logo} alt="Logo" className="hidden sm:block" style={{ height: 40 }} />
+          <img src={MobileLogo} alt="Logo" className="block sm:hidden" style={{ height: 40 }} />
         </Link>
         <div style={{
           gap: '8px',

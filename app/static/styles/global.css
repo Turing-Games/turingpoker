@@ -104,25 +104,3 @@ button:disabled {
     font-size: 10px;
   }
 }
-
-.desktop {
-  display: block;
-}
-
-.mobile {
-  display: none;
-}
-
-.menu-active {
-  font-weight: 800;
-}
-
-@media (max-width: 768px) {
-  .desktop {
-    display: none;
-  }
-
-  .mobile {
-    display: block;
-  }
-}
