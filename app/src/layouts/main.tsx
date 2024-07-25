@@ -12,7 +12,16 @@ type Props = {
 
 const menuItems = [
   { link: "/games", label: "Games" },
-  { link: "/learn", label: "Learn" },
+  { link: "/tournaments", label: "Tournaments" },
+  // { link: "/learn", label: "Learn" },
+  { link: "/leaderboard", label: "Leaderboard" },
+  {
+    link: "/resources",
+    label: "Resources",
+    submenu: [
+      { link: "/resources/learn", label: "Learn" }
+    ]
+  },
   { link: "https://discord.gg/kz5ed2Q4QP", label: <DiscordLogoIcon />, target: '_blank' },
 ];
 

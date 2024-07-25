@@ -4,7 +4,13 @@ export default {
     "./src/**/*.tsx",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        'barlow': ['Barlow', 'sans-serif'],
+        'roboto': ['Roboto', 'sans-serif'],
+        'urbanist': ['Urbanist', 'sans-serif']
+      }
+    }
   },
   plugins: [],
 }
