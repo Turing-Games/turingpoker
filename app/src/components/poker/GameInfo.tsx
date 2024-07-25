@@ -78,7 +78,7 @@ export function GameInfo({
                 <DoubleArrowLeftIcon />
             }
             onClick={() => setCollapsed(!collapsed)}
-            className={`absolute z-[100] top-[12px] rounded-none ${collapsed ? 'left-[-4px]' : 'right-[-45px]'} `}
+            className={`absolute z-[100] top-[12px] rounded-none ${collapsed ? 'left-[-4px]' : ' right: 0 sm:right-[-45px]'} `}
           />
         }
       </div>
