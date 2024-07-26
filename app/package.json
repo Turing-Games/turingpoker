@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "npm run migrations:local && concurrently \"npm run dev:partykit\" \"npm run dev:hono\" \"npm run dev:wrangler\" --kill-others --prefix app",
     "clean": "rm -rf ./dist/",
-    "build": "npm run clean && vite build --mode client && vite build && cp -r static/favico/* dist/assets/",
+    "build": "npm run clean && vite build --mode client && vite build && cp -r static/favico/* dist/assets/ && npm run avatar_asset",
+    "avatar_asset": "cp -r static/images/robot-white.png dist/assets/",
     "dev:hono": "vite --host",
     "dev:wrangler": "wrangler dev src/index.tsx",
     "test": "jest",
