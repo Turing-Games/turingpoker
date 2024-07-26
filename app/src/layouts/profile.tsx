@@ -39,7 +39,25 @@ export default function Profile() {
         justifyContent: 'stretch',
         flexGrow: 1
       }}>
-        <UserProfile>
+        <UserProfile
+          appearance={{
+            elements: {
+              profileSectionPrimaryButton: {
+                display: 'none'
+              },
+              userPreviewAvatarBox: {
+                backgroundColor: '#000',
+                backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
+                backgroundPosition: 'center',
+                backgroundSize: '80px',
+                border: '1px solid #000'
+              },
+              avatarImage: {
+                display: 'none'
+              }
+            }
+          }}
+        >
           <UserProfile.Page label='API Keys' url='api-keys' labelIcon={<GearIcon />}>
             <Keys />
           </UserProfile.Page>

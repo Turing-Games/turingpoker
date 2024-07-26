@@ -89,7 +89,34 @@ export default function Header() {
             <SignInButton />
           </SignedOut>
           <SignedIn>
-            <UserButton userProfileMode='navigation' userProfileUrl='/user' />
+            <UserButton
+              userProfileMode='navigation'
+              userProfileUrl='/user'
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: {
+                    backgroundColor: '#000',
+                    backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
+                    backgroundPosition: 'center',
+                    backgroundSize: '45px',
+                    border: '1px solid #000'
+                  },
+                  userPreviewAvatarBox: {
+                    backgroundColor: '#000',
+                    backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
+                    backgroundPosition: 'center',
+                    backgroundSize: '60px',
+                    border: '1px solid #000'
+                  },
+                  avatarImage: {
+                    display: 'none'
+                  },
+                  userButtonPopoverFooter: {
+                    display: 'none'
+                  }
+                }
+              }}
+            />
           </SignedIn>
         </div>
       </div>
