@@ -53,7 +53,8 @@ export default function Profile({ pageTitle = '' }) {
                 backgroundColor: '#CC1F00',
                 backgroundImage: 'url("https://play.turingpoker.com/assets/robot-white.png")',
                 backgroundPosition: 'center',
-                backgroundSize: '80px',
+                backgroundSize: '70%',
+                backgroundRepeat: 'no-repeat',
                 // border: '1px solid #000'
               },
               avatarImage: {
