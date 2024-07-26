@@ -7,6 +7,7 @@ import useSmallScreen from '@app/hooks/useSmallScreen';
 import { DiscordLogoIcon, GearIcon } from '@radix-ui/react-icons';
 import Keys from '@app/pages/user/keys';
 import Header from '@app/components/Header';
+import { Helmet } from 'react-helmet';
 
 const menuItems = [
   { link: "/games", label: "Games" },
@@ -14,7 +15,7 @@ const menuItems = [
   { link: "https://discord.gg/kz5ed2Q4QP", label: <DiscordLogoIcon />, target: '_blank' },
 ];
 
-export default function Profile() {
+export default function Profile({ pageTitle = '' }) {
 
   const smallScreen = useSmallScreen(1e9, 450);
 
@@ -31,6 +32,9 @@ export default function Profile() {
         flexDirection: 'column'
       })
     }}>
+      <Helmet>
+        <title>{pageTitle ? `${pageTitle} | Turing Poker` : 'Turing Poker'}</title>
+      </Helmet>
       <Header />
       <main style={{
         position: 'relative',

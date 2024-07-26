@@ -60,7 +60,7 @@ const router = createBrowserRouter([
   },
   {
     path: '/user',
-    element: <Profile />,
+    element: <Profile pageTitle='Profile' />,
     children: [
       { path: 'keys', element: <div>test</div> }
     ]

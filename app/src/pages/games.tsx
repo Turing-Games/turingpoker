@@ -15,6 +15,7 @@ import { CONFIGURABLE_PROPERTIES as POKER_CONFIG } from '@app/constants/games/po
 import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuhn';
 import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
 import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
+import { Helmet } from "react-helmet";
 
 
 export function TableCard({
@@ -80,54 +81,56 @@ export function TableCard({
     }
   }
 
-  return <div style={{ position: 'relative' }}>
-    <div
-      className={`
+  return (
+    <div style={{ position: 'relative' }}>
+      <div
+        className={`
         border border-black absolute top-[-10px] right-[-10px] bg-white 
         ${selected ? 'transition-[width,height] duration-300 w-[150px] h-[186px] rounded-[4px] p-[8px]' :
-          'flex items-center justify-center w-[25px] h-[25px] rounded-[50px] cursor-pointer'
-        }
+            'flex items-center justify-center w-[25px] h-[25px] rounded-[50px] cursor-pointer'
+          }
       `}
-      onClick={() => !selected ? handleClickCardMenu(table.id) : false}
-    >
-      {
-        selected ?
-          <div className="flex flex-col gap-[8px]">
-            <div
-              className="flex justify-end gap-[4px]"
-            >
-              <div onClick={() => handleClickCardMenu('')} className="cursor-pointer">
-                <Cross1Icon />
+        onClick={() => !selected ? handleClickCardMenu(table.id) : false}
+      >
+        {
+          selected ?
+            <div className="flex flex-col gap-[8px]">
+              <div
+                className="flex justify-end gap-[4px]"
+              >
+                <div onClick={() => handleClickCardMenu('')} className="cursor-pointer">
+                  <Cross1Icon />
+                </div>
               </div>
-            </div>
-            {
-              cardMenuOptions.filter(option => option.include).map((option, i) => {
-                return (
-                  <div
-                    className="flex gap-[4px] items-center cursor-pointer transition-[padding] duration-100 hover:pl-[4px]"
-                    onClick={option.onClick}
-                  >
-                    {option.label}
-                  </div>
-                )
-              })
-            }
-          </div> :
-          <DotsHorizontalIcon />
-      }
+              {
+                cardMenuOptions.filter(option => option.include).map((option, i) => {
+                  return (
+                    <div
+                      className="flex gap-[4px] items-center cursor-pointer transition-[padding] duration-100 hover:pl-[4px]"
+                      onClick={option.onClick}
+                    >
+                      {option.label}
+                    </div>
+                  )
+                })
+              }
+            </div> :
+            <DotsHorizontalIcon />
+        }
+      </div>
+      <Link
+        className="bg-white border border-black rounded-[4px] grid gap-[8px] p-[12px] pt-[20px]"
+        to={`/games/${table.id}/${table.gameType}`}
+        key={table.id}
+      >
+        <strong>{table?.gameType?.toUpperCase()}</strong>
+        <Text>Table: {table.id}</Text>
+        <Text>Status: {table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`}</Text>
+        <Text>Spectators: {spectatorCount}</Text>
+        <Text>Players: {playerCount}</Text>
+      </Link>
     </div>
-    <Link
-      className="bg-white border border-black rounded-[4px] grid gap-[8px] p-[12px] pt-[20px]"
-      to={`/games/${table.id}/${table.gameType}`}
-      key={table.id}
-    >
-      <strong>{table?.gameType?.toUpperCase()}</strong>
-      <Text>Table: {table.id}</Text>
-      <Text>Status: {table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`}</Text>
-      <Text>Spectators: {spectatorCount}</Text>
-      <Text>Players: {playerCount}</Text>
-    </Link>
-  </div>
+  )
 }
 
 export default function Games() {
@@ -221,7 +224,7 @@ export default function Games() {
   } as any
 
   return (
-    <Main>
+    <Main pageTitle='Games'>
       <div className="p-[20px] w-full">
         <div className="flex items-center justify-between">
           <Heading mb="2" size="4">Games ({tables.length})</Heading>

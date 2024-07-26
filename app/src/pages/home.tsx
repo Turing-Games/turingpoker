@@ -21,7 +21,7 @@ export default function Home() {
   ]
 
   return (
-    <Main>
+    <Main pageTitle={game ? games.find(g => g.value === game)?.label : 'Play'}>
       {
         (game && join) || gameId ?
           <GameClient gameId={gameId} gameType={game || gameType} /> :
