@@ -96,15 +96,20 @@ export default function Header() {
                 elements: {
                   userButtonAvatarBox: {
                     backgroundColor: '#CC1F00',
-                    // backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
-                    // backgroundPosition: 'center',
-                    // backgroundSize: '45px',
+                    backgroundImage: 'url("https://play.turingpoker.com/assets/robot-white.png")',
+                    backgroundPosition: 'center',
+                    backgroundSize: '45px',
+                    // border: '1px solid #000'
                   },
                   userPreviewAvatarBox: {
                     backgroundColor: '#CC1F00',
-                    // backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
-                    // backgroundPosition: 'center',
-                    // backgroundSize: '60px',
+                    backgroundImage: 'url("https://play.turingpoker.com/assets/robot-white.png")',
+                    backgroundPosition: 'center',
+                    backgroundSize: '60px',
+                    // border: '1px solid #000'
+                  },
+                  avatarImage: {
+                    display: 'none'
                   },
                   userButtonPopoverFooter: {
                     display: 'none'
