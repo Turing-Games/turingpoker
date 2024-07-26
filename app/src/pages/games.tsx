@@ -32,6 +32,8 @@ export function TableCard({
   setGameId?: (game?: any) => void
 }) {
 
+  const [showItems, setShowItems] = React.useState(false)
+
   const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
   const playerCount = table?.gameState?.players?.length || 0;
 
@@ -74,10 +76,14 @@ export function TableCard({
   ]
 
   const handleClickCardMenu = (id: any) => {
+    setShowItems(false)
     if (selected) {
       setGameId('')
     } else {
       setGameId(id)
+      setTimeout(() => {
+        setShowItems(true)
+      }, 150)
     }
   }
 
@@ -94,7 +100,7 @@ export function TableCard({
       >
         {
           selected ?
-            <div className="flex flex-col gap-[8px]">
+            <div className={`flex flex-col gap-[8px] ${showItems ? 'transition-[opacity] opacity-100' : 'opacity-0'}`}>
               <div
                 className="flex justify-end gap-[4px]"
               >
