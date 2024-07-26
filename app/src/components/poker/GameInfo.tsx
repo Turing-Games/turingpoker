@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { ClientState } from "@app/client";
 import GameLog from "./GameLog";
 import { ServerStateMessage } from "@tg/shared";
-import Collapse, { CollapseToggle } from "../Collapse";
 import useSmallScreen from "@app/hooks/useSmallScreen";
 import { Text } from "@radix-ui/themes";
 import Logo from '@static/images/logo.png'
@@ -27,7 +26,8 @@ export function GameInfo({
           boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.5)",
           maxWidth: collapsed ? "0" : "100%",
           zIndex: 100
-        }}>
+        }}
+      >
         <div className="overflow-hidden h-full">
           <div className="flex flex-col h-0 min-h-full gap-[8px] max-w-[450px] p-[16px] justify-between items-stretch bg-[black] overflow-x-hidden">
             <div className="flex flex-col items-center font-mono">
@@ -70,17 +70,15 @@ export function GameInfo({
             <GameLog gameLog={clientState.updateLog} />
           </div>
         </div>
-        {collapsible &&
-          <Button
-            label={
-              collapsed ?
-                <DoubleArrowRightIcon /> :
-                <DoubleArrowLeftIcon />
-            }
-            onClick={() => setCollapsed(!collapsed)}
-            className={`absolute z-[100] top-[12px] rounded-none ${collapsed ? 'left-[-4px]' : ' right: 0 sm:right-[-45px]'} `}
-          />
-        }
+        <Button
+          label={
+            collapsed ?
+              <DoubleArrowRightIcon /> :
+              <DoubleArrowLeftIcon />
+          }
+          onClick={() => setCollapsed(!collapsed)}
+          className={`absolute z-[100] top-[12px] rounded-none ${collapsed ? 'left-[-4px]' : ' right-0 sm:right-[-45px]'} `}
+        />
       </div>
     </div >
   )
