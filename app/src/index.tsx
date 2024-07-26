@@ -1,10 +1,12 @@
 import { D1Database } from '@cloudflare/workers-types';
 import { Hono } from 'hono'
 import { createHash } from 'node:crypto';
+import { decode, sign, verify } from 'hono/jwt'
 
 // This ensures c.env.DB is correctly typed
 export type Bindings = {
   DB: D1Database;
+  BOT_SECRET_KEY: string;
 };
 
 const app = new Hono<{ Bindings: Bindings }>()
@@ -128,18 +130,29 @@ app.post("/api/v1/keys", async (c) => {
     // generate key
     const uuid = crypto.randomUUID()
     const key = `turing_${crypto.randomUUID()}`
+
+    const payload = {
+      id: uuid,
+      key,
+      role: 'bot'
+    }
+
+    const token = await sign(payload, c.env.BOT_SECRET_KEY)
+
+
     let { results } = await c.env.DB.prepare(
       'INSERT into api_keys (id, user_id, bot_id, name, key) VALUES (?, ?, ?, ?, ?)'
     )
-      .bind(uuid, userId, botId, name, key)
+      .bind(uuid, userId, botId, name, token)
       .all()
     return c.json(results);
   } catch (e) {
+    console.log(e)
     return c.json({ message: 'Error creating key', error: e }, 500);
   }
 });
 
-// update key hash/viewed columns
+// update key / hash
 app.put("/api/v1/keys/:id", async (c) => {
   const { key, name, viewed } = await c.req.json()
   let keyToSave = key

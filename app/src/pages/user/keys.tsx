@@ -1,4 +1,4 @@
-import { CheckIcon, EyeOpenIcon, InfoCircledIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
+import { CheckIcon, CopyIcon, EyeOpenIcon, InfoCircledIcon, PlusIcon, TrashIcon } from '@radix-ui/react-icons'
 import { Callout, Code, DataList, Flex, Heading, Text } from '@radix-ui/themes'
 import * as React from 'react'
 import { UserContext } from '@app/context/UserContext'
@@ -9,10 +9,10 @@ export default function Keys() {
 
   const [loading, setLoading] = React.useState(true)
   const [updateLoading, setUpdateLoading] = React.useState(false)
-  const [name, setName] = React.useState('')
   const [keys, setKeys] = React.useState<any[]>([])
-  const [showKey, setShowKey] = React.useState(false)
+  const [showKey, setShowKey] = React.useState<string>('') // key id
   const [openInfo, setOpenInfo] = React.useState(false)
+  const [selectedKey, setSelectedKey] = React.useState({})
 
   const { user } = React.useContext(UserContext)
 
@@ -28,20 +28,11 @@ export default function Keys() {
     getKeys()
   }
 
-  const updateApiKey = async (id = '', params = {}, reveal = false) => {
-    setLoading(true)
+  const updateApiKey = async (id = '', params = {}) => {
     await fetch(`/api/v1/keys/${id}`, {
       method: 'PUT',
-      body: JSON.stringify({
-        ...params,
-        name: params.name || name,
-        viewed: true,
-      })
+      body: JSON.stringify(params)
     })
-
-    if (!reveal) {
-      getKeys()
-    }
   }
 
   const deleteApiKey = async (id = '') => {
@@ -58,6 +49,29 @@ export default function Keys() {
     const keys = await res.json()
     setLoading(false)
     setKeys(keys)
+  }
+
+  // const debouce = React.useCallback(() => {
+  //   const timer = setTimeout(() => {
+  //     updateApiKey(selectedKey.id, selectedKey)
+  //   }, 2000)
+
+  //   return () => clearTimeout(timer)
+  // }, [JSON.stringify(selectedKey)])
+
+  const updateKeyName = (name: any) => {
+    if (name !== selectedKey.name) {
+      setSelectedKey({
+        ...selectedKey,
+        name
+      })
+      setTimeout(() => {
+        updateApiKey(selectedKey.id, {
+          ...selectedKey,
+          name
+        })
+      }, 1500)
+    }
   }
 
   React.useEffect(() => {
@@ -107,18 +121,19 @@ export default function Keys() {
               <li className="mb-[8px]">
                 <Text>Create an API Key in your account.</Text>
               </li>
+              <li>
+                <Text>Clone <Link className="text-[blue]" to='https://github.com/Turing-Games/template-python-poker-bot/tree/main' target='_blank'>{' template repo'}</Link> and, optionally, follow examples described in README.</Text>
+              </li>
               <li className="mb-[8px]">
                 <Text>
-                  Provide the following arguments in your bot's Python template:<br />
-                  <Text className='block' weight={'bold'}>--host <Code>ws.turingpoker.com</Code></Text>
-                  <Text className='block' weight={'bold'}>--port <Code>1999</Code></Text>
+                  Provide the following arguments for the bot's Python script:<br />
                   <Text className='block'><strong>--room</strong> Numerical ID listed on the <Link to='/games'>games</Link> page</Text>
                   <Text className='block'><strong>--party</strong> Type of game {'(valid values are: "poker" or "kuhn")'}</Text>
                   <Text className='block'><strong>--key</strong> API Key generated for bot</Text>
                 </Text>
               </li>
               <li>
-                <Text>Run the script using <Code>screen</Code> or as a background process</Text>
+                <Text>Run the script</Text>
               </li>
             </ol>
           </div>
@@ -131,40 +146,55 @@ export default function Keys() {
                 {
                   keys.map((key, i) => {
                     return (
-                      <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`}>
-                        <p className="mb-[8px] text-xs">ID: {key.id}</p>
+                      <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`} key={key.id}>
                         <div className={`flex items-center justify-between gap-[16px]`} key={i}>
                           <input
                             type="text"
                             placeholder={key.name || 'Name for key (optional)'}
                             defaultValue={key.name || ''}
-                            onChange={e => setName(e.target.value)}
+                            onChange={e => updateKeyName(e.target.value)}
                             className="bg-transparent"
+                            onFocus={() => setSelectedKey(key)}
+                            onBlur={() => setSelectedKey({})}
                           />
-                          {
-                            key.viewed ?
-                              <input className="bg-transparent" type="password" disabled value={key.key} /> :
-                              <p className="block text-xs p-[4px]">{key.key}</p>
-                          }
-                          <div>
-                            <div className="flex items-center gap-[8px]">
-                              {!key.viewed &&
+                          <div className="flex items-center gap-[16px]">
+                            {
+                              key.viewed || key.id !== showKey ?
+                                <input className="bg-transparent" type="password" disabled value={'1234567890123456789012345678901234567890'} /> :
+                                <p className="block text-xs p-[4px] max-w-[177px] w-full truncate">{key.key}</p>
+                            }
+                            {!key.viewed ?
+                              key.id === showKey ?
+                                // copy
+                                <div>
+                                  <CopyIcon
+                                    className="cursor-pointer"
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(key.key)
+                                      alert('Copied API key to clipboard')
+                                    }}
+                                  />
+                                </div> :
+                                // view
                                 <div
                                   className="cursor-pointer"
                                   onClick={() => {
+                                    setShowKey(key.id)
                                     updateApiKey(key.id, {
                                       ...key,
                                       viewed: true
-                                    }, true)
+                                    })
                                   }}
                                 >
                                   <EyeOpenIcon />
-                                </div>
-                              }
-                              <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
-                                <TrashIcon className="text-[red]" />
+                                </div> :
+                              <div className="opacity-0">
+                                <EyeOpenIcon />
                               </div>
-                            </div>
+                            }
+                          </div>
+                          <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
+                            <TrashIcon className="text-[red]" />
                           </div>
                         </div>
                       </div>

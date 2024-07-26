@@ -39,23 +39,10 @@ function GameControls({ clientState, joinLeave, gameType }: { clientState: Clien
 
   // Render game controls
   return (
-    <div className="tg-poker__controls">
-      <div
-        style={{
-          flexDirection: "column",
-          width: "100%",
-          display: "flex",
-          alignItems: 'stretch',
-          gap: "8px",
-        }}
-      >
+    <div className="flex gap-[5px] w-[200px] min-w-[200px]">
+      <div className="flex flex-col w-full gap-[8px] items-stretch">
         {/* Call button */}
-        <div style={{
-          flexDirection: "row",
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "8px",
-        }}>
+        <div className="flex gap-[8px] justify-between items-center">
           {/* Check button */}
           <button disabled={!gameState || gameState?.whoseTurn !== currentPlayer?.id || !isPlayerInGame}
             onClick={() => {

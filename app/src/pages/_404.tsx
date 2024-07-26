@@ -7,7 +7,7 @@ import { useParams } from 'react-router-dom';
 export default function _404() {
 
   return (
-    <Main>
+    <Main pageTitle='Page Not Found'>
       <div className="flex items-center justify-center w-full h-full">
         <div className="border flex items-center justify-center bg-white h-[400px] w-full max-w-[600px]">
           <Heading size={'4'} className="text-center">The page you are looking for<br />is not in your cards</Heading>

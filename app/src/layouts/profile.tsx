@@ -6,6 +6,8 @@ import { ReactNode } from 'react';
 import useSmallScreen from '@app/hooks/useSmallScreen';
 import { DiscordLogoIcon, GearIcon } from '@radix-ui/react-icons';
 import Keys from '@app/pages/user/keys';
+import Header from '@app/components/Header';
+import { Helmet } from 'react-helmet';
 
 const menuItems = [
   { link: "/games", label: "Games" },
@@ -13,7 +15,7 @@ const menuItems = [
   { link: "https://discord.gg/kz5ed2Q4QP", label: <DiscordLogoIcon />, target: '_blank' },
 ];
 
-export default function Profile() {
+export default function Profile({ pageTitle = '' }) {
 
   const smallScreen = useSmallScreen(1e9, 450);
 
@@ -30,57 +32,10 @@ export default function Profile() {
         flexDirection: 'column'
       })
     }}>
-      <header style={{
-        display: 'flex',
-        alignItems: 'left',
-        textAlign: 'left',
-        ...(smallScreen ? {
-          flexDirection: 'column',
-          padding: '8px',
-          borderBottom: 'none',
-          borderRight: '1px solid black',
-        } : {
-          flexDirection: 'row'
-        })
-      }}>
-        <Link to='/'>
-          <img src={Logo} alt="Logo" className="desktop" style={{ height: 40 }} />
-          <img src={MobileLogo} alt="Logo" className="mobile" style={{ height: 40 }} />
-        </Link>
-        <div style={{
-          gap: '8px',
-          display: 'flex',
-          textAlign: 'left',
-          ...(smallScreen ? {
-            alignItems: 'baseline',
-            flexDirection: 'column',
-          } : {
-            alignItems: 'center',
-            flexDirection: 'row'
-          })
-        }}>
-          {
-            menuItems.map((item) => {
-              return (
-                <NavLink
-                  key={item.link}
-                  to={item.link}
-                  target={item.target ?? '_self'}
-                  className={({ isActive, isPending }) => isActive ? "menu-active" : ""}
-                >
-                  {item.label}
-                </NavLink>
-              )
-            })
-          }
-          <SignedOut>
-            <SignInButton />
-          </SignedOut>
-          <SignedIn>
-            <UserButton userProfileMode='navigation' userProfileUrl='/user' />
-          </SignedIn>
-        </div>
-      </header >
+      <Helmet>
+        <title>{pageTitle ? `${pageTitle} | Turing Poker` : 'Turing Poker'}</title>
+      </Helmet>
+      <Header />
       <main style={{
         position: 'relative',
         display: 'flex',
@@ -88,7 +43,25 @@ export default function Profile() {
         justifyContent: 'stretch',
         flexGrow: 1
       }}>
-        <UserProfile>
+        <UserProfile
+          appearance={{
+            elements: {
+              profileSectionPrimaryButton: {
+                display: 'none'
+              },
+              userPreviewAvatarBox: {
+                backgroundColor: '#000',
+                backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
+                backgroundPosition: 'center',
+                backgroundSize: '80px',
+                border: '1px solid #000'
+              },
+              avatarImage: {
+                display: 'none'
+              }
+            }
+          }}
+        >
           <UserProfile.Page label='API Keys' url='api-keys' labelIcon={<GearIcon />}>
             <Keys />
           </UserProfile.Page>

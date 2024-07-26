@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 /* rgb(187, 39, 26) */
 /* 
   We've already included normalize.css. 
@@ -8,15 +12,6 @@
 */
 * {
   box-sizing: border-box;
-}
-
-a {
-  color: #000;
-  text-decoration: none;
-}
-
-a:visited {
-  color: inherit;
 }
 
 #root {
@@ -31,29 +26,28 @@ html {
 }
 
 body {
-  font-family: sans-serif;
+  font-family: 'Roboto', sans-serif;
   height: 100%;
   font-size: 16px;
   line-height: 1.5;
-  color: #333;
-  background-image: url("/static/images/poker-bg-tile.jpg");
-  background-repeat: repeat;
-  background-color: rgba(255, 255, 255, 0.85);
-  background-blend-mode: lighten;
+  color: #000;
   padding: 0;
   margin: 0;
+}
+
+a {
+  /* color: #000; */
+  text-decoration: none;
+}
+
+a:visited {
+  /* color: inherit; */
 }
 
 label,
 p {
   font-size: 1rem;
 }
-
-button {
-  display: inline-block;
-  /* Ensure buttons are visible */
-}
-
 
 h1,
 h2,
@@ -74,11 +68,12 @@ p {
 
 button {
   padding: 10px 15px;
-  background-color: #4CAF50;
   color: white;
+  display: inline-block;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  @apply bg-green;
 }
 
 button:hover {
@@ -102,46 +97,5 @@ button:disabled {
 @media (max-width: 768px) {
   body {
     font-size: 10px;
-  }
-}
-
-header {
-  background: #fff;
-  border-bottom: 1px solid #000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px;
-}
-
-header>div {
-  align-items: center;
-  display: flex;
-}
-
-header>div>* {
-  font-size: 16px;
-  margin-left: 8px;
-}
-
-.desktop {
-  display: block;
-}
-
-.mobile {
-  display: none;
-}
-
-.menu-active {
-  font-weight: 800;
-}
-
-@media (max-width: 768px) {
-  .desktop {
-    display: none;
-  }
-
-  .mobile {
-    display: block;
   }
 }

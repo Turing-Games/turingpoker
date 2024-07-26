@@ -27,7 +27,7 @@ function GameStatus({ clientState, gameType = '' }: { clientState: ClientState, 
   }
 
   return (
-    <div className="tg-poker__table__gamestatus">
+    <div className="p-[8px] bg-[black] rounded-[4px] w-[fit-content] flex gap-[8px] flex-wrap justify-between grid-auto grid-cols-[32px] sm:grid-cols-auto">
       <KV label="Pot" value={`$${gameState.pot.toFixed(2)}`} />
       {
         gameType !== 'kuhn' &&

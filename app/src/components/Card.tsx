@@ -136,8 +136,8 @@ const Card = forwardRef<HTMLImageElement>(function Card(props: {
 
   const { value } = props;
 
-  const style = { 
-    ...props.style 
+  const style = {
+    ...props.style
   };
   return (
     <img

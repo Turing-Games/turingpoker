@@ -49,12 +49,18 @@ const router = createBrowserRouter([
     element: <Games />,
   },
   {
-    path: "/learn",
-    element: <Learn />,
+    path: "/resources",
+    // element: <Learn />,
+    children: [
+      {
+        path: "learn",
+        element: <Learn />
+      }
+    ]
   },
   {
     path: '/user',
-    element: <Profile />,
+    element: <Profile pageTitle='Profile' />,
     children: [
       { path: 'keys', element: <div>test</div> }
     ]
