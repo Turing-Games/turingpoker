@@ -279,7 +279,7 @@ export default function Games() {
         <div
           className='flex justify-between items-center mb-[16px]'
         >
-          <h2 className="text-[18px]">Create a game</h2>
+          <h2 className="font-barlow font-medium text-[18px]">Create a game</h2>
           <div onClick={() => setIsOpen(false)}>
             <Cross1Icon />
           </div>
