@@ -95,21 +95,16 @@ export default function Header() {
               appearance={{
                 elements: {
                   userButtonAvatarBox: {
-                    backgroundColor: '#000',
-                    backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
-                    backgroundPosition: 'center',
-                    backgroundSize: '45px',
-                    border: '1px solid #000'
+                    backgroundColor: '#CC1F00',
+                    // backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
+                    // backgroundPosition: 'center',
+                    // backgroundSize: '45px',
                   },
                   userPreviewAvatarBox: {
-                    backgroundColor: '#000',
-                    backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
-                    backgroundPosition: 'center',
-                    backgroundSize: '60px',
-                    border: '1px solid #000'
-                  },
-                  avatarImage: {
-                    display: 'none'
+                    backgroundColor: '#CC1F00',
+                    // backgroundImage: 'url("https://play.turingpoker.com/assets/logo.png")',
+                    // backgroundPosition: 'center',
+                    // backgroundSize: '60px',
                   },
                   userButtonPopoverFooter: {
                     display: 'none'
