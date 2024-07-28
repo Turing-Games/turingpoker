@@ -32,3 +32,14 @@ export const DEFAULT_CLIENT_STATE = {
   updateLog: [],
   gameType: ''
 }
+
+export const GAME_STATUS_FILTERS = [
+  { label: 'Game Status', value: '' },
+  { label: 'Pending', value: 'pending' },
+  { label: 'Active', value: 'active' },
+]
+
+export const GAME_TYPE_FILTERS = [
+  { label: 'Game Type', value: '' },
+  ...GAMES
+]

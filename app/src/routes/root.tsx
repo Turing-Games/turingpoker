@@ -76,7 +76,10 @@ export default function Root() {
   return (
     <React.StrictMode>
 
-      <Theme hasBackground={false}>
+      <Theme
+        hasBackground={false}
+        grayColor='#2C363F'
+      >
         <SocketContext.Provider value={{}}>
           <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
             <User>

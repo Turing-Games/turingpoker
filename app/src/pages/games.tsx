@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Main from '@app/layouts/main';
 import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { Cross1Icon, DotsHorizontalIcon, ExitIcon, GearIcon, PlusIcon, Share1Icon, TrashIcon } from '@radix-ui/react-icons';
+import { ChevronDownIcon, Cross1Icon, DotsHorizontalIcon, ExitIcon, GearIcon, PlusIcon, Share1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
 import { Link } from 'react-router-dom';
@@ -10,134 +10,15 @@ import { Heading, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';
 import Modal from 'react-modal';
 import Select from '@app/components/Select';
-import { GAMES, MODAL_STYLES } from '@app/constants/games/shared';
+import { GAME_STATUS_FILTERS, GAME_TYPE_FILTERS, GAMES, MODAL_STYLES } from '@app/constants/games/shared';
 import { CONFIGURABLE_PROPERTIES as POKER_CONFIG } from '@app/constants/games/poker';
 import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuhn';
 import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
 import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 import { Helmet } from "react-helmet";
+import TgTable from '@app/components/Table';
+import { TableCard } from '@app/components/TableCard';
 
-
-export function TableCard({
-  table,
-  onDelete,
-  isAdmin,
-  selected = false,
-  setGameId = () => { },
-}: {
-  table: TableState,
-  onDelete: (id: string) => void,
-  isAdmin: boolean
-  selected?: boolean
-  setGameId?: (game?: any) => void
-}) {
-
-  const [showItems, setShowItems] = React.useState(false)
-
-  const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
-  const playerCount = table?.gameState?.players?.length || 0;
-
-  const cardMenuOptions = [
-    {
-      label: (
-        <>
-          <TrashIcon />
-          Delete
-        </>
-      ),
-      onClick: () => onDelete(table.id), include: isAdmin
-    },
-    {
-      label: (
-        <>
-          <Share1Icon />
-          Invite URL
-        </>
-      ),
-      onClick: () => {
-        navigator.clipboard.writeText(`${location.origin}/games/${table.id}/${table.gameType}`)
-        alert('Copied invite URL to clipboard')
-      },
-      include: true
-    },
-    {
-      label: (
-        <>
-          <GearIcon />
-          Python CLI
-        </>
-      ),
-      onClick: () => {
-        navigator.clipboard.writeText(`python3 main.py --party ${table.gameType} --room ${table.id}`)
-        alert('Copied CLI command to clipboard')
-      },
-      include: true
-    }
-  ]
-
-  const handleClickCardMenu = (id: any) => {
-    setShowItems(false)
-    if (selected) {
-      setGameId('')
-    } else {
-      setGameId(id)
-      setTimeout(() => {
-        setShowItems(true)
-      }, 150)
-    }
-  }
-
-  return (
-    <div style={{ position: 'relative' }}>
-      <div
-        className={`
-        border border-black absolute top-[-10px] right-[-10px] bg-white 
-        ${selected ? 'transition-[width,height] duration-300 w-[150px] h-[186px] rounded-[4px] p-[8px]' :
-            'flex items-center justify-center w-[25px] h-[25px] rounded-[50px] cursor-pointer'
-          }
-      `}
-        onClick={() => !selected ? handleClickCardMenu(table.id) : false}
-      >
-        {
-          selected ?
-            <div className={`flex flex-col gap-[8px] ${showItems ? 'transition-[opacity] opacity-100' : 'opacity-0'}`}>
-              <div
-                className="flex justify-end gap-[4px]"
-              >
-                <div onClick={() => handleClickCardMenu('')} className="cursor-pointer">
-                  <Cross1Icon />
-                </div>
-              </div>
-              {
-                cardMenuOptions.filter(option => option.include).map((option, i) => {
-                  return (
-                    <div
-                      className="flex gap-[4px] items-center cursor-pointer transition-[padding] duration-100 hover:pl-[4px]"
-                      onClick={option.onClick}
-                    >
-                      {option.label}
-                    </div>
-                  )
-                })
-              }
-            </div> :
-            <DotsHorizontalIcon />
-        }
-      </div>
-      <Link
-        className="bg-white border border-black rounded-[4px] grid gap-[8px] p-[12px] pt-[20px]"
-        to={`/games/${table.id}/${table.gameType}`}
-        key={table.id}
-      >
-        <strong>{table?.gameType?.toUpperCase()}</strong>
-        <Text>Table: {table.id}</Text>
-        <Text>Status: {table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`}</Text>
-        <Text>Spectators: {spectatorCount}</Text>
-        <Text>Players: {playerCount}</Text>
-      </Link>
-    </div>
-  )
-}
 
 export default function Games() {
 
@@ -202,16 +83,6 @@ export default function Games() {
     getTables()
   }, [gameType, gameStatus])
 
-  const gameTypeFilters = [
-    { label: 'Game Type', value: '' },
-    ...GAMES
-  ]
-
-  const gameStatusFilters = [
-    { label: 'Game Status', value: '' },
-    { label: 'Pending', value: 'pending' },
-    { label: 'Active', value: 'active' },
-  ]
 
   const checkValidInput = () => {
     if (gameTypeForm === '') return alert('Please select a game type')
@@ -245,13 +116,13 @@ export default function Games() {
         {/* filters */}
         <div className="flex items-center gap-[8px] mt-[16px] mb-[32px]">
           <Select
-            options={gameTypeFilters}
+            options={GAME_TYPE_FILTERS}
             selected={gameType}
             placeholder="Game type"
             onChange={(value) => setGameType(value)}
           ></Select>
           <Select
-            options={gameStatusFilters}
+            options={GAME_STATUS_FILTERS}
             selected={gameStatus}
             placeholder="Game status"
             onChange={(value) => setGameStatus(value)}
@@ -261,22 +132,29 @@ export default function Games() {
           loading ?
             <Text>Loading...</Text> :
             tables.length > 0 ?
-              <div className="flex flex-wrap gap-[16px]">
-                {
-                  tables.map((table, i) => {
-                    return (
-                      <TableCard
-                        key={i}
-                        table={table}
-                        isAdmin={isAdmin}
-                        onDelete={deleteTable}
-                        selected={table.id === gameId}
-                        setGameId={setGameId}
-                      />
-                    )
-                  })
-                }
-              </div> :
+              <TgTable
+                headers={[
+                  { value: 'id', label: 'Table ID' },
+                  { value: 'gameType', label: 'Game Type' },
+                  { value: 'gameState', label: 'Status' },
+                  { value: 'spectatorPlayers', label: 'Spectators' },
+                  { value: 'queuedPlayers', label: 'Queued' },
+                  { value: 'players', label: 'In-Game' },
+                  { value: 'dropdown', label: '' }
+                ]}
+                rows={tables.map(table => {
+                  const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
+                  return {
+                    id: table.id,
+                    gameType: table.gameType,
+                    gameState: table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`,
+                    spectatorPlayers: spectatorCount,
+                    queuedPlayers: table?.queuedPlayers?.length || 0,
+                    players: table?.gameState?.players?.length || 0,
+                    dropdown: <ChevronDownIcon />,
+                  }
+                })}
+              /> :
               <Text>No tables found</Text>
         }
       </div>
