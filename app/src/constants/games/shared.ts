@@ -34,12 +34,12 @@ export const DEFAULT_CLIENT_STATE = {
 }
 
 export const GAME_STATUS_FILTERS = [
-  { label: 'Game Status', value: '' },
-  { label: 'Pending', value: 'pending' },
+  // { label: 'All', value: 'all' },
   { label: 'Active', value: 'active' },
+  { label: 'Pending', value: 'pending' },
 ]
 
 export const GAME_TYPE_FILTERS = [
-  { label: 'Game Type', value: '' },
+  { label: 'All Games', value: '' },
   ...GAMES
 ]

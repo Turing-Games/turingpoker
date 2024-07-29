@@ -13,6 +13,13 @@
 
 * {
   box-sizing: border-box;
+  border-color: #E7EBEE;
+}
+
+.radix-themes {
+  --my-brand-color: #CC1F00 !important;
+  --color-surface: #F3F5F700 !important;
+  --gray-12: #080A0C !important;
 }
 
 #root {
@@ -31,7 +38,7 @@ body {
   height: 100%;
   font-size: 16px;
   line-height: 1.5;
-  color: #000;
+  color: #080A0C;
   padding: 0;
   margin: 0;
 }
@@ -77,7 +84,7 @@ button {
   @apply bg-green;
 }
 
-button:hover {
+button:not(.rt-reset):hover {
   background-color: #45a049;
 }
 

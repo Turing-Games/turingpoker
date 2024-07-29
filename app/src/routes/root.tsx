@@ -78,7 +78,6 @@ export default function Root() {
 
       <Theme
         hasBackground={false}
-        grayColor='#2C363F'
       >
         <SocketContext.Provider value={{}}>
           <ClerkProvider publishableKey={PUBLISHABLE_KEY}>

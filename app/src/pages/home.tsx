@@ -15,7 +15,7 @@ export default function Home() {
   let { gameId, gameType } = useParams();
 
   const games = [
-    { label: 'Select a game', value: '' },
+    { label: 'Select a game', value: 'all' },
     { label: 'Poker', value: 'poker' },
     { label: 'Kuhn', value: 'kuhn' }
   ]

@@ -1,12 +1,12 @@
 import * as React from 'react'
 import Main from '@app/layouts/main';
 import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { ChevronDownIcon, Cross1Icon, DotsHorizontalIcon, ExitIcon, GearIcon, PlusIcon, Share1Icon, TrashIcon } from '@radix-ui/react-icons';
+import { ChevronDownIcon, Cross1Icon, DotsHorizontalIcon, ExitIcon, EyeOpenIcon, GearIcon, PlusIcon, Share1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
 import { Link } from 'react-router-dom';
 import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
-import { Heading, Text } from '@radix-ui/themes';
+import { Heading, SegmentedControl, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';
 import Modal from 'react-modal';
 import Select from '@app/components/Select';
@@ -18,6 +18,7 @@ import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/
 import { Helmet } from "react-helmet";
 import TgTable from '@app/components/Table';
 import { TableCard } from '@app/components/TableCard';
+import { EyeIcon } from '@heroicons/react/16/solid';
 
 
 export default function Games() {
@@ -26,7 +27,7 @@ export default function Games() {
   const [tables, setTables] = React.useState<TableState[]>([])
   const [gameType, setGameType] = React.useState('')
   const [gameTypeForm, setGameTypeForm] = React.useState('')
-  const [gameStatus, setGameStatus] = React.useState('all')
+  const [gameStatus, setGameStatus] = React.useState('active')
   const [isOpen, setIsOpen] = React.useState(false)
   const [gameConfig, setGameConfig] = React.useState({})
   const [gameId, setGameId] = React.useState('')
@@ -104,7 +105,7 @@ export default function Games() {
     <Main pageTitle='Games'>
       <div className="p-[20px] w-full">
         <div className="flex items-center justify-between">
-          <Heading mb="2" size="4">Games ({tables.length})</Heading>
+          <Heading mb="2" size="4">Games</Heading>
           <button
             className="flex items-center gap-[6px] justify-between"
             onClick={() => setIsOpen(true)}
@@ -115,17 +116,29 @@ export default function Games() {
         </div>
         {/* filters */}
         <div className="flex items-center gap-[8px] mt-[16px] mb-[32px]">
+
+          <SegmentedControl.Root
+            defaultValue={'active'}
+            style={{ height: 40 }}
+          >
+            {
+              GAME_STATUS_FILTERS.map((filter, i) => {
+                return (
+                  <SegmentedControl.Item
+                    value={filter.value}
+                    onClick={() => setGameStatus(filter.value)}
+                  >
+                    {filter.label}
+                  </SegmentedControl.Item>
+                )
+              })
+            }
+          </SegmentedControl.Root>
           <Select
             options={GAME_TYPE_FILTERS}
             selected={gameType}
-            placeholder="Game type"
+            placeholder="All Games"
             onChange={(value) => setGameType(value)}
-          ></Select>
-          <Select
-            options={GAME_STATUS_FILTERS}
-            selected={gameStatus}
-            placeholder="Game status"
-            onChange={(value) => setGameStatus(value)}
           ></Select>
         </div>
         {
@@ -135,24 +148,35 @@ export default function Games() {
               // <div className="h-[200px]">
               <TgTable
                 headers={[
-                  { value: 'id', name: 'Table ID' },
+                  { value: 'id', name: 'Table' },
                   { value: 'gameType', name: 'Game Type' },
                   { value: 'gameState', name: 'Status' },
-                  { value: 'spectatorPlayers', name: 'Spectators' },
-                  { value: 'queuedPlayers', name: 'Queued' },
-                  { value: 'players', name: 'In-Game' },
-                  { value: 'dropdown', name: '' }
+                  // { value: 'spectatorPlayers', name: 'Spectators', sortable: true },
+                  { value: 'queuedPlayers', name: 'Queued', sortable: true },
+                  { value: 'players', name: 'In-Game', sortable: true },
+                  { value: 'view', name: '', align: 'center' },
+                  // { value: 'quickview', name: '', align: 'right' }
                 ]}
                 rows={tables.map(table => {
                   const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
                   return {
-                    id: table.id,
+                    id: table.name || table.id,
                     gameType: table.gameType,
                     gameState: table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`,
                     spectatorPlayers: spectatorCount,
                     queuedPlayers: table?.queuedPlayers?.length || 0,
-                    players: table?.gameState?.players?.length || 0,
-                    dropdown: <ChevronDownIcon />,
+                    players: `${table?.gameState?.players?.length || 0}/${tables.config?.maxPlayers || 0}`,
+                    quickview: (
+                      <div>
+                        <EyeOpenIcon />
+                      </div>
+
+                    ),
+                    view: (
+                      <button>
+                        <Link to={`/games/${table.id}/${table.gameType}`}>View</Link>
+                      </button>
+                    )
                   }
                 })}
               />
@@ -202,7 +226,7 @@ export default function Games() {
               <p>Game Type:</p>
               <Select
                 options={[
-                  { label: 'Game Type', value: '' },
+                  { label: 'Game Type', value: 'all' },
                   ...GAMES
                 ]}
                 selected={gameTypeForm}

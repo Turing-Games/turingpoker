@@ -23,7 +23,7 @@ export default function Select({
   return (
     <div className="relative">
       <div
-        className="flex items-center gap-[6px] justify-between bg-white p-[8px] cursor-pointer border rounded-lg w-full h-[40px] text-sm"
+        className="flex items-center gap-[6px] justify-between bg-white p-[8px] cursor-pointer border rounded-[4px] w-full h-[40px] text-[14px]"
         onClick={() => setIsOpen(!isOpen)}
         style={{
           width: width
@@ -34,7 +34,7 @@ export default function Select({
       </div>
       {isOpen &&
         <div
-          className="bg-white border absolute top-[45px] left-0 shadow-md rounded-lg w-full z-10"
+          className="bg-white border absolute top-[45px] left-0 shadow-md rounded-[4px] w-full z-10"
           style={{
             width: width
           }}
