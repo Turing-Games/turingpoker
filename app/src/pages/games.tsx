@@ -132,15 +132,16 @@ export default function Games() {
           loading ?
             <Text>Loading...</Text> :
             tables.length > 0 ?
+              // <div className="h-[200px]">
               <TgTable
                 headers={[
-                  { value: 'id', label: 'Table ID' },
-                  { value: 'gameType', label: 'Game Type' },
-                  { value: 'gameState', label: 'Status' },
-                  { value: 'spectatorPlayers', label: 'Spectators' },
-                  { value: 'queuedPlayers', label: 'Queued' },
-                  { value: 'players', label: 'In-Game' },
-                  { value: 'dropdown', label: '' }
+                  { value: 'id', name: 'Table ID' },
+                  { value: 'gameType', name: 'Game Type' },
+                  { value: 'gameState', name: 'Status' },
+                  { value: 'spectatorPlayers', name: 'Spectators' },
+                  { value: 'queuedPlayers', name: 'Queued' },
+                  { value: 'players', name: 'In-Game' },
+                  { value: 'dropdown', name: '' }
                 ]}
                 rows={tables.map(table => {
                   const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
@@ -154,7 +155,9 @@ export default function Games() {
                     dropdown: <ChevronDownIcon />,
                   }
                 })}
-              /> :
+              />
+              // </div> 
+              :
               <Text>No tables found</Text>
         }
       </div>
