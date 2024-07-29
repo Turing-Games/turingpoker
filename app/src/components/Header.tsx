@@ -12,7 +12,7 @@ export default function Header() {
 
   const menuItems = [
     { link: "/games", label: "Games", include: isSignedIn },
-    // { link: "/tournaments", label: "Tournaments", include: isSignedIn },
+    { link: "/tournaments", label: "Tournaments", include: isSignedIn },
     // { link: "/leaderboard", label: "Leaderboard", include: true },
     {
       link: "/resources",

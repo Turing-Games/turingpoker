@@ -40,7 +40,7 @@ export default defineConfig(({ command, mode }) => {
         paths,
         pages(),
         devServer({
-          entry: "./src/index.tsx",
+          entry: "./src/api/index.tsx",
           adapter: cloudflareAdapter
         }),
       ],
