@@ -1,7 +1,9 @@
 import { D1Database } from '@cloudflare/workers-types';
 import { Hono } from 'hono'
-import { createHash } from 'node:crypto';
-import { decode, sign, verify } from 'hono/jwt'
+import { clerk } from './webhooks';
+import { users } from './users';
+import { keys } from './keys';
+import { games } from './games';
 
 // This ensures c.env.DB is correctly typed
 export type Bindings = {
@@ -11,57 +13,23 @@ export type Bindings = {
 
 const app = new Hono<{ Bindings: Bindings }>()
 
-// Webhooks (clerk)
-app.post("/webhooks/clerk/user", async (c) => {
-  const uuid = crypto.randomUUID()
-  const clerkUser = await c.req.json()
-  try {
-    let { results } = await c.env.DB.prepare(
-      'INSERT into users (id, clerk_id) VALUES (?, ?)'
-    )
-      .bind(`${uuid}`, clerkUser.data?.id)
-      .all();
-    return c.json(results);
-  } catch (e) {
-    return c.json({ message: 'Error signing up', error: e }, 500);
-  }
-});
-
-// api routes
+// WEBHOOKS (clerk)
+app.post("/webhooks/clerk/user", clerk.create);
 
 // USERS
-app.get("/api/v1/users/:id", async (c) => {
-  let usrStmt = c.env.DB.prepare('SELECT * from users WHERE clerk_id = ?').bind(c.req.param('id'))
-  try {
-    const { results } = await usrStmt.all()
-    return c.json({ data: results[0] });
-  } catch (e) {
-    return c.json({ message: JSON.stringify(e) }, 500);
-  }
-});
+app.get("/api/v1/users/:id", users.get);
+app.get("/api/v1/users/:id/keys", users.getKeys);
 
 // GAMES
-app.get("/api/v1/games", async (c) => {
-  let usrStmt = c.env.DB.prepare('SELECT * from games;')
-  try {
-    const { results } = await usrStmt.all()
-    return c.json(results);
-  } catch (e) {
-    return c.json({ message: JSON.stringify(e) }, 500);
-  }
-})
+app.get("/api/v1/games", games.get)
+app.post('/api/v1/games', games.create)
 
-// API KEYS
-app.get("/api/v1/users/:id/keys", async (c) => {
-  const id = c.req.param('id')
-  let usrStmt = c.env.DB.prepare('SELECT * from api_keys where user_id = ? ').bind(id)
-  try {
-    const { results } = await usrStmt.all()
-    return c.json(results);
-  } catch (e) {
-    return c.json({ message: JSON.stringify(e) }, 500);
-  }
-});
+// KEYS
+app.post("/api/v1/keys", keys.create)
+app.put("/api/v1/keys/:id", keys.update)
+app.delete("/api/v1/keys/:id", keys.delete);
+app.get("/api/v1/keys/verify", keys.verify);
+
 
 // LOCAL DEVELOPMENT ROUTES
 app.get('/api/dev/keys', async (c) => {
@@ -91,118 +59,6 @@ app.get('/api/dev/users', async (c) => {
     return c.json({}, 401);
   }
 })
-
-// app.get("/api/v1/keys", async (c) => {
-//   let usrStmt = c.env.DB.prepare('SELECT * from api_keys;')
-//   try {
-//     const { results } = await usrStmt.all()
-//     return c.json(results);
-//   } catch (e) {
-//     return c.json({ message: JSON.stringify(e) }, 500);
-//   }
-// });
-
-app.get("/api/v1/auth", async (c) => {
-  const key = c.req.header('API_SECRET')
-  const apiId = c.req.header('API_ID')
-  let apiKeyStmt = c.env.DB.prepare('SELECT * from api_keys where id = ? ').bind(apiId)
-  try {
-    const { results } = await apiKeyStmt.all()
-    const hash = results[0]?.key
-    if (!hash) {
-      return c.json({ message: 'Key not found' }, 404)
-    }
-
-    const isValid = verifyApiKey(key, hash as string)
-    if (!isValid) {
-      return c.json({ message: 'Invalid key' }, 401)
-    } else {
-      return c.json({});
-    }
-  } catch (e) {
-    return c.json({ message: JSON.stringify(e) }, 500);
-  }
-});
-
-app.post("/api/v1/keys", async (c) => {
-  const { userId = null, botId = null, name = '' } = await c.req.json()
-  try {
-    // generate key
-    const uuid = crypto.randomUUID()
-    const key = `turing_${crypto.randomUUID()}`
-
-    const payload = {
-      id: uuid,
-      key,
-      role: 'bot'
-    }
-
-    const token = await sign(payload, c.env.BOT_SECRET_KEY)
-
-
-    let { results } = await c.env.DB.prepare(
-      'INSERT into api_keys (id, user_id, bot_id, name, key) VALUES (?, ?, ?, ?, ?)'
-    )
-      .bind(uuid, userId, botId, name, token)
-      .all()
-    return c.json(results);
-  } catch (e) {
-    console.log(e)
-    return c.json({ message: 'Error creating key', error: e }, 500);
-  }
-});
-
-// update key / hash
-app.put("/api/v1/keys/:id", async (c) => {
-  const { key, name, viewed } = await c.req.json()
-  let keyToSave = key
-  const id = c.req.param('id')
-
-  if (key.startsWith('turing')) {
-    const hash = createHash('sha256')
-    hash.update(key)
-    keyToSave = hash.digest('hex')
-  }
-
-  try {
-    let { results } = await c.env.DB.prepare(
-      'UPDATE api_keys SET key = ?, name = ?, viewed = ? where id = ?'
-    )
-      .bind(keyToSave, name, viewed, id)
-      .all()
-    return c.json(results);
-  } catch (e) {
-    console.log(e)
-    return c.json({ message: 'Error updating key', error: e }, 500);
-  }
-})
-
-app.delete("/api/v1/keys/:id", async (c) => {
-  const id = c.req.param('id')
-  let usrStmt = c.env.DB.prepare('DELETE from api_keys where id = ? ').bind(id)
-  try {
-    const { results } = await usrStmt.all()
-    return c.json(results);
-  } catch (e) {
-    return c.json({ message: JSON.stringify(e) }, 500);
-  }
-});
-
-const verifyApiKey = (key: string, hash: string) => {
-  const hashedKey = createHash('sha256')
-  hashedKey.update(key)
-  return hashedKey.digest('hex') === hash
-}
-
-// games api
-app.post('/api/v1/games', async (c) => {
-  const params = await c.req.json()
-  let usrStmt = c.env.DB.prepare('INSERT into games (id, name, autostart, minPlayers, maxPlayers, tournament_id) VALUES (?, ?, ?, ?, ?) ').bind(id, name, autostart, minPlayers, maxPlayers, tournamentId)
-
-})
-
-// user has unhashed key
-// compare key to hashed key
 
 // handles assets, serving client
 app.get("*", (c) => {

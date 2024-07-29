@@ -18,7 +18,7 @@ export default function Keys() {
 
   const createApiKey = async () => {
     setLoading(true)
-    await fetch(`/api/v1/keys`, {
+    await fetch(`/api/v1/users/${user.id}/keys`, {
       method: 'POST',
       body: JSON.stringify({
         userId: user.id
