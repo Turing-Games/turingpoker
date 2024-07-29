@@ -4,6 +4,7 @@ import { clerk } from './webhooks';
 import { users } from './users';
 import { keys } from './keys';
 import { games } from './games';
+import { tournaments } from './tournaments';
 
 // This ensures c.env.DB is correctly typed
 export type Bindings = {
@@ -30,6 +31,9 @@ app.put("/api/v1/keys/:id", keys.update)
 app.delete("/api/v1/keys/:id", keys.delete);
 app.get("/api/v1/keys/verify", keys.verify);
 
+// TOURNAMENTS
+app.get("/api/v1/tournaments", tournaments.get)
+app.post('/api/v1/tournaments', tournaments.create)
 
 // LOCAL DEVELOPMENT ROUTES
 app.get('/api/dev/keys', async (c) => {

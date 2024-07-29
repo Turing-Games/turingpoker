@@ -12,7 +12,7 @@ export default function Header() {
 
   const menuItems = [
     { link: "/games", label: "Games", include: isSignedIn },
-    { link: "/tournaments", label: "Tournaments", include: isSignedIn },
+    // { link: "/tournaments", label: "Tournaments", include: isSignedIn },
     // { link: "/leaderboard", label: "Leaderboard", include: true },
     {
       link: "/resources",
@@ -41,9 +41,9 @@ export default function Header() {
           ${smallScreen ? 'flex-col' : 'flex-row items-center'}
         `}>
         {
-          menuItems.filter(item => item.include).map((item) => {
+          menuItems.filter(item => item.include).map((item, i) => {
             return (
-              <div className="relative group ml-[8px] text-[16px]">
+              <div className="relative group ml-[8px] text-[16px]" key={i}>
                 {!item.submenu ?
                   <NavLink
                     key={item.link}

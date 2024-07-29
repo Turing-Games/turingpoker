@@ -3,72 +3,37 @@ import Main from '@app/layouts/main';
 import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { ChevronDownIcon, Cross1Icon, DotsHorizontalIcon, ExitIcon, EyeOpenIcon, GearIcon, PlusIcon, Share1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn, useUser } from '@clerk/clerk-react';
-import { sendMessage } from '@tg/utils/websocket';
-import { Link } from 'react-router-dom';
 import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
-import { Heading, SegmentedControl, Text } from '@radix-ui/themes';
+import { Heading, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';
 import Modal from 'react-modal';
 import Select from '@app/components/Select';
-import { GAME_STATUS_FILTERS, GAME_TYPE_FILTERS, GAMES, MODAL_STYLES } from '@app/constants/games/shared';
-import { CONFIGURABLE_PROPERTIES as POKER_CONFIG } from '@app/constants/games/poker';
-import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuhn';
-import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
-import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
-import { Helmet } from "react-helmet";
+import { GAME_TYPE_FILTERS, GAMES, MODAL_STYLES } from '@app/constants/games/shared';
 import TgTable from '@app/components/Table';
-import { TableCard } from '@app/components/TableCard';
-import { EyeIcon } from '@heroicons/react/16/solid';
-import { title } from 'process';
+import queryClient from '@app/client/apiClient';
 
 
 export default function Tournaments() {
 
   const [loading, setLoading] = React.useState(false)
-  const [tournaments, setTournaments] = React.useState<TableState[]>([])
+  const [tournaments, setTournaments] = React.useState<any[]>([])
   const [gameType, setGameType] = React.useState('')
-  const [gameTypeForm, setGameTypeForm] = React.useState('')
-  const [poolSize, setPoolSize] = React.useState(2)
+  const [gameTypeForm, setGameTypeForm] = React.useState('poker')
   const [isOpen, setIsOpen] = React.useState(false)
+  const [title, setTitle] = React.useState('')
   const [gameConfig, setGameConfig] = React.useState({
     size: 2,
-    title: '',
     private: false
   })
 
-  const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
-
-  const deleteTable = async (id: string) => {
-    // await fetch(partyUrl, {
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     action: "delete",
-    //     id: id
-    //   })
-    // });
-
-    // getTables()
-  }
 
   const getTournaments = async () => {
     setLoading(true)
     try {
-      const res = await PartySocket.fetch(
-        {
-          host: PARTYKIT_URL,
-          room: SINGLETON_ROOM_ID,
-          party: 'tables',
-          query: async () => {
-            return {
-              gameType: gameType,
-              // gameStatus: gameStatus,
-            }
-          }
-        })
-      let tournaments = ((await res.json()) ?? []) as TableState[];
-      // setTables(rooms)
-      // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
+      const tournaments = await queryClient('tournaments?withConfig=true', 'GET')
+      console.log({ tournaments })
+      setTournaments(tournaments)
     } catch (err) {
       console.log(err)
     }
@@ -76,19 +41,20 @@ export default function Tournaments() {
   }
 
   React.useEffect(() => {
-    // getTables()
+    getTournaments()
   }, [])
 
 
   const checkValidInput = () => {
-    if (poolSize < 2) return alert('Minimum pool size should be at least 2')
-    if (poolSize % 2 !== 0) return alert('Pool size must be an even number')
+    if (!title) return alert('Enter a tournament title')
+    if (gameConfig['size'] < 2) return alert('Minimum pool size should be at least 2')
+    if (gameConfig['size'] % 2 !== 0) return alert('Pool size must be an even number')
   }
 
   const configurableProperties = [
-    { label: 'Title', value: 'title', type: 'text', default: '' },
-    { label: 'Pool Size', value: 'poolSize', type: 'number', default: 2 },
-    { label: 'Start Date', value: 'startDate', type: 'date', default: new Date() }
+    { label: 'Pool Size', value: 'size', type: 'number', default: 2 },
+    { label: 'Private?', value: 'private', type: 'checkbox', default: false },
+    // { label: 'Start Date', value: 'startDate', type: 'date', default: new Date() }
   ] as any
 
   return (
@@ -117,42 +83,20 @@ export default function Tournaments() {
           loading ?
             <Text>Loading...</Text> :
             tournaments.length > 0 ?
-              // <div className="h-[200px]">
               <TgTable
                 headers={[
-                  { value: 'id', name: 'Table' },
+                  { value: 'id', name: 'Tournament' },
                   { value: 'gameType', name: 'Game Type' },
-                  { value: 'gameState', name: 'Status' },
-                  // { value: 'spectatorPlayers', name: 'Spectators', sortable: true },
-                  { value: 'queuedPlayers', name: 'Queued', sortable: true },
-                  { value: 'players', name: 'In-Game', sortable: true },
-                  { value: 'view', name: '', align: 'center' },
-                  // { value: 'quickview', name: '', align: 'right' }
+                  { value: 'size', name: 'Pool Size' },
                 ]}
-                rows={tournaments.map(table => {
-                  const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
+                rows={tournaments.map(t => {
                   return {
-                    // id: table.name || table.id,
-                    // gameType: table.gameType,
-                    // gameState: table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`,
-                    // spectatorPlayers: spectatorCount,
-                    // queuedPlayers: table?.queuedPlayers?.length || 0,
-                    // players: `${table?.gameState?.players?.length || 0}/${tables.config?.maxPlayers || 0}`,
-                    // quickview: (
-                    //   <div>
-                    //     <EyeOpenIcon />
-                    //   </div>
-
-                    // ),
-                    // view: (
-                    //   <button>
-                    //     <Link to={`/games/${table.id}/${table.gameType}`}>View</Link>
-                    //   </button>
-                    // )
+                    id: t.title || t.id,
+                    gameType: t.gameType,
+                    size: t.size
                   }
                 })}
               />
-              // </div> 
               :
               <Text>No tournaments found</Text>
         }
@@ -174,15 +118,8 @@ export default function Tournaments() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            const roomId = Math.round(Math.random() * 10000);
-            await fetch(partyUrl, {
-              method: "POST",
-              body: JSON.stringify({
-                action: "create",
-                id: roomId
-              })
-            });
-            // getTables()
+            await queryClient('tournaments', 'POST', { title, config: gameConfig })
+            getTournaments()
             setIsOpen(false)
           }}
           className="flex flex-col gap-[8px] mt-[16px]"
@@ -191,23 +128,31 @@ export default function Tournaments() {
             <div>
               <p>Game Type:</p>
               <Select
-                options={[
-                  { label: 'Game Type', value: 'all' },
-                  ...GAMES
-                ]}
+                options={GAMES}
                 selected={gameTypeForm}
                 placeholder="Game type"
                 onChange={(value) => {
                   setGameTypeForm(value)
-                  setGameConfig(defaultTableStates[value])
                 }}
               ></Select>
             </div>
             <div className="grid grid-cols-2 gap-[8px]">
+              <div>
+                <label htmlFor={'title'}>Title</label>
+                <input
+                  id={'title'}
+                  min={0}
+                  value={title}
+                  required={true}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="border border-black rounded-[4px] p-[8px] w-full text-sm"
+                />
+              </div>
               {
-                configurableProperties[gameTypeForm]?.map((property, i) => {
+                configurableProperties.map((property, i) => {
                   return (
                     <div
+                      key={i}
                       style={property.type === 'checkbox' ? {
                         display: 'flex',
                         gap: '8px',
@@ -218,9 +163,14 @@ export default function Tournaments() {
                       <input
                         id={property.value}
                         min={0}
-                        value={property.default}
+                        value={gameConfig[property.value]}
                         type={property.type}
-                        onChange={(e) => setGameConfig({ ...gameConfig, [property.value]: e.target.value })}
+                        onChange={(e) => {
+                          setGameConfig({
+                            ...gameConfig,
+                            [property.value]: property.type === 'checkbox' ? e.target.checked : e.target.value
+                          })
+                        }}
                         className="border border-black rounded-[4px] p-[8px] w-full text-sm"
                       />
                     </div>
