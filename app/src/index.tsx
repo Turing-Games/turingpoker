@@ -1,10 +1,10 @@
 import { D1Database } from '@cloudflare/workers-types';
 import { Hono } from 'hono'
-import { clerk } from './webhooks';
-import { users } from './users';
-import { keys } from './keys';
-import { games } from './games';
-import { tournaments } from './tournaments';
+import { clerk } from './api/webhooks';
+import { users } from './api/users';
+import { keys } from './api/keys';
+import { games } from './api/games';
+import { tournaments } from './api/tournaments';
 
 // This ensures c.env.DB is correctly typed
 export type Bindings = {

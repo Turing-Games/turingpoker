@@ -6,7 +6,7 @@
     "build": "npm run clean && vite build --mode client && vite build && cp -r static/favico/* dist/assets/ && npm run avatar_asset",
     "avatar_asset": "cp -r static/images/robot-white.png dist/assets/",
     "dev:hono": "vite --host",
-    "dev:wrangler": "wrangler dev src/api/index.tsx",
+    "dev:wrangler": "wrangler dev src/index.tsx",
     "test": "jest",
     "dev:partykit": "npx partykit dev --live",
     "deploy:prod": "NODE_ENV=production npm run build && NODE_ENV=production wrangler pages deploy dist",

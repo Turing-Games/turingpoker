@@ -2,7 +2,7 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: [
-    './src/api/index.tsx',
+    './src/api/index.ts',
     "./src/**/*.tsx",
   ],
   theme: {
