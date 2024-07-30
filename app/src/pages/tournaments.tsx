@@ -37,6 +37,7 @@ export default function Tournaments() {
     } catch (err) {
       console.log(err)
     }
+    console.log(tournaments)
     setLoading(false)
   }
 
@@ -52,7 +53,7 @@ export default function Tournaments() {
   }
 
   const configurableProperties = [
-    { label: 'Pool Size', value: 'size', type: 'number', default: 2 },
+    { label: 'Size', value: 'size', type: 'number', default: 2 },
     { label: 'Private?', value: 'private', type: 'checkbox', default: false },
     // { label: 'Start Date', value: 'startDate', type: 'date', default: new Date() }
   ] as any
@@ -87,12 +88,12 @@ export default function Tournaments() {
                 headers={[
                   { value: 'title', name: 'Tournament' },
                   { value: 'gameType', name: 'Game Type' },
-                  { value: 'size', name: 'Pool Size' },
+                  { value: 'size', name: 'Size' },
                   { value: 'buttons', name: '', align: 'right' }
                 ]}
                 rows={tournaments.map(t => {
                   return {
-                    id: t.id,
+                    id: t.tournament_id,
                     title: t.title,
                     gameType: t.game_type,
                     size: t.size,
@@ -101,7 +102,7 @@ export default function Tournaments() {
                         <div
                           className='cursor-pointer'
                           onClick={async () => {
-                            await queryClient(`tournaments/${t.id}`, 'DELETE')
+                            await queryClient(`tournaments/${t.tournament_id}`, 'DELETE')
                             getTournaments()
                           }}
                         >

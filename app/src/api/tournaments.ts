@@ -8,7 +8,7 @@ export const tournaments = {
     const gameType = c.req.query('gameType')
     let statement = 'SELECT * from tournaments'
     if (withConfig) {
-      statement += ' JOIN tournament_configs on tournaments.tournament_config_id = tournament_configs.id'
+      statement += ' JOIN tournament_configs on tournaments.id = tournament_configs.tournament_id'
     }
     if (gameType) {
       statement += ' WHERE game_type = ?;'
@@ -29,15 +29,16 @@ export const tournaments = {
       const { title = '', config, gameType = '' } = await c.req.json()
       const tournamentConfigId = crypto.randomUUID()
       const tournamentId = crypto.randomUUID()
-      const configOptionLength = Object.keys(config).length
 
-      const configValuesPlaceholders = configOptionLength > 0 ? `, ${Array(configOptionLength).fill('?').join(',')}` : ''
-      const configValueColumns = configOptionLength > 0 ? `, ${Object.keys(config).join(',')}` : ''
+      const configOptionLength = Object.keys(config).length
+      const configValuesPlaceholders = configOptionLength > 0 ? `${Array(configOptionLength).fill('?').join(',')}` : ''
+      const configValueColumns = configOptionLength > 0 ? `${Object.keys(config).join(',')}` : ''
       const configValues = configOptionLength > 0 ? Object.values(config) : []
-      let configStmt = c.env.DB.prepare(`INSERT into tournament_configs (id ${configValueColumns}) VALUES (? ${configValuesPlaceholders}) `).bind(tournamentConfigId, ...configValues)
-      let tournamentStmt = c.env.DB.prepare('INSERT into tournaments (id, title, game_type, tournament_config_id) VALUES (?, ?, ?, ?) ').bind(tournamentId, title, gameType, tournamentConfigId)
-      await configStmt.run()
+
+      let tournamentStmt = c.env.DB.prepare('INSERT into tournaments (id, title, game_type) VALUES (?, ?, ?) ').bind(tournamentId, title, gameType)
+      let configStmt = c.env.DB.prepare(`INSERT into tournament_configs (id, tournament_id, ${configValueColumns}) VALUES (?, ?, ${configValuesPlaceholders}) `).bind(tournamentConfigId, tournamentId, ...configValues)
       await tournamentStmt.run()
+      await configStmt.run()
       return c.json()
     } catch (e) {
       console.log(e)
@@ -50,7 +51,7 @@ export const tournaments = {
       let gameStmt = c.env.DB.prepare('DELETE from games where tournament_id = ? ').bind(id)
       let configStmt = c.env.DB.prepare('DELETE from tournament_configs where tournament_id = ? ').bind(id)
       let tournamentStmt = c.env.DB.prepare('DELETE from tournaments where id = ? ').bind(id)
-      await configStmt.all()
+      await configStmt.all();
       await gameStmt.all()
       await tournamentStmt.all()
       return c.json({ message: 'Tournament deleted' }, 200);
