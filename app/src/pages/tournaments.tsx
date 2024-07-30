@@ -30,9 +30,9 @@ export default function Tournaments() {
 
   const getTournaments = async () => {
     setLoading(true)
+    const params = gameType ? `gameType=${gameType}` : ''
     try {
-      const tournaments = await queryClient('tournaments?withConfig=true', 'GET')
-      console.log({ tournaments })
+      const tournaments = await queryClient(`tournaments?withConfig=true&${params}`, 'GET')
       setTournaments(tournaments)
     } catch (err) {
       console.log(err)
@@ -42,7 +42,7 @@ export default function Tournaments() {
 
   React.useEffect(() => {
     getTournaments()
-  }, [])
+  }, [gameType])
 
 
   const checkValidInput = () => {
@@ -82,18 +82,33 @@ export default function Tournaments() {
         {
           loading ?
             <Text>Loading...</Text> :
-            tournaments.length > 0 ?
+            tournaments?.length > 0 ?
               <TgTable
                 headers={[
-                  { value: 'id', name: 'Tournament' },
+                  { value: 'title', name: 'Tournament' },
                   { value: 'gameType', name: 'Game Type' },
                   { value: 'size', name: 'Pool Size' },
+                  { value: 'buttons', name: '', align: 'right' }
                 ]}
                 rows={tournaments.map(t => {
                   return {
-                    id: t.title || t.id,
-                    gameType: t.gameType,
-                    size: t.size
+                    id: t.id,
+                    title: t.title,
+                    gameType: t.game_type,
+                    size: t.size,
+                    buttons: (
+                      <div className="flex items-center gap-[8px]">
+                        <div
+                          className='cursor-pointer'
+                          onClick={async () => {
+                            await queryClient(`tournaments/${t.id}`, 'DELETE')
+                            getTournaments()
+                          }}
+                        >
+                          <TrashIcon className="text-[red]" />
+                        </div>
+                      </div>
+                    )
                   }
                 })}
               />
@@ -118,7 +133,7 @@ export default function Tournaments() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            await queryClient('tournaments', 'POST', { title, config: gameConfig })
+            await queryClient('tournaments', 'POST', { title, gameType: gameTypeForm, config: gameConfig })
             getTournaments()
             setIsOpen(false)
           }}

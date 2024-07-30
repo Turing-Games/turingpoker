@@ -4,11 +4,19 @@ const configureGames = () => {
 
 export const tournaments = {
   get: async (c) => {
-    // const { withConfig } = await c.req.query
     const withConfig = c.req.query('withConfig')
-    console.log(withConfig)
-    const statement = withConfig ? 'SELECT * from tournaments JOIN tournament_configs ON tournaments.tournament_config_id = tournament_configs.id;' : 'SELECT * from tournaments;'
+    const gameType = c.req.query('gameType')
+    let statement = 'SELECT * from tournaments'
+    if (withConfig) {
+      statement += ' JOIN tournament_configs on tournaments.tournament_config_id = tournament_configs.id'
+    }
+    if (gameType) {
+      statement += ' WHERE game_type = ?;'
+    }
     let usrStmt = c.env.DB.prepare(statement)
+    if (gameType) {
+      usrStmt = usrStmt.bind(gameType)
+    }
     try {
       const { results } = await usrStmt.all()
       return c.json(results);
@@ -18,7 +26,7 @@ export const tournaments = {
   },
   create: async (c) => {
     try {
-      const { title = '', config } = await c.req.json()
+      const { title = '', config, gameType = '' } = await c.req.json()
       const tournamentConfigId = crypto.randomUUID()
       const tournamentId = crypto.randomUUID()
       const configOptionLength = Object.keys(config).length
@@ -27,13 +35,27 @@ export const tournaments = {
       const configValueColumns = configOptionLength > 0 ? `, ${Object.keys(config).join(',')}` : ''
       const configValues = configOptionLength > 0 ? Object.values(config) : []
       let configStmt = c.env.DB.prepare(`INSERT into tournament_configs (id ${configValueColumns}) VALUES (? ${configValuesPlaceholders}) `).bind(tournamentConfigId, ...configValues)
-      let tournamentStmt = c.env.DB.prepare('INSERT into tournaments (id, title, tournament_config_id) VALUES (?, ?, ?) ').bind(tournamentId, title, tournamentConfigId)
+      let tournamentStmt = c.env.DB.prepare('INSERT into tournaments (id, title, game_type, tournament_config_id) VALUES (?, ?, ?, ?) ').bind(tournamentId, title, gameType, tournamentConfigId)
       await configStmt.run()
       await tournamentStmt.run()
       return c.json()
     } catch (e) {
       console.log(e)
       return c.json({ message: 'Error creating tournament', error: e }, 500);
+    }
+  },
+  delete: async (c) => {
+    const id = c.req.param('id')
+    try {
+      let gameStmt = c.env.DB.prepare('DELETE from games where tournament_id = ? ').bind(id)
+      let configStmt = c.env.DB.prepare('DELETE from tournament_configs where tournament_id = ? ').bind(id)
+      let tournamentStmt = c.env.DB.prepare('DELETE from tournaments where id = ? ').bind(id)
+      await configStmt.all()
+      await gameStmt.all()
+      await tournamentStmt.all()
+      return c.json({ message: 'Tournament deleted' }, 200);
+    } catch (e) {
+      return c.json({ message: JSON.stringify(e) }, 500);
     }
   }
 }
