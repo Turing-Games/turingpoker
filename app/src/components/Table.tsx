@@ -10,15 +10,21 @@ interface TgTableProps {
   }[];
   rows: any[];
   maxWidth?: number | string;
+  selectableRows?: boolean;
+  loading?: boolean;
 }
 
 export default function TgTable({
   headers = [],
   rows = [],
-  maxWidth = 1000
+  maxWidth = 1000,
+  selectableRows = false,
+  loading = false
 }: TgTableProps) {
   return (
     <DataTable
+      loading={loading}
+      selectableRows={selectableRows}
       columns={headers.map(header => ({
         ...header,
         selector: (row: any) => row[header.value],

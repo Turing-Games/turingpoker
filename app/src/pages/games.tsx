@@ -72,6 +72,7 @@ export default function Games() {
           rooms = rooms.filter(room => room.gameState)
         }
       }
+      console.log(rooms)
       setTables(rooms)
       // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     } catch (err) {
@@ -142,47 +143,47 @@ export default function Games() {
           ></Select>
         </div>
         {
-          loading ?
-            <Text>Loading...</Text> :
-            tables.length > 0 ?
-              // <div className="h-[200px]">
-              <TgTable
-                headers={[
-                  { value: 'id', name: 'Table' },
-                  { value: 'gameType', name: 'Game Type' },
-                  { value: 'gameState', name: 'Status' },
-                  // { value: 'spectatorPlayers', name: 'Spectators', sortable: true },
-                  { value: 'queuedPlayers', name: 'Queued', sortable: true },
-                  { value: 'players', name: 'In-Game', sortable: true },
-                  { value: 'view', name: '', align: 'center' },
-                  // { value: 'quickview', name: '', align: 'right' }
-                ]}
-                rows={tables.map(table => {
-                  const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
-                  return {
-                    id: table.name || table.id,
-                    gameType: table.gameType,
-                    gameState: table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`,
-                    spectatorPlayers: spectatorCount,
-                    queuedPlayers: table?.queuedPlayers?.length || 0,
-                    players: `${table?.gameState?.players?.length || 0}/${tables.config?.maxPlayers || 0}`,
-                    quickview: (
-                      <div>
-                        <EyeOpenIcon />
-                      </div>
+          tables.length > 0 ?
+            // <div className="h-[200px]">
+            <TgTable
+              loading={loading}
+              selectableRows={true}
+              headers={[
+                { value: 'id', name: 'Table' },
+                { value: 'gameType', name: 'Game Type' },
+                { value: 'gameState', name: 'Status' },
+                // { value: 'spectatorPlayers', name: 'Spectators', sortable: true },
+                { value: 'queuedPlayers', name: 'Queued', sortable: true },
+                { value: 'players', name: 'In-Game', sortable: true },
+                { value: 'view', name: '', align: 'center' },
+                // { value: 'quickview', name: '', align: 'right' }
+              ]}
+              rows={tables.map(table => {
+                const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
+                return {
+                  id: table.name || table.id,
+                  gameType: table.gameType,
+                  gameState: table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`,
+                  spectatorPlayers: spectatorCount,
+                  queuedPlayers: table?.queuedPlayers?.length || 0,
+                  players: `${table?.gameState?.players?.length || 0}/${table.config?.maxPlayers || 0}`,
+                  quickview: (
+                    <div>
+                      <EyeOpenIcon />
+                    </div>
 
-                    ),
-                    view: (
-                      <button>
-                        <Link to={`/games/${table.id}/${table.gameType}`}>View</Link>
-                      </button>
-                    )
-                  }
-                })}
-              />
-              // </div> 
-              :
-              <Text>No tables found</Text>
+                  ),
+                  view: (
+                    <button>
+                      <Link to={`/games/${table.id}/${table.gameType}`}>View</Link>
+                    </button>
+                  )
+                }
+              })}
+            />
+            // </div> 
+            :
+            <Text>No tables found</Text>
         }
       </div>
       <Modal

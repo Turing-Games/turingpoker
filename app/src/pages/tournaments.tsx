@@ -81,40 +81,40 @@ export default function Tournaments() {
           ></Select>
         </div>
         {
-          loading ?
-            <Text>Loading...</Text> :
-            tournaments?.length > 0 ?
-              <TgTable
-                headers={[
-                  { value: 'title', name: 'Tournament' },
-                  { value: 'gameType', name: 'Game Type' },
-                  { value: 'size', name: 'Size' },
-                  { value: 'buttons', name: '', align: 'right' }
-                ]}
-                rows={tournaments.map(t => {
-                  return {
-                    id: t.tournament_id,
-                    title: t.title,
-                    gameType: t.game_type,
-                    size: t.size,
-                    buttons: (
-                      <div className="flex items-center gap-[8px]">
-                        <div
-                          className='cursor-pointer'
-                          onClick={async () => {
-                            await queryClient(`tournaments/${t.tournament_id}`, 'DELETE')
-                            getTournaments()
-                          }}
-                        >
-                          <TrashIcon className="text-[red]" />
-                        </div>
+          tournaments?.length > 0 ?
+            <TgTable
+              loading={loading}
+              selectableRows={true}
+              headers={[
+                { value: 'title', name: 'Tournament' },
+                { value: 'gameType', name: 'Game Type' },
+                { value: 'size', name: 'Size' },
+                { value: 'buttons', name: '', align: 'right' }
+              ]}
+              rows={tournaments.map(t => {
+                return {
+                  id: t.tournament_id,
+                  title: t.title,
+                  gameType: t.game_type,
+                  size: t.size,
+                  buttons: (
+                    <div className="flex items-center gap-[8px]">
+                      <div
+                        className='cursor-pointer'
+                        onClick={async () => {
+                          await queryClient(`tournaments/${t.tournament_id}`, 'DELETE')
+                          getTournaments()
+                        }}
+                      >
+                        <TrashIcon className="text-[red]" />
                       </div>
-                    )
-                  }
-                })}
-              />
-              :
-              <Text>No tournaments found</Text>
+                    </div>
+                  )
+                }
+              })}
+            />
+            :
+            <Text>No tournaments found</Text>
         }
       </div>
       <Modal
