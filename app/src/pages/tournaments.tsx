@@ -97,7 +97,7 @@ export default function Tournaments() {
                   title: t.title,
                   gameType: t.game_type,
                   size: t.size,
-                  buttons: (
+                  buttons: (isAdmin &&
                     <div className="flex items-center gap-[8px]">
                       <div
                         className='cursor-pointer'

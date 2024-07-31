@@ -168,7 +168,7 @@ export default function Games() {
                   spectatorPlayers: spectatorCount,
                   queuedPlayers: table?.queuedPlayers?.length || 0,
                   players: `${table?.gameState?.players?.length || 0}/${table.config?.maxPlayers || 0}`,
-                  delete: (
+                  delete: (isAdmin &&
                     <div
                       className='cursor-pointer'
                       onClick={async () => {

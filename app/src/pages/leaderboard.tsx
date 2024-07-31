@@ -19,6 +19,8 @@ export default function Leaderboard() {
   const [players, setPlayers] = React.useState<any[]>([])
   const [gameType, setGameType] = React.useState('')
 
+  const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
+
   const getPlayers = async () => {
     setLoading(true)
     const params = gameType ? `gameType=${gameType}` : ''
@@ -55,12 +57,26 @@ export default function Leaderboard() {
             { value: 'username', name: 'User' },
             { value: 'wins', name: 'Wins' },
             { value: 'losses', name: 'Losses' },
+            { value: 'button', name: '' }
           ]}
           rows={players.map(t => {
             return {
               username: t.username,
               wins: t.wins || 0,
-              losses: t.losses || 0
+              losses: t.losses || 0,
+              button: (
+                (isAdmin &&
+                  <div
+                    className='cursor-pointer'
+                    onClick={async () => {
+                      await queryClient(`users/${t.id}`, 'DELETE')
+                      getPlayers()
+                    }}
+                  >
+                    <TrashIcon className="text-[red]" />
+                  </div>
+                )
+              )
             }
           })}
         />
