@@ -40,7 +40,7 @@ export default function Leaderboard() {
     <Main pageTitle='Leaderboard'>
       <div className="p-[20px] w-full">
         <Heading mb="2" size="4">Leaderboard</Heading>
-        <div>
+        <div className="my-[32px]">
           <Select
             options={GAME_TYPE_FILTERS}
             selected={gameType}
