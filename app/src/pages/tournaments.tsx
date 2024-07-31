@@ -62,13 +62,13 @@ export default function Tournaments() {
       <div className="p-[20px] w-full">
         <div className="flex items-center justify-between">
           <Heading mb="2" size="4">Tournaments</Heading>
-          <button
+          {/* <button
             className="flex items-center gap-[6px] justify-between"
             onClick={() => setIsOpen(true)}
           >
             <PlusIcon />
             Start a tournament
-          </button>
+          </button> */}
         </div>
         {/* filters */}
         <div className="flex items-center gap-[8px] mt-[16px] mb-[32px]">
