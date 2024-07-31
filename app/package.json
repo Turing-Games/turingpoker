@@ -13,7 +13,7 @@
     "deploy:dev": "npm run build && wrangler pages deploy --branch=staging",
     "deploy:partykit": "npx partykit deploy --domain ws.turingpoker.com",
     "migrations:local": "npx wrangler d1 migrations apply DB --local",
-    "migrations:dev": "npx wrangler d1 migrations apply DB --remote --preview",
+    "migrations:dev": "npx wrangler d1 migrations apply DB --preview --remote",
     "migrations:prod": "npx wrangler d1 migrations apply DB --remote",
     "migrations:create": "npx wrangler d1 migrations create DB"
   },
