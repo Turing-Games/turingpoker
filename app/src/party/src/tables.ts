@@ -89,14 +89,7 @@ export default class TablesServer extends PartyServer {
     const info = update.tableState;
     const totalPlayers = info?.queuedPlayers?.length + info?.spectatorPlayers?.length + info?.inGamePlayers?.length;
 
-    // if (totalPlayers === 0) {
-    //   // if no users are present, delete the room
-    //   await this.party.storage.delete(update.id);
-    //   return this.getActiveRooms();
-    // }
-
     this.party.storage.put(update.id, info);
-    // await this.party.storage.put(update.id, info);
     return this.getActiveRooms();
   }
 }

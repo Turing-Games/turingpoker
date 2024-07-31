@@ -18,6 +18,7 @@ import { Theme } from '@radix-ui/themes';
 import { UserContext } from '@app/context/UserContext';
 import User from '@app/components/User';
 import Tournaments from '@app/pages/tournaments';
+import Leaderboard from '@app/pages/leaderboard';
 
 export type ClientState = {
   isConnected: boolean;
@@ -52,6 +53,10 @@ const router = createBrowserRouter([
   {
     path: '/tournaments',
     element: <Tournaments />
+  },
+  {
+    path: '/leaderboard',
+    element: <Leaderboard />
   },
   {
     path: "/resources",

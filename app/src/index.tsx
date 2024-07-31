@@ -18,6 +18,7 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.post("/webhooks/clerk/user", clerk.create);
 
 // USERS
+app.get("/api/v1/users", users.get);
 app.get("/api/v1/users/:id", users.get);
 app.get("/api/v1/users/:id/keys", users.getKeys);
 

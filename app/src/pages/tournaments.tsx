@@ -84,7 +84,7 @@ export default function Tournaments() {
           tournaments?.length > 0 ?
             <TgTable
               loading={loading}
-              selectableRows={true}
+              selectableRows={false}
               headers={[
                 { value: 'title', name: 'Tournament' },
                 { value: 'gameType', name: 'Game Type' },

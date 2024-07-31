@@ -18,8 +18,8 @@ export default function User({ children }: { children: React.ReactNode }) {
       const dbUser = await getDbUser(user?.id)
       const mergedUser = {
         ...user,
-        clerk_id: dbUser?.data?.clerk_id,
-        id: dbUser?.data?.id
+        clerk_id: dbUser?.clerk_id,
+        id: dbUser?.id
       }
       setTgUser(mergedUser)
     } else {

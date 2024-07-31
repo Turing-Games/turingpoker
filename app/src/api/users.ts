@@ -1,9 +1,19 @@
 export const users = {
   get: async (c) => {
-    let usrStmt = c.env.DB.prepare('SELECT * from users WHERE clerk_id = ?').bind(c.req.param('id'))
+    const id = c.req.param('id')
+    let sqlStmt = 'SELECT * from users'
+    if (id) {
+      sqlStmt += ' WHERE clerk_id = ? '
+    }
+    let usrStmt = c.env.DB.prepare(sqlStmt)
+    if (id) {
+      usrStmt = usrStmt.bind(id)
+    }
+
     try {
       const { results } = await usrStmt.all()
-      return c.json({ data: results[0] });
+      const users = id ? results[0] : results
+      return c.json(users);
     } catch (e) {
       return c.json({ message: JSON.stringify(e) }, 500);
     }

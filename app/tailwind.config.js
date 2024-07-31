@@ -14,7 +14,8 @@ export default {
           200: '#0AC60E',
           300: '#0AB70D',
           400: '#09A70B'
-        }
+        },
+        'turing-red': '#CC1F00'
       }),
       fontFamily: {
         'barlow': ['Barlow', 'sans-serif'],

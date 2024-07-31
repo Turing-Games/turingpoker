@@ -147,7 +147,7 @@ export default function Games() {
             // <div className="h-[200px]">
             <TgTable
               loading={loading}
-              selectableRows={true}
+              selectableRows={false}
               headers={[
                 { value: 'id', name: 'Table' },
                 { value: 'gameType', name: 'Game Type' },
@@ -156,6 +156,7 @@ export default function Games() {
                 { value: 'queuedPlayers', name: 'Queued', sortable: true },
                 { value: 'players', name: 'In-Game', sortable: true },
                 { value: 'view', name: '', align: 'center' },
+                { value: 'delete', name: '', align: 'center' },
                 // { value: 'quickview', name: '', align: 'right' }
               ]}
               rows={tables.map(table => {
@@ -167,12 +168,22 @@ export default function Games() {
                   spectatorPlayers: spectatorCount,
                   queuedPlayers: table?.queuedPlayers?.length || 0,
                   players: `${table?.gameState?.players?.length || 0}/${table.config?.maxPlayers || 0}`,
-                  quickview: (
-                    <div>
-                      <EyeOpenIcon />
+                  delete: (
+                    <div
+                      className='cursor-pointer'
+                      onClick={async () => {
+                        await deleteTable(table.id)
+                      }}
+                    >
+                      <TrashIcon className="text-[red]" />
                     </div>
-
                   ),
+                  // quickview: (
+                  //   <div>
+                  //     <EyeOpenIcon />
+                  //   </div>
+
+                  // ),
                   view: (
                     <button>
                       <Link to={`/games/${table.id}/${table.gameType}`}>View</Link>

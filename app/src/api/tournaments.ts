@@ -2,6 +2,21 @@ const configureGames = () => {
 
 }
 
+const generateGames = (c, tournament_id: string, gameType = '', size = 2) => {
+  return new Promise(async (resolve, reject) => {
+    const gameIds = Array(size).fill('_').map(() => crypto.randomUUID())
+    try {
+      const gameStmt = c.env.DB.prepare(`
+        INSERT INTO games (id, tournament_id, game_type)
+        VALUES ${gameIds.map((id) => `('${id}', '${tournament_id}', '${gameType}')`).join(',')}`)
+      await gameStmt.run()
+      resolve(true)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
 export const tournaments = {
   get: async (c) => {
     const withConfig = c.req.query('withConfig')
@@ -39,6 +54,8 @@ export const tournaments = {
       let configStmt = c.env.DB.prepare(`INSERT into tournament_configs (id, tournament_id, ${configValueColumns}) VALUES (?, ?, ${configValuesPlaceholders}) `).bind(tournamentConfigId, tournamentId, ...configValues)
       await tournamentStmt.run()
       await configStmt.run()
+
+      await generateGames(c, tournamentId, gameType, config.size)
       return c.json()
     } catch (e) {
       console.log(e)
