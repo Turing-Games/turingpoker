@@ -18,7 +18,7 @@ BOT_SECRET_KEY = "95eff06e276944f587efa311d5b402b3da520af77cfaf3ca78bd7e6eb3776b
 
 [[d1_databases]]
 binding = "DB"
-database_name = "turinggames_prod"
+database_name = "turinggames"
 database_id = "054c910b-1580-4cfc-8ea4-1874bb729251"
 preview_database_id = "bbb9dcef-4175-4cbe-b26e-e2bf75852ea5"
 
