@@ -19,6 +19,7 @@ app.post("/webhooks/clerk/user", webhooks.clerk.user);
 
 // USERS
 app.get("/api/v1/users", users.get);
+app.delete("/api/v1/users/:id", users.delete);
 app.get("/api/v1/users/:id", users.get);
 app.get("/api/v1/users/:id/keys", users.getKeys);
 

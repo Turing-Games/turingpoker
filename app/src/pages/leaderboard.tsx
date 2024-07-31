@@ -30,7 +30,6 @@ export default function Leaderboard() {
     } catch (err) {
       console.log(err)
     }
-    console.log(players)
     setLoading(false)
   }
 

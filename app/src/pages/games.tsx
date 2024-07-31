@@ -72,7 +72,6 @@ export default function Games() {
           rooms = rooms.filter(room => room.gameState)
         }
       }
-      console.log(rooms)
       setTables(rooms)
       // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     } catch (err) {

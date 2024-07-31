@@ -32,6 +32,7 @@ export default function TgTable({
         center: header.align === 'center',
       }))}
       data={rows}
+      theme='light'
       customStyles={{
         table: {
           style: {

@@ -37,7 +37,6 @@ export default function Tournaments() {
     } catch (err) {
       console.log(err)
     }
-    console.log(tournaments)
     setLoading(false)
   }
 
