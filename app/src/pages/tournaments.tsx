@@ -30,9 +30,9 @@ export default function Tournaments() {
 
   const getTournaments = async () => {
     setLoading(true)
-    const params = gameType ? `gameType=${gameType}` : ''
     try {
-      const tournaments = await queryClient(`tournaments?withConfig=true&${params}`, 'GET')
+      const tournaments = await queryClient('tournaments?withConfig=true', 'GET')
+      console.log({ tournaments })
       setTournaments(tournaments)
     } catch (err) {
       console.log(err)
@@ -42,7 +42,7 @@ export default function Tournaments() {
 
   React.useEffect(() => {
     getTournaments()
-  }, [gameType])
+  }, [])
 
 
   const checkValidInput = () => {
@@ -52,7 +52,7 @@ export default function Tournaments() {
   }
 
   const configurableProperties = [
-    { label: 'Size', value: 'size', type: 'number', default: 2 },
+    { label: 'Pool Size', value: 'size', type: 'number', default: 2 },
     { label: 'Private?', value: 'private', type: 'checkbox', default: false },
     // { label: 'Start Date', value: 'startDate', type: 'date', default: new Date() }
   ] as any
@@ -62,13 +62,13 @@ export default function Tournaments() {
       <div className="p-[20px] w-full">
         <div className="flex items-center justify-between">
           <Heading mb="2" size="4">Tournaments</Heading>
-          {/* <button
+          <button
             className="flex items-center gap-[6px] justify-between"
             onClick={() => setIsOpen(true)}
           >
             <PlusIcon />
             Start a tournament
-          </button> */}
+          </button>
         </div>
         {/* filters */}
         <div className="flex items-center gap-[8px] mt-[16px] mb-[32px]">
@@ -80,40 +80,25 @@ export default function Tournaments() {
           ></Select>
         </div>
         {
-          tournaments?.length > 0 ?
-            <TgTable
-              loading={loading}
-              selectableRows={false}
-              headers={[
-                { value: 'title', name: 'Tournament' },
-                { value: 'gameType', name: 'Game Type' },
-                { value: 'size', name: 'Size' },
-                { value: 'buttons', name: '', align: 'right' }
-              ]}
-              rows={tournaments.map(t => {
-                return {
-                  id: t.tournament_id,
-                  title: t.title,
-                  gameType: t.game_type,
-                  size: t.size,
-                  buttons: (isAdmin &&
-                    <div className="flex items-center gap-[8px]">
-                      <div
-                        className='cursor-pointer'
-                        onClick={async () => {
-                          await queryClient(`tournaments/${t.tournament_id}`, 'DELETE')
-                          getTournaments()
-                        }}
-                      >
-                        <TrashIcon className="text-[red]" />
-                      </div>
-                    </div>
-                  )
-                }
-              })}
-            />
-            :
-            <Text>No tournaments found</Text>
+          loading ?
+            <Text>Loading...</Text> :
+            tournaments.length > 0 ?
+              <TgTable
+                headers={[
+                  { value: 'id', name: 'Tournament' },
+                  { value: 'gameType', name: 'Game Type' },
+                  { value: 'size', name: 'Pool Size' },
+                ]}
+                rows={tournaments.map(t => {
+                  return {
+                    id: t.title || t.id,
+                    gameType: t.gameType,
+                    size: t.size
+                  }
+                })}
+              />
+              :
+              <Text>No tournaments found</Text>
         }
       </div>
       <Modal
@@ -133,7 +118,7 @@ export default function Tournaments() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            await queryClient('tournaments', 'POST', { title, gameType: gameTypeForm, config: gameConfig })
+            await queryClient('tournaments', 'POST', { title, config: gameConfig })
             getTournaments()
             setIsOpen(false)
           }}
