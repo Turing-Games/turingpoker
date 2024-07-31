@@ -22,7 +22,7 @@ export default function Main({ children, pageTitle }: Props) {
       </Helmet>
       <Header />
       <main
-        className="flex relative items-stretch justify-stretch flex-grow"
+        className="flex relative items-stretch justify-stretch flex-grow max-w-[1400px]"
         style={location.pathname.startsWith('/games/') ? {
           backgroundImage: 'url("/static/images/poker-bg-tile.jpg")',
           backgroundRepeat: 'repeat',
