@@ -1,6 +1,6 @@
 import { D1Database } from '@cloudflare/workers-types';
 import { Hono } from 'hono'
-import { clerk } from './api/webhooks';
+import { webhooks } from './api/webhooks';
 import { users } from './api/users';
 import { keys } from './api/keys';
 import { games } from './api/games';
@@ -15,7 +15,7 @@ export type Bindings = {
 const app = new Hono<{ Bindings: Bindings }>()
 
 // WEBHOOKS (clerk)
-app.post("/webhooks/clerk/user", clerk.create);
+app.post("/webhooks/clerk/user", webhooks.clerk.user);
 
 // USERS
 app.get("/api/v1/users", users.get);

@@ -46,9 +46,9 @@ export default function Profile({ pageTitle = '' }) {
         <UserProfile
           appearance={{
             elements: {
-              profileSectionPrimaryButton: {
-                display: 'none'
-              },
+              // profileSectionPrimaryButton: {
+              //   display: 'none'
+              // },
               userPreviewAvatarBox: {
                 backgroundColor: '#CC1F00',
                 backgroundImage: 'url("https://play.turingpoker.com/assets/robot-white.png")',

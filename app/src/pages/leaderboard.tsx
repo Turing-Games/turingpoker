@@ -52,13 +52,13 @@ export default function Leaderboard() {
           loading={loading}
           selectableRows={false}
           headers={[
-            { value: 'id', name: 'Id' },
+            { value: 'username', name: 'User' },
             { value: 'wins', name: 'Wins' },
             { value: 'losses', name: 'Losses' },
           ]}
           rows={players.map(t => {
             return {
-              id: t.id,
+              username: t.username,
               wins: t.wins || 0,
               losses: t.losses || 0
             }
