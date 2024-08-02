@@ -69,8 +69,10 @@ export const keys = {
     }
   },
   verify: async (c) => {
-    // const { key } = await c.req.json()
-    let apiKeyStmt = c.env.DB.prepare('SELECT * from api_keys where id = ? ').bind(apiId)
+    const bearerToken = c.req.header('Authorization')
+    const token = bearerToken.split(' ')[1]
+    const { id, key } = decode(token)?.payload
+    let apiKeyStmt = c.env.DB.prepare('SELECT * from api_keys where id = ? ').bind(id)
     try {
       const { results } = await apiKeyStmt.all()
       const hash = results[0]?.key
@@ -78,12 +80,13 @@ export const keys = {
         return c.json({ message: 'Key not found' }, 404)
       }
 
-      const isValid = verifyApiKey(key, hash as string)
-      if (!isValid) {
-        return c.json({ message: 'Invalid key' }, 401)
-      } else {
-        return c.json({});
-      }
+      return c.json({ message: 'Invalid key' }, 401)
+      // const isValid = verifyApiKey(key, hash as string)
+      // if (!isValid) {
+      //   return c.json({ message: 'Invalid key' }, 401)
+      // } else {
+      //   return c.json({});
+      // }
     } catch (e) {
       return c.json({ message: JSON.stringify(e) }, 500);
     }

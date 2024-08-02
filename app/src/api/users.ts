@@ -20,12 +20,11 @@ export const users = {
   },
   delete: async (c) => {
     const id = c.req.param('id')
-    let usrStmt = c.env.DB.prepare('DELETE from users where id = ?').bind(id)
+    let usrStmt = c.env.DB.prepare('DELETE from users where clerk_id = ?').bind(id)
     try {
       const { results } = await usrStmt.run()
       return c.json(results);
     } catch (e) {
-      console.log(e)
       return c.json({ message: JSON.stringify(e) }, 500
       );
     }

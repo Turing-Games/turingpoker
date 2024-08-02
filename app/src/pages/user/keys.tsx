@@ -4,6 +4,7 @@ import * as React from 'react'
 import { UserContext } from '@app/context/UserContext'
 import * as Form from '@radix-ui/react-form';
 import { Link } from 'react-router-dom';
+import { useUser } from '@clerk/clerk-react';
 
 export default function Keys() {
 
@@ -14,15 +15,12 @@ export default function Keys() {
   const [openInfo, setOpenInfo] = React.useState(false)
   const [selectedKey, setSelectedKey] = React.useState({})
 
-  const { user } = React.useContext(UserContext)
+  const { user } = useUser()
 
   const createApiKey = async () => {
     setLoading(true)
     await fetch(`/api/v1/users/${user.id}/keys`, {
-      method: 'POST',
-      body: JSON.stringify({
-        userId: user.id
-      })
+      method: 'POST'
     })
 
     getKeys()

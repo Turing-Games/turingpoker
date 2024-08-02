@@ -18,10 +18,9 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.post("/webhooks/clerk/user", webhooks.clerk.user);
 
 // USERS
-app.get("/api/v1/users", users.get);
-app.delete("/api/v1/users/:id", users.delete);
-app.get("/api/v1/users/:id", users.get);
+app.get("/api/v1/users/:id", users.get)
 app.get("/api/v1/users/:id/keys", users.getKeys);
+app.delete("/api/v1/users/:id", users.delete);
 
 // GAMES
 app.get("/api/v1/games", games.get)
@@ -39,15 +38,7 @@ app.post('/api/v1/tournaments', tournaments.create)
 app.delete('/api/v1/tournaments/:id', tournaments.delete)
 
 // auth
-app.get('/api/v1/auth/bots', async (c) => {
-  const { key } = await c.req.json()
-  // if (secret === c.env.BOT_SECRET_KEY) {
-  // } else {
-  //   return c.json({ message: 'Unauthorized' }, 401);
-  // }
-  console.log('auth bots endpoint')
-  return c.json({ message: key });
-})
+app.get('/api/v1/auth/bots', keys.verify)
 
 // LOCAL DEVELOPMENT ROUTES
 app.get('/api/dev/keys', async (c) => {

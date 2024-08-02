@@ -14,6 +14,7 @@ export default function User({ children }: { children: React.ReactNode }) {
   }
 
   const getUser = async () => {
+    console.log('get user')
     if (user?.id) {
       const dbUser = await getDbUser(user?.id)
       const mergedUser = {
