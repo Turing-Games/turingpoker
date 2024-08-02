@@ -66,13 +66,13 @@ export default class PartyServer implements Party.Server {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    console.log('connect')
-    authBotConnection(conn, ctx);
-    // if (this.inGamePlayers.length < 2) {
-    //   this.serverState.gamePhase = "pending";
-    // }
+    // console.log('connect')
+    // authBotConnection(conn, ctx);
+    if (this.inGamePlayers.length < 2) {
+      this.serverState.gamePhase = "pending";
+    }
 
-    // this.addPlayer(conn.id);
+    this.addPlayer(conn.id);
   }
 
   async onRequest(req: Party.Request) {
