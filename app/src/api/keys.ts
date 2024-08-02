@@ -71,8 +71,10 @@ export const keys = {
   verify: async (c) => {
     const bearerToken = c.req.header('Authorization')
     const token = bearerToken.split(' ')[1]
+
     const { id, key } = decode(token)?.payload
     let apiKeyStmt = c.env.DB.prepare('SELECT * from api_keys where id = ? ').bind(id)
+
     try {
       const { results } = await apiKeyStmt.all()
       const hash = results[0]?.key
@@ -80,13 +82,13 @@ export const keys = {
         return c.json({ message: 'Key not found' }, 404)
       }
 
-      return c.json({ message: 'Invalid key' }, 401)
-      // const isValid = verifyApiKey(key, hash as string)
-      // if (!isValid) {
-      //   return c.json({ message: 'Invalid key' }, 401)
-      // } else {
-      //   return c.json({});
-      // }
+      const isJWTValid = await verify(token, c.env.BOT_SECRET_KEY)
+      const isHashValid = verifyApiKey(key, hash as string)
+      if (isJWTValid && isHashValid) {
+        return c.json({});
+      } else {
+        return c.json({ message: 'Invalid key' }, 401)
+      }
     } catch (e) {
       return c.json({ message: JSON.stringify(e) }, 500);
     }
