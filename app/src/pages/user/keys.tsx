@@ -16,7 +16,6 @@ export default function Keys() {
   const [selectedKey, setSelectedKey] = React.useState({})
 
   const { user } = React.useContext(UserContext)
-  console.log({ user })
 
   const createApiKey = async () => {
     setLoading(true)
