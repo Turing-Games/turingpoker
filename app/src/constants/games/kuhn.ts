@@ -20,10 +20,8 @@ export const DEFAULT_TABLE_STATE = {
 
 export const CONFIGURABLE_PROPERTIES = [
   // { label: 'Dealer Position', value: 'dealerPosition', type: 'number', default: 0 },
-  // { label: 'Big Blind', value: 'bigBlind', type: 'number', default: 1 },
-  // { label: 'Small Blind', value: 'smallBlind', type: 'number', default: 1 },
-  { label: 'Max Players', value: 'maxPlayers', type: 'number', default: 10 },
-  { label: 'Min Players', value: 'minPlayers', type: 'number', default: 2 },
+  // { label: 'Min Players', value: 'minPlayers', type: 'number', default: 2 },
+  // { label: 'Max Players', value: 'maxPlayers', type: 'number', default: 2, max: 2 },
   {
     label: 'Auto Start',
     value: 'autoStart',

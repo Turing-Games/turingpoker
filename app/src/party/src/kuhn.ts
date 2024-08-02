@@ -4,9 +4,11 @@ import { ClientMessage, ServerStateMessage, ServerUpdateMessage, TABLE_STATE_VER
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from './utils/response';
 import { RoomDeleteRequest, RoomInfoUpdateRequest } from './tables';
+import authBotConnection from './utils/auth';
 
 export interface IPlayer {
   playerId: string;
+  isBot?: boolean;
 }
 
 export interface IPartyServerState {
@@ -64,11 +66,13 @@ export default class PartyServer implements Party.Server {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    if (this.inGamePlayers.length < 2) {
-      this.serverState.gamePhase = "pending";
-    }
+    console.log('connect')
+    authBotConnection(conn, ctx);
+    // if (this.inGamePlayers.length < 2) {
+    //   this.serverState.gamePhase = "pending";
+    // }
 
-    this.addPlayer(conn.id);
+    // this.addPlayer(conn.id);
   }
 
   async onRequest(req: Party.Request) {

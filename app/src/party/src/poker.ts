@@ -7,6 +7,7 @@ import { RoomDeleteRequest, RoomInfoUpdateRequest } from './tables';
 
 export interface IPlayer {
   playerId: string;
+  isBot?: boolean;
 }
 
 export interface IPartyServerState {

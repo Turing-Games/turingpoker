@@ -38,6 +38,17 @@ app.get("/api/v1/tournaments", tournaments.get)
 app.post('/api/v1/tournaments', tournaments.create)
 app.delete('/api/v1/tournaments/:id', tournaments.delete)
 
+// auth
+app.get('/api/v1/auth/bots', async (c) => {
+  const { key } = await c.req.json()
+  // if (secret === c.env.BOT_SECRET_KEY) {
+  // } else {
+  //   return c.json({ message: 'Unauthorized' }, 401);
+  // }
+  console.log('auth bots endpoint')
+  return c.json({ message: key });
+})
+
 // LOCAL DEVELOPMENT ROUTES
 app.get('/api/dev/keys', async (c) => {
   if (c.env.HONO_ENV !== 'production') {

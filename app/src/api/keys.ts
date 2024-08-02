@@ -69,7 +69,7 @@ export const keys = {
     }
   },
   verify: async (c) => {
-    const { key } = await c.req.json()
+    // const { key } = await c.req.json()
     let apiKeyStmt = c.env.DB.prepare('SELECT * from api_keys where id = ? ').bind(apiId)
     try {
       const { results } = await apiKeyStmt.all()

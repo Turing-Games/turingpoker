@@ -87,8 +87,6 @@ export default function Games() {
 
   const checkValidInput = () => {
     if (gameTypeForm === '') return alert('Please select a game type')
-    if (minPlayers < 2 || maxPlayers < 2) return alert('Minimum players should be at least 2')
-    if (minPlayers > maxPlayers) return alert('Minimum players should be less than maximum players')
   }
 
   const configurableProperties = {
