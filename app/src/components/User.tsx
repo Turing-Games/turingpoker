@@ -23,8 +23,6 @@ export default function User({ children }: { children: React.ReactNode }) {
         id: dbUser?.id
       }
       setTgUser(mergedUser)
-    } else {
-      setTgUser({})
     }
   }
 
