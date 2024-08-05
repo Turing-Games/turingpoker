@@ -69,6 +69,7 @@ export const keys = {
     }
   },
   verify: async (c) => {
+    console.log('verify')
     const bearerToken = c.req.header('Authorization')
     const token = bearerToken.split(' ')[1]
 
@@ -84,11 +85,25 @@ export const keys = {
 
       const isJWTValid = await verify(token, c.env.BOT_SECRET_KEY)
       const isHashValid = verifyApiKey(key, hash as string)
+      console.log(bearerToken)
       if (isJWTValid && isHashValid) {
         return c.json({});
       } else {
         return c.json({ message: 'Invalid key' }, 401)
       }
+    } catch (e) {
+      return c.json({ message: JSON.stringify(e) }, 500);
+    }
+  },
+  get: async (c) => {
+    const id = c.req.param('id')
+    let usrStmt = c.env.DB.prepare('SELECT * from api_keys')
+    if (id) {
+      usrStmt = usrStmt.bind(id)
+    }
+    try {
+      const { results } = await usrStmt.all()
+      return c.json(results);
     } catch (e) {
       return c.json({ message: JSON.stringify(e) }, 500);
     }

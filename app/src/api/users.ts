@@ -3,11 +3,11 @@ export const users = {
     const id = c.req.param('id')
     let sqlStmt = 'SELECT * from users'
     if (id) {
-      sqlStmt += ' WHERE clerk_id = ? '
+      sqlStmt += ' WHERE clerk_id = ? OR id = ?'
     }
     let usrStmt = c.env.DB.prepare(sqlStmt)
     if (id) {
-      usrStmt = usrStmt.bind(id)
+      usrStmt = usrStmt.bind(id, id)
     }
 
     try {
@@ -24,7 +24,7 @@ export const users = {
   },
   delete: async (c) => {
     const id = c.req.param('id')
-    let usrStmt = c.env.DB.prepare('DELETE from users where clerk_id = ?').bind(id)
+    let usrStmt = c.env.DB.prepare('DELETE from users where clerk_id = ? or ID = ?').bind(id, id)
     try {
       const { results } = await usrStmt.run()
       return c.json(results);

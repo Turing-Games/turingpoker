@@ -18,7 +18,8 @@ const app = new Hono<{ Bindings: Bindings }>()
 app.post("/webhooks/clerk/user", webhooks.clerk.user);
 
 // USERS
-app.get("/api/v1/users/:id", users.get)
+app.get("/api/v1/users", users.get);
+app.get("/api/v1/users/:id", users.get);
 app.get("/api/v1/users/:id/keys", users.getKeys);
 app.delete("/api/v1/users/:id", users.delete);
 
@@ -27,6 +28,7 @@ app.get("/api/v1/games", games.get)
 app.post('/api/v1/games', games.create)
 
 // KEYS
+app.get("/api/v1/keys", keys.get)
 app.post("/api/v1/keys", keys.create)
 app.put("/api/v1/keys/:id", keys.update)
 app.delete("/api/v1/keys/:id", keys.delete);
@@ -40,34 +42,8 @@ app.delete('/api/v1/tournaments/:id', tournaments.delete)
 // auth
 app.get('/api/v1/auth/bots', keys.verify)
 
-// LOCAL DEVELOPMENT ROUTES
-app.get('/api/dev/keys', async (c) => {
-  if (c.env.HONO_ENV !== 'production') {
-    let usrStmt = c.env.DB.prepare('SELECT * from api_keys;')
-    try {
-      const { results } = await usrStmt.all()
-      return c.json(results);
-    } catch (e) {
-      return c.json({ message: JSON.stringify(e) }, 500);
-    }
-  } else {
-    return c.json({}, 401);
-  }
-})
-
-app.get('/api/dev/users', async (c) => {
-  if (c.env.HONO_ENV !== 'production') {
-    let usrStmt = c.env.DB.prepare('SELECT * from users;')
-    try {
-      const { results } = await usrStmt.all()
-      return c.json(results);
-    } catch (e) {
-      return c.json({ message: JSON.stringify(e) }, 500);
-    }
-  } else {
-    return c.json({}, 401);
-  }
-})
+// BOTS
+app.get('/api/v1/bots', c => c.json({ message: 'Not implemented' }, 501))
 
 // handles assets, serving client
 app.get("*", (c) => {

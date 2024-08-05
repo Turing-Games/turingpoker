@@ -1,4 +1,5 @@
 const buildDbQuery = (c: any, event = '', data = {}) => {
+  console.log(event)
   const events = {
     'user.created': async () => {
       const uuid = crypto.randomUUID()
@@ -11,6 +12,7 @@ const buildDbQuery = (c: any, event = '', data = {}) => {
             .all();
           resolve(results);
         } catch (e) {
+          console.log(e)
           reject({ message: `Error: ${data.type}`, error: e });
         }
       })
@@ -25,6 +27,21 @@ const buildDbQuery = (c: any, event = '', data = {}) => {
             .all();
           resolve(results);
         } catch (e) {
+          reject({ message: `Error: ${data.type}`, error: e });
+        }
+      })
+    },
+    'user.deleted': async () => {
+      return new Promise(async (resolve, reject) => {
+        try {
+          let { results } = await c.env.DB.prepare(
+            'DELETE FROM users WHERE clerk_id = ?'
+          )
+            .bind(data?.data?.id)
+            .all();
+          resolve(results);
+        } catch (e) {
+          console.log(e)
           reject({ message: `Error: ${data.type}`, error: e });
         }
       })

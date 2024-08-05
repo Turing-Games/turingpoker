@@ -5,6 +5,7 @@ import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from './utils/response';
 import { RoomDeleteRequest, RoomInfoUpdateRequest } from './tables';
 import authBotConnection from './utils/auth';
+import MainPartyServer from './main';
 
 export interface IPlayer {
   playerId: string;
@@ -20,7 +21,7 @@ export const MIN_PLAYERS_AUTO_START = 2;
 export const MAX_PLAYERS = 2
 
 const defaultStack = 1000;
-export default class PartyServer implements Party.Server {
+export default class PartyServer extends MainPartyServer {
   public gameState: Kuhn.IPokerGame | null = null;
   public gameConfig: Kuhn.IPokerConfig = {
     dealerPosition: 0,
@@ -43,7 +44,9 @@ export default class PartyServer implements Party.Server {
 
   public queuedUpdates: ServerUpdateMessage[] = [];
 
-  constructor(public readonly party: Party.Party) { }
+  constructor(public readonly party: Party.Party) {
+    super(party);
+  }
 
   onStart(): void | Promise<void> {
     this.timeoutLoopInterval = setInterval(() => {
@@ -66,8 +69,6 @@ export default class PartyServer implements Party.Server {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    // console.log('connect')
-    // authBotConnection(conn, ctx);
     if (this.inGamePlayers.length < 2) {
       this.serverState.gamePhase = "pending";
     }

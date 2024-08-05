@@ -19,6 +19,7 @@ import { UserContext } from '@app/context/UserContext';
 import User from '@app/components/User';
 import Tournaments from '@app/pages/tournaments';
 import Leaderboard from '@app/pages/leaderboard';
+import Admin from '@app/pages/admin';
 
 export type ClientState = {
   isConnected: boolean;
@@ -74,6 +75,10 @@ const router = createBrowserRouter([
     children: [
       { path: 'keys', element: <div>test</div> }
     ]
+  },
+  {
+    path: '/admin',
+    element: <Admin />
   },
   {
     path: '*',
