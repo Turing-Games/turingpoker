@@ -5,7 +5,7 @@ import { useUser } from '@clerk/clerk-react';
 import { Heading, Text } from '@radix-ui/themes';
 import Select from '@app/components/Select';
 import TgTable from '@app/components/Table';
-import { RESOURCES } from '@app/constants/resources';
+import { RESOURCE_ATTRIBUTES, RESOURCES } from '@app/constants/resources';
 
 
 export default function Admin() {
@@ -61,28 +61,37 @@ export default function Admin() {
               loading={loading}
               selectableRows={false}
               headers={[
-                { value: 'id', name: RESOURCES.find(r => r.value === resource)?.label },
-                { value: 'username', name: 'Username' },
-                { value: 'delete', name: '', align: 'center' },
+                ...RESOURCE_ATTRIBUTES[resource].map((attr: string) => {
+                  return {
+                    value: attr,
+                    name: attr.charAt(0).toUpperCase() + attr.slice(1).replace(/_/g, ' '),
+                  }
+                }),
+                { value: 'delete', name: '', align: 'center' }
               ]}
-              rows={data.map(data => {
-                return {
-                  id: data.id,
-                  username: data.username,
-                  delete: (isAdmin &&
-                    <div
-                      className='cursor-pointer'
-                      onClick={async () => {
-                        await deleteResource(data.id)
-                      }}
-                    >
-                      <TrashIcon className="text-[red]" />
-                    </div>
-                  ),
-                }
-              })}
+              rows={
+                data.map(data => {
+                  const dataObj = RESOURCE_ATTRIBUTES[resource].reduce((acc: any, val: any) => {
+                    acc[val] = data[val]
+                    return acc
+                  }, {})
+                  return {
+                    ...dataObj,
+                    delete: (isAdmin &&
+                      <div
+                        className='cursor-pointer'
+                        onClick={async () => {
+                          await deleteResource(data.id)
+                        }}
+                      >
+                        <TrashIcon className="text-[red]" />
+                      </div>
+                    ),
+                  }
+                })
+              }
             />
-            // </div> 
+            // </div>
             :
             <Text>No data found</Text>
         }
