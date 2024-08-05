@@ -4,7 +4,6 @@ import { ClientMessage, ServerStateMessage, ServerUpdateMessage, TABLE_STATE_VER
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from './utils/response';
 import { RoomDeleteRequest, RoomInfoUpdateRequest } from './tables';
-import authBotConnection from './utils/auth';
 import MainPartyServer from './main';
 
 export interface IPlayer {

@@ -1,5 +1,4 @@
 const buildDbQuery = (c: any, event = '', data = {}) => {
-  console.log(event)
   const events = {
     'user.created': async () => {
       const uuid = crypto.randomUUID()

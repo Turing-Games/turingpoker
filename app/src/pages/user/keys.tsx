@@ -140,70 +140,68 @@ export default function Keys() {
           </div>
         </div>
         {
-          loading ?
-            <Text>Loading...</Text> :
-            keys.length > 0 ?
-              <div className="flex flex-col gap-[8px]">
-                {
-                  keys.map((key, i) => {
-                    return (
-                      <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`} key={key.id}>
-                        <div className={`flex items-center justify-between gap-[16px]`} key={i}>
-                          <input
-                            type="text"
-                            placeholder={key.name || 'Name for key (optional)'}
-                            defaultValue={key.name || ''}
-                            onChange={e => updateKeyName(e.target.value)}
-                            className="bg-transparent"
-                            onFocus={() => setSelectedKey(key)}
-                            onBlur={() => setSelectedKey({})}
-                          />
-                          <div className="flex items-center gap-[16px]">
-                            {
-                              key.viewed || key.id !== showKey ?
-                                <input className="bg-transparent" type="password" disabled value={'1234567890123456789012345678901234567890'} /> :
-                                <p className="block text-xs p-[4px] max-w-[177px] w-full truncate">{key.key}</p>
-                            }
-                            {!key.viewed ?
-                              key.id === showKey ?
-                                // copy
-                                <div>
-                                  <CopyIcon
-                                    className="cursor-pointer"
-                                    onClick={() => {
-                                      navigator.clipboard.writeText(key.key)
-                                      alert('Copied API key to clipboard')
-                                    }}
-                                  />
-                                </div> :
-                                // view
-                                <div
+          keys.length > 0 ?
+            <div className="flex flex-col gap-[8px]">
+              {
+                keys.map((key, i) => {
+                  return (
+                    <div className={`px-[8px] py-[4px] ${i % 2 === 0 ? 'bg-[#f8f8f8]' : 'bg-white'}`} key={key.id}>
+                      <div className={`flex items-center justify-between gap-[16px]`} key={i}>
+                        <input
+                          type="text"
+                          placeholder={key.name || 'Name for key (optional)'}
+                          defaultValue={key.name || ''}
+                          onChange={e => updateKeyName(e.target.value)}
+                          className="bg-transparent"
+                          onFocus={() => setSelectedKey(key)}
+                          onBlur={() => setSelectedKey({})}
+                        />
+                        <div className="flex items-center gap-[16px]">
+                          {
+                            key.viewed || key.id !== showKey ?
+                              <input className="bg-transparent" type="password" disabled value={'1234567890123456789012345678901234567890'} /> :
+                              <p className="block text-xs p-[4px] max-w-[177px] w-full truncate">{key.key}</p>
+                          }
+                          {!key.viewed ?
+                            key.id === showKey ?
+                              // copy
+                              <div>
+                                <CopyIcon
                                   className="cursor-pointer"
                                   onClick={() => {
-                                    setShowKey(key.id)
-                                    updateApiKey(key.id, {
-                                      ...key,
-                                      viewed: true
-                                    })
+                                    navigator.clipboard.writeText(key.key)
+                                    alert('Copied API key to clipboard')
                                   }}
-                                >
-                                  <EyeOpenIcon />
-                                </div> :
-                              <div className="opacity-0">
+                                />
+                              </div> :
+                              // view
+                              <div
+                                className="cursor-pointer"
+                                onClick={() => {
+                                  setShowKey(key.id)
+                                  updateApiKey(key.id, {
+                                    ...key,
+                                    viewed: true
+                                  })
+                                }}
+                              >
                                 <EyeOpenIcon />
-                              </div>
-                            }
-                          </div>
-                          <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
-                            <TrashIcon className="text-[red]" />
-                          </div>
+                              </div> :
+                            <div className="opacity-0">
+                              <EyeOpenIcon />
+                            </div>
+                          }
+                        </div>
+                        <div className="cursor-pointer" onClick={() => deleteApiKey(key.id)}>
+                          <TrashIcon className="text-[red]" />
                         </div>
                       </div>
-                    )
-                  })
-                }
-              </div> :
-              <Text>No keys found</Text>
+                    </div>
+                  )
+                })
+              }
+            </div> :
+            <Text>No keys found</Text>
         }
       </div>
     </div >

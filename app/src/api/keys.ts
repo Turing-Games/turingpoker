@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { decode, sign, verify } from 'hono/jwt'
+import { HTTPException } from 'hono/http-exception'
 
 const verifyApiKey = (key: string, hash: string) => {
   const hashedKey = createHash('sha256')
@@ -69,30 +70,13 @@ export const keys = {
     }
   },
   verify: async (c) => {
-    console.log('verify')
     const bearerToken = c.req.header('Authorization')
-    const token = bearerToken.split(' ')[1]
-
-    const { id, key } = decode(token)?.payload
-    let apiKeyStmt = c.env.DB.prepare('SELECT * from api_keys where id = ? ').bind(id)
-
+    const token = bearerToken?.split(' ')[1]
     try {
-      const { results } = await apiKeyStmt.all()
-      const hash = results[0]?.key
-      if (!hash) {
-        return c.json({ message: 'Key not found' }, 404)
-      }
-
-      const isJWTValid = await verify(token, c.env.BOT_SECRET_KEY)
-      const isHashValid = verifyApiKey(key, hash as string)
-      console.log(bearerToken)
-      if (isJWTValid && isHashValid) {
-        return c.json({});
-      } else {
-        return c.json({ message: 'Invalid key' }, 401)
-      }
+      await verify(token, c.env.BOT_SECRET_KEY)
+      return c.json({})
     } catch (e) {
-      return c.json({ message: JSON.stringify(e) }, 500);
+      throw new HTTPException(401, { message: 'Unauthorized' })
     }
   },
   get: async (c) => {

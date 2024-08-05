@@ -90,7 +90,6 @@ export default function Root() {
 
   return (
     <React.StrictMode>
-
       <Theme
         hasBackground={false}
       >
