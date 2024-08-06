@@ -13,11 +13,7 @@ export const users = {
     try {
       const { results } = await usrStmt.all()
       const users = id ? results[0] : results
-      if (results.length > 0) {
-        return c.json(users);
-      } else {
-        return c.json({ message: 'User not found' }, 404);
-      }
+      return c.json(users);
     } catch (e) {
       return c.json({ message: JSON.stringify(e) }, 500);
     }

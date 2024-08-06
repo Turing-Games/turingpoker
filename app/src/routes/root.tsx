@@ -20,6 +20,7 @@ import User from '@app/components/User';
 import Tournaments from '@app/pages/tournaments';
 import Leaderboard from '@app/pages/leaderboard';
 import Admin from '@app/pages/admin';
+import Interactions from '@app/pages/interactions';
 
 export type ClientState = {
   isConnected: boolean;
@@ -31,7 +32,8 @@ export type ClientState = {
 
 let PUBLISHABLE_KEY = ''
 if (typeof location !== 'undefined') {
-  PUBLISHABLE_KEY = process.env.VITE_ENV === 'production' && location.host.split('.')[0] === 'play' ? 'pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA' : 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
+  const isProduction = process.env.NODE_ENV === 'production' && location.host.split('.')[0] === 'play'
+  PUBLISHABLE_KEY = isProduction ? 'pk_live_Y2xlcmsudHVyaW5ncG9rZXIuY29tJA' : 'pk_test_YmVjb21pbmctc2hhcmstMTAuY2xlcmsuYWNjb3VudHMuZGV2JA'
 
   if (!PUBLISHABLE_KEY) {
     throw new Error("Missing Publishable Key")
@@ -59,6 +61,10 @@ const router = createBrowserRouter([
     path: '/leaderboard',
     element: <Leaderboard />
   },
+  // {
+  //   path: '/interactions',
+  //   element: <Interactions />
+  // },
   {
     path: "/resources",
     // element: <Learn />,
