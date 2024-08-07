@@ -11,7 +11,7 @@ interface TgTableProps {
   rows: any[];
   maxWidth?: number | string;
   selectableRows?: boolean;
-  loading?: boolean;
+  progressPending?: boolean;
   fixedHeader?: boolean;
   fixedHeaderScrollHeight?: string;
 }
@@ -21,7 +21,7 @@ export default function TgTable({
   rows = [],
   maxWidth = 1000,
   selectableRows = false,
-  loading = false,
+  progressPending = false,
   fixedHeader = true,
   fixedHeaderScrollHeight = '300px'
 }: TgTableProps) {
@@ -29,7 +29,7 @@ export default function TgTable({
     <DataTable
       fixedHeader={fixedHeader}
       fixedHeaderScrollHeight={fixedHeaderScrollHeight}
-      loading={loading}
+      progressPending={progressPending}
       selectableRows={selectableRows}
       columns={headers.map(header => ({
         ...header,

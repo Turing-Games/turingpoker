@@ -11,10 +11,20 @@ import { RESOURCE_ATTRIBUTES, RESOURCES } from '@app/constants/resources';
 export default function Admin() {
 
   const [loading, setLoading] = React.useState(false)
-  const [resource, setResource] = React.useState<any>('users')
+  const [resource, setResource] = React.useState<any>('tournaments')
   const [data, setData] = React.useState<any[]>([])
 
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
+
+  const relations: {
+    [key: string]: string[]
+  } = {
+
+  }
+
+  const resourceRelations = React.useMemo(() => {
+    return relations[resource] ? `?populate=${relations[resource].join(',')}` : ''
+  }, [resource])
 
   const deleteResource = async (id: string) => {
     await fetch(`/api/v1/${resource}/${id}`, {
@@ -27,8 +37,9 @@ export default function Admin() {
   const getData = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`/api/v1/${resource}`)
+      const res = await fetch(`/api/v1/${resource}${resourceRelations}`)
       const data = await res.json() ?? []
+      console.log(data)
       setData(data)
       // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     } catch (err) {
@@ -37,6 +48,7 @@ export default function Admin() {
     setLoading(false)
   }
 
+  console.log(data)
   React.useEffect(() => {
     getData()
   }, [resource])

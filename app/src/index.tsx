@@ -39,6 +39,12 @@ app.get("/api/v1/tournaments", tournaments.get)
 app.post('/api/v1/tournaments', tournaments.create)
 app.delete('/api/v1/tournaments/:id', tournaments.delete)
 
+// TOURNAMENT CONFIGS
+app.get("/api/v1/tournament_configs", c => c.json({ message: 'Not implemented' }, 501))
+
+// GAME CONFIGS
+app.get("/api/v1/game_configs", c => c.json({ message: 'Not implemented' }, 501))
+
 // auth
 app.get('/api/v1/auth/bots', keys.verify)
 

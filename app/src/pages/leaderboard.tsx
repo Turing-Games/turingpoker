@@ -50,7 +50,7 @@ export default function Leaderboard() {
           ></Select>
         </div>
         <TgTable
-          loading={loading}
+          progressPending={loading}
           selectableRows={false}
           headers={[
             { value: 'username', name: 'User' },

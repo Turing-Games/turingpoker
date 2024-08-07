@@ -7,11 +7,13 @@ export const RESOURCES = [
   { label: 'Users', value: 'users' },
   { label: 'Games', value: 'games' },
   { label: 'Bots', value: 'bots' },
+  { label: 'Tournament Configs', value: 'tournament_configs' },
+  { label: 'Game Configs', value: 'game_configs' },
 ]
 
 export const RESOURCE_ATTRIBUTES = {
   keys: ['id', 'user_id', 'created_at'],
-  tournaments: ['id', 'title', 'created_at'],
+  tournaments: ['id', 'game_type', 'title', 'created_at'],
   users: ['id', 'username', 'created_at'],
   games: ['id', 'title', 'party', 'room', 'created_at']
 }

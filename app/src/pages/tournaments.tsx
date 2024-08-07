@@ -31,8 +31,7 @@ export default function Tournaments() {
   const getTournaments = async () => {
     setLoading(true)
     try {
-      const tournaments = await queryClient('tournaments?withConfig=true', 'GET')
-      console.log({ tournaments })
+      const tournaments = await queryClient('tournaments?populate=tournament_configs', 'GET')
       setTournaments(tournaments)
     } catch (err) {
       console.log(err)
@@ -118,7 +117,7 @@ export default function Tournaments() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            await queryClient('tournaments', 'POST', { title, config: gameConfig })
+            await queryClient('tournaments', 'POST', { title, gameType: gameTypeForm, config: gameConfig })
             getTournaments()
             setIsOpen(false)
           }}
