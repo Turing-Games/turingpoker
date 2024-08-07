@@ -212,7 +212,7 @@ export default function Games() {
             e.preventDefault()
             checkValidInput()
             const roomId = Math.round(Math.random() * 10000);
-            const socket = new PartySocket({
+            new PartySocket({
               host: PARTYKIT_URL,
               room: roomId.toString(),
               party: gameTypeForm

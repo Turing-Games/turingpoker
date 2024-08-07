@@ -15,7 +15,8 @@
     "migrations:local": "npx wrangler d1 migrations apply DB --local",
     "migrations:dev": "npx wrangler d1 migrations apply DB --preview --remote",
     "migrations:prod": "npx wrangler d1 migrations apply DB --remote",
-    "migrations:create": "npx wrangler d1 migrations create DB"
+    "migrations:create": "npx wrangler d1 migrations create DB",
+    "d1:schema": "npx wrangler d1 export turinggames --remote --output=./schema.sql --no-data"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.1.0",

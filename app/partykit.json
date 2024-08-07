@@ -6,7 +6,8 @@
   "parties": {
     "poker": "src/party/src/poker.ts",
     "kuhn": "src/party/src/kuhn.ts",
-    "tables": "src/party/src/tables.ts"
+    "tables": "src/party/src/tables.ts",
+    // "users": "src/party/src/users.ts" // for notifications, invites, etc
   },
   "compatibilityDate": "2024-04-08"
 }
