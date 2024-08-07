@@ -19,9 +19,6 @@ export const DEFAULT_TABLE_STATE = {
 }
 
 export const CONFIGURABLE_PROPERTIES = [
-  // { label: 'Dealer Position', value: 'dealerPosition', type: 'number', default: 0 },
-  // { label: 'Min Players', value: 'minPlayers', type: 'number', default: 2 },
-  // { label: 'Max Players', value: 'maxPlayers', type: 'number', default: 2, max: 2 },
   {
     label: 'Auto Start',
     value: 'autoStart',

@@ -9,6 +9,10 @@ import PartySocket from 'partysocket';
 import Modal from 'react-modal';
 import Select from '@app/components/Select';
 import { GAME_TYPE_FILTERS, GAMES, MODAL_STYLES } from '@app/constants/games/shared';
+import { CONFIGURABLE_PROPERTIES as POKER_CONFIG } from '@app/constants/games/poker';
+import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuhn';
+import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
+import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 import TgTable from '@app/components/Table';
 import queryClient from '@app/client/apiClient';
 
@@ -21,10 +25,13 @@ export default function Tournaments() {
   const [gameTypeForm, setGameTypeForm] = React.useState('poker')
   const [isOpen, setIsOpen] = React.useState(false)
   const [title, setTitle] = React.useState('')
-  const [gameConfig, setGameConfig] = React.useState({
+  const [tournamentConfig, setTournamentConfig] = React.useState({
     size: 2,
-    private: false
+    private: false,
+    min_players: 2,
+    max_players: 8,
   })
+  const [gameConfig, setGameConfig] = React.useState({})
 
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
 
@@ -32,6 +39,7 @@ export default function Tournaments() {
     setLoading(true)
     try {
       const tournaments = await queryClient('tournaments?populate=tournament_configs', 'GET')
+      console.log(tournaments)
       setTournaments(tournaments)
     } catch (err) {
       console.log(err)
@@ -39,22 +47,25 @@ export default function Tournaments() {
     setLoading(false)
   }
 
+  const checkValidInput = () => {
+    if (!title) return alert('Enter a tournament title')
+    if (tournamentConfig['size'] < 2) return alert('Minimum pool size should be at least 2')
+    if (tournamentConfig['size'] % 2 !== 0) return alert('Pool size must be an even number')
+  }
+
+  const configurableGameProperties = {
+    'poker': POKER_CONFIG,
+    'kuhn': KUHN_CONFIG
+  } as any
+
+  const configurableTournamentProperties = [
+    { label: 'Pool Size', value: 'size', type: 'number', default: 2 },
+    { label: 'Private?', value: 'private', type: 'checkbox', default: false },
+  ] as any
+
   React.useEffect(() => {
     getTournaments()
   }, [])
-
-
-  const checkValidInput = () => {
-    if (!title) return alert('Enter a tournament title')
-    if (gameConfig['size'] < 2) return alert('Minimum pool size should be at least 2')
-    if (gameConfig['size'] % 2 !== 0) return alert('Pool size must be an even number')
-  }
-
-  const configurableProperties = [
-    { label: 'Pool Size', value: 'size', type: 'number', default: 2 },
-    { label: 'Private?', value: 'private', type: 'checkbox', default: false },
-    // { label: 'Start Date', value: 'startDate', type: 'date', default: new Date() }
-  ] as any
 
   return (
     <Main pageTitle='Tournaments'>
@@ -117,7 +128,12 @@ export default function Tournaments() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            await queryClient('tournaments', 'POST', { title, gameType: gameTypeForm, config: gameConfig })
+            await queryClient('tournaments', 'POST', {
+              title,
+              gameType: gameTypeForm,
+              gameConfig,
+              tournamentConfig
+            })
             getTournaments()
             setIsOpen(false)
           }}
@@ -135,6 +151,7 @@ export default function Tournaments() {
                 }}
               ></Select>
             </div>
+            <h4>Tournament Configuration</h4>
             <div className="grid grid-cols-2 gap-[8px]">
               <div>
                 <label htmlFor={'title'}>Title</label>
@@ -148,7 +165,39 @@ export default function Tournaments() {
                 />
               </div>
               {
-                configurableProperties.map((property, i) => {
+                configurableTournamentProperties.map((property, i) => {
+                  return (
+                    <div
+                      key={i}
+                      style={property.type === 'checkbox' ? {
+                        display: 'flex',
+                        gap: '8px',
+                        alignItems: 'center',
+                      } : {}}
+                    >
+                      <label htmlFor={property.value}>{property.label}</label>
+                      <input
+                        id={property.value}
+                        min={0}
+                        value={tournamentConfig[property.value]}
+                        type={property.type}
+                        onChange={(e) => {
+                          setTournamentConfig({
+                            ...tournamentConfig,
+                            [property.value]: property.type === 'checkbox' ? e.target.checked : e.target.value
+                          })
+                        }}
+                        className="border border-black rounded-[4px] p-[8px] w-full text-sm"
+                      />
+                    </div>
+                  )
+                })
+              }
+            </div>
+            <h4>Game Configuration</h4>
+            <div className="grid grid-cols-2 gap-[8px]">
+              {
+                configurableGameProperties[gameTypeForm].map((property, i) => {
                   return (
                     <div
                       key={i}

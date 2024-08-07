@@ -15,5 +15,5 @@ export const RESOURCE_ATTRIBUTES = {
   keys: ['id', 'user_id', 'created_at'],
   tournaments: ['id', 'game_type', 'title', 'created_at'],
   users: ['id', 'username', 'created_at'],
-  games: ['id', 'title', 'party', 'room', 'created_at']
+  games: ['id', 'title', 'game_type', 'created_at', 'tournament_id'],
 }
