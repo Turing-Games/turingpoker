@@ -67,6 +67,14 @@ export default function Tournaments() {
     getTournaments()
   }, [])
 
+  React.useEffect(() => {
+    setGameConfig(
+      configurableGameProperties[gameTypeForm].reduce((acc, property) => {
+        acc[property.value] = property.default
+        return acc
+      }, {}))
+  }, [gameTypeForm])
+
   return (
     <Main pageTitle='Tournaments'>
       <div className="p-[20px] w-full">

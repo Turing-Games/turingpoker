@@ -1,5 +1,6 @@
 // Tournament tables will default to min of 2 players, max of 8, auto start is false
 const generateTournamentGames = async (c, tournamentId: string, gameType = '', config: any, size: number) => {
+  console.log(config)
   // game config
   const gameConfigOptionLength = Object.keys(config).length
   const gameConfigValuesPlaceholders = gameConfigOptionLength > 0 ? `${Array(gameConfigOptionLength).fill('?').join(',')}` : ''
@@ -7,19 +8,19 @@ const generateTournamentGames = async (c, tournamentId: string, gameType = '', c
   const gameConfigValues = gameConfigOptionLength > 0 ? Object.values(config) : []
 
   return new Promise(async (resolve, reject) => {
-    const gameIds = Array(size).fill('_').map(() => crypto.randomUUID())
     try {
       // create # of games based on size
+      const gameIds = Array(size).fill('_').map(() => crypto.randomUUID())
       const gameStmt = c.env.DB.prepare("INSERT INTO games (id, tournament_id, game_type) VALUES (?, ?, ?)")
-      await c.env.DB.batch(gameIds.map((id) => gameStmt.bind(id, tournamentId, gameType)))
+      const gameBatch = gameIds.map((id) => gameStmt.bind(id, tournamentId, gameType))
+      const games = await c.env.DB.batch(gameBatch)
+      console.log({ games })
 
-      // create one config for each game
+      // create one config for each game)
       const gameConfigIds = Array(size).fill('_').map(() => crypto.randomUUID())
-      const gameConfigStmt = c.env.DB.prepare(`
-        INSERT INTO game_configs (id, game_id, ${gameConfigValueColumns})
-        VALUES ${gameIds.map((id) => `(?, ?, ${gameConfigValuesPlaceholders})`).join(',')}
-        `)
-      await c.env.DB.batch(gameIds.map((id, i) => gameConfigStmt.bind(gameConfigIds[i], id, ...gameConfigValues)))
+      const gameConfigStmt = c.env.DB.prepare(`INSERT INTO game_configs (id, game_id, ${gameConfigValueColumns}) VALUES (?, ?, ${gameConfigValuesPlaceholders})`)
+      const configBatch = gameIds.map((id, i) => gameConfigStmt.bind(gameConfigIds[i], id, ...gameConfigValues))
+      await c.env.DB.batch(configBatch)
 
       resolve(true)
     } catch (e) {
@@ -61,18 +62,20 @@ export const tournaments = {
       const tournamentId = crypto.randomUUID()
       // tournament config
       const tournamentConfigOptionLength = Object.keys(tournamentConfig).length
-      const tournamentConfigValuesPlaceholders = tournamentConfigOptionLength > 0 ? `${Array(tournamentConfigOptionLength).fill('?').join(',')}` : ''
-      const tournamentConfigValueColumns = tournamentConfigOptionLength > 0 ? `${Object.keys(tournamentConfig).join(',')}` : ''
+      const tournamentConfigValuesPlaceholders = tournamentConfigOptionLength > 0 ? `${Array(tournamentConfigOptionLength).fill('?').join(',')} ` : ''
+      const tournamentConfigValueColumns = tournamentConfigOptionLength > 0 ? `${Object.keys(tournamentConfig).join(',')} ` : ''
       const tournamentConfigValues = tournamentConfigOptionLength > 0 ? Object.values(tournamentConfig) : []
 
       // insert tournament and tournament config
       let tournamentStmt = c.env.DB.prepare('INSERT into tournaments (id, title, game_type) VALUES (?, ?, ?) ').bind(tournamentId, title, gameType)
-      let tournamentConfigStmt = c.env.DB.prepare(`INSERT into tournament_configs (id, tournament_id, ${tournamentConfigValueColumns}) VALUES (?, ?, ${tournamentConfigValuesPlaceholders}) `)
+      let tournamentConfigStmt = c.env.DB.prepare(`INSERT into tournament_configs(id, tournament_id, ${tournamentConfigValueColumns}) VALUES(?, ?, ${tournamentConfigValuesPlaceholders})`)
         .bind(tournamentConfigId, tournamentId, ...tournamentConfigValues)
       await tournamentStmt.run()
       await tournamentConfigStmt.run()
 
-      await generateTournamentGames(c, tournamentId, gameType, gameConfig, tournamentConfig.size)
+      console.log(gameConfig)
+      console.log(tournamentConfig)
+      await generateTournamentGames(c, tournamentId, gameType, gameConfig, parseInt(tournamentConfig.size))
       return c.json()
     } catch (e) {
       console.log(e)

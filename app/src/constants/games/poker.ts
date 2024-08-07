@@ -22,7 +22,7 @@ export const CONFIGURABLE_PROPERTIES = [
   { label: 'Dealer Position', value: 'dealerPosition', type: 'number', default: 0 },
   { label: 'Big Blind', value: 'bigBlind', type: 'number', default: 1 },
   { label: 'Small Blind', value: 'smallBlind', type: 'number', default: 1 },
-  { label: 'Min Players', value: 'minPlayers', type: 'number', default: 2 },
-  { label: 'Max Players', value: 'maxPlayers', type: 'number', default: 10 },
-  { label: 'Auto Start', value: 'autoStart', type: 'checkbox', default: AUTO_START }
+  { label: 'Min Players', value: 'min_players', type: 'number', default: 2 },
+  { label: 'Max Players', value: 'max_players', type: 'number', default: 8 },
+  { label: 'Auto Start', value: 'auto_start', type: 'checkbox', default: AUTO_START }
 ] as any
