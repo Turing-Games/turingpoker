@@ -4,10 +4,11 @@ import Logo from '../../static/images/logo-dark.png'
 import MobileLogo from '../../static/images/logo.png'
 import { ReactNode } from 'react';
 import useSmallScreen from '@app/hooks/useSmallScreen';
-import { DiscordLogoIcon, GearIcon } from '@radix-ui/react-icons';
+import { BarChartIcon, DiscordLogoIcon, GearIcon } from '@radix-ui/react-icons';
 import Keys from '@app/pages/user/keys';
 import Header from '@app/components/Header';
 import { Helmet } from 'react-helmet';
+import Stats from '@app/pages/user/stats';
 
 const menuItems = [
   { link: "/games", label: "Games" },
@@ -63,6 +64,9 @@ export default function Profile({ pageTitle = '' }) {
             }
           }}
         >
+          <UserProfile.Page label='User Stats' url='stats' labelIcon={<BarChartIcon />}>
+            <Stats />
+          </UserProfile.Page>
           <UserProfile.Page label='API Keys' url='api-keys' labelIcon={<GearIcon />}>
             <Keys />
           </UserProfile.Page>
