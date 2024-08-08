@@ -258,11 +258,19 @@ export default class PartyServer implements Party.Server {
       reason,
     });
     this.gameState = null;
+    this.eliminatePlayers();
     this.broadcastGameState();
     this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
     if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
       this.startRound();
     }
+  }
+
+  // remove ingame players that have 0 chips
+  eliminatePlayers() {
+    this.inGamePlayers = this.inGamePlayers.filter(
+      (player) => this.stacks[player.playerId] > 0
+    );
   }
 
   getStateMessage(playerId: string): ServerStateMessage {

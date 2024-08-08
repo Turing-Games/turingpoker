@@ -263,11 +263,19 @@ export default class PartyServer extends MainPartyServer {
       reason,
     });
     this.gameState = null;
+    this.eliminatePlayers();
     this.broadcastGameState();
     this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
     if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
       this.startRound();
     }
+  }
+
+  // remove ingame players that have 0 chips
+  eliminatePlayers() {
+    this.inGamePlayers = this.inGamePlayers.filter(
+      (player) => this.stacks[player.playerId] > 0
+    );
   }
 
   getStateMessage(playerId: string): ServerStateMessage {
@@ -336,6 +344,7 @@ export default class PartyServer extends MainPartyServer {
   }
 
   playerJoinGame(playerId: string) {
+    console.log('join game')
     if (
       this.queuedPlayers.find((player) => player.playerId === playerId) ||
       this.inGamePlayers.find((player) => player.playerId === playerId)

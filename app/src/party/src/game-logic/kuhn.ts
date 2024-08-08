@@ -77,8 +77,6 @@ export interface IPokerConfig {
 
 export interface IPokerSharedState {
   dealerPosition: number;
-  smallBlind: number;
-  bigBlind: number;
   pot: number;
   targetBet: number;
   // clockwise order
@@ -138,8 +136,6 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
     playerCurrentBet[player] = 0;
   }
 
-  const sb = (config.dealerPosition - 1 + players.length) % players.length;
-  const bb = (config.dealerPosition - 2 + players.length) % players.length;
   const out: IPokerGame = {
     state: { // shared state
       done: false,
@@ -148,8 +144,6 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
       round: 'pre-flop',
       targetBet: config.bigBlind,
       dealerPosition: config.dealerPosition,
-      smallBlind: config.smallBlind,
-      bigBlind: config.bigBlind,
       cards: [],
       whoseTurn: players[(config.dealerPosition - 1 + players.length) % players.length],
     },
@@ -157,11 +151,11 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
     config,
     hands
   }
-  out.state.players[sb].currentBet = Math.min(config.smallBlind, stacks[sb]);
-  out.state.players[sb].stack -= out.state.players[sb].currentBet;
-  out.state.players[bb].currentBet = Math.min(config.bigBlind, stacks[bb]);
-  out.state.players[bb].stack -= out.state.players[bb].currentBet;
-  out.state.pot = out.state.players[sb].currentBet + out.state.players[bb].currentBet;
+  out.state.players[0].currentBet = Math.min(config.smallBlind, stacks[0]);
+  out.state.players[0].stack -= out.state.players[0].currentBet;
+  out.state.players[1].currentBet = Math.min(config.bigBlind, stacks[1]);
+  out.state.players[1].stack -= out.state.players[1].currentBet;
+  out.state.pot = out.state.players[0].currentBet + out.state.players[1].currentBet;
 
   return out;
 }
