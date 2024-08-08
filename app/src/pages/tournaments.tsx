@@ -15,6 +15,7 @@ import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games
 import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 import TgTable from '@app/components/Table';
 import queryClient from '@app/client/apiClient';
+import { Link } from 'react-router-dom';
 
 
 export default function Tournaments() {
@@ -100,7 +101,7 @@ export default function Tournaments() {
         {
           loading ?
             <Text>Loading...</Text> :
-            tournaments.length > 0 ?
+            tournaments?.length > 0 ?
               <TgTable
                 headers={[
                   { value: 'id', name: 'Tournament' },
@@ -109,7 +110,11 @@ export default function Tournaments() {
                 ]}
                 rows={tournaments.map(t => {
                   return {
-                    id: t.title || t.id,
+                    id: (
+                      <Link to={`/tournaments/${t.id}`}>
+                        {t.title || t.id}
+                      </Link>
+                    ),
                     gameType: t.gameType,
                     size: t.size
                   }

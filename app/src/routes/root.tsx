@@ -21,6 +21,7 @@ import Tournaments from '@app/pages/tournaments';
 import Leaderboard from '@app/pages/leaderboard';
 import Admin from '@app/pages/admin';
 import Interactions from '@app/pages/interactions';
+import Tournament from '@app/pages/tournament';
 
 export type ClientState = {
   isConnected: boolean;
@@ -55,7 +56,16 @@ const router = createBrowserRouter([
   },
   {
     path: '/tournaments',
-    element: <Tournaments />
+    children: [
+      {
+        path: '',
+        element: <Tournaments />
+      },
+      {
+        path: ':tournamentId',
+        element: <Tournament />
+      }
+    ]
   },
   {
     path: '/leaderboard',

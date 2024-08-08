@@ -19,7 +19,7 @@ export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
 export const MAX_PLAYERS = 2
 
-const defaultStack = 1000;
+const defaultStack = 3;
 export default class PartyServer extends MainPartyServer {
   public gameState: Kuhn.IPokerGame | null = null;
   public gameConfig: Kuhn.IPokerConfig = {
@@ -118,11 +118,11 @@ export default class PartyServer extends MainPartyServer {
       } else if (data.type == "join-game") {
         this.playerJoinGame(websocket.id);
       } else if (data.type == "start-game") {
-        this.startGame();
+        this.startRound();
       } else if (data.type == "spectate") {
         this.playerSpectate(websocket.id);
       } else if (data.type == "reset-game") {
-        this.endGame("system");
+        this.endRound("system");
       } else {
         console.error("Invalid message type", data);
       }
@@ -181,7 +181,7 @@ export default class PartyServer extends MainPartyServer {
       console.log(err);
     }
     if (this.gameState.state.done) {
-      this.endGame(
+      this.endRound(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );
     }
@@ -201,17 +201,19 @@ export default class PartyServer extends MainPartyServer {
     this.queuedPlayers = [];
   }
 
-  startGame() {
+  startRound() {
     if (this.gameState && !this.gameState.state.done) {
       return;
     }
+
     // if anyone has zero chips just reset them to 1000
-    for (const player of this.inGamePlayers.concat(this.queuedPlayers)) {
-      this.lastActed[player.playerId] = Date.now();
-      if (this.stacks[player.playerId] <= 0) {
-        this.stacks[player.playerId] = defaultStack;
-      }
-    }
+    // for (const player of this.inGamePlayers.concat(this.queuedPlayers)) {
+    //   this.lastActed[player.playerId] = Date.now();
+    //   if (this.stacks[player.playerId] <= 0) {
+    //     this.stacks[player.playerId] = defaultStack;
+    //   }
+    // }
+
     this.processQueuedPlayers();
     this.gameState = Kuhn.createPokerGame(
       this.gameConfig,
@@ -232,7 +234,7 @@ export default class PartyServer extends MainPartyServer {
     }, 3000);
   }
 
-  endGame(reason: "showdown" | "fold" | "system") {
+  endRound(reason: "showdown" | "fold" | "system") {
     if (!this.gameState) {
       return;
     }
@@ -264,7 +266,7 @@ export default class PartyServer extends MainPartyServer {
     this.broadcastGameState();
     this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
     if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
-      this.startGame();
+      this.startRound();
     }
   }
 
@@ -364,7 +366,7 @@ export default class PartyServer extends MainPartyServer {
       this.serverState.gamePhase === "pending" &&
       this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START
     ) {
-      this.startGame();
+      this.startRound();
     } else {
       this.broadcastGameState();
     }
@@ -427,11 +429,11 @@ export default class PartyServer extends MainPartyServer {
     // it's important to remove the players before ending the game since if autostart is on
     // we don't want the removed player to get added
     if (this.gameState?.state.done) {
-      this.endGame(
+      this.endRound(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );
     } else if (this.inGamePlayers.length < 2) {
-      this.endGame("fold");
+      this.endRound("fold");
     }
 
     this.broadcastGameState();

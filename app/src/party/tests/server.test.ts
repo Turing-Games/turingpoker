@@ -50,13 +50,13 @@ describe('Poker server', () => {
         server.playerJoinGame('1');
         server.onConnect({ id: '2' } as any, {} as any);
         server.playerJoinGame('2');
-        server.startGame();
+        server.startRound();
         server.onConnect({ id: '3' } as any, {} as any);
         server.playerJoinGame('3');
         expect(server.inGamePlayers.length).toBe(2);
         expect(server.queuedPlayers.length).toBe(1);
         expect(server.gameState?.state.players.length).toBe(2);
-        server.endGame('system')
+        server.endRound('system')
 
         expect(server.inGamePlayers.length).toBe(3);
         expect(server.queuedPlayers.length).toBe(0);
@@ -68,8 +68,8 @@ describe('Poker server', () => {
         server.playerJoinGame('1');
         server.onConnect({ id: '2' } as any, {} as any);
         server.playerJoinGame('2');
-        server.startGame();
-        server.endGame('fold');
+        server.startRound();
+        server.endRound('fold');
         expect(server.serverState.gamePhase).toBe('active');
         expect(server.gameState).toBeTruthy();
     });
@@ -79,7 +79,7 @@ describe('Poker server', () => {
         server.playerJoinGame('1');
         server.onConnect({ id: '2' } as any, {} as any);
         server.playerJoinGame('2');
-        server.startGame();
+        server.startRound();
         server.onClose({ id: '1' } as any);
         expect(server.serverState.gamePhase).toBe('pending');
         expect(server.inGamePlayers.length).toBe(1);
@@ -95,7 +95,7 @@ describe('Poker server', () => {
         server.playerJoinGame('2');
         server.onConnect({ id: '3' } as any, {} as any);
         server.playerJoinGame('3');
-        server.startGame();
+        server.startRound();
         server.handlePlayerAction('3', { type: 'call' });
         server.handlePlayerAction('1', { type: 'call' });
         server.handlePlayerAction('2', { type: 'call' });
@@ -119,7 +119,7 @@ describe('Poker server', () => {
         server.onConnect({ id: '2' } as any, {} as any);
         server.playerJoinGame('2');
         server.onConnect({ id: '3' } as any, {} as any);
-        server.startGame();
+        server.startRound();
 
         expect(server.getStateMessage("1").hand?.length).toBe(2);
         expect(server.getStateMessage("2").hand?.length).toBe(2);

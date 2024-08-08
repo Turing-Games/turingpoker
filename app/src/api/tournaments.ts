@@ -31,6 +31,7 @@ const generateTournamentGames = async (c, tournamentId: string, gameType = '', c
 
 export const tournaments = {
   get: async (c) => {
+    const id = c.req.param('id')
     const relations = c.req.query('populate')?.split(',')
     const gameType = c.req.query('gameType')
     let statement = 'SELECT tournaments.*, COUNT(games.id) AS games_count FROM tournaments LEFT JOIN games ON games.tournament_id = tournaments.id'
@@ -39,17 +40,32 @@ export const tournaments = {
         statement += ` LEFT JOIN ${relation} ON tournaments.id = ${relation}.tournament_id`
       }
     }
+    if (id) {
+      statement += ' WHERE tournaments.id = ?'
+    }
+
     if (gameType) {
       statement += ' WHERE game_type = ?'
     }
     statement += ' GROUP BY tournaments.id;'
     let usrStmt = c.env.DB.prepare(statement)
+    if (id) {
+      usrStmt = usrStmt.bind(id)
+    }
     if (gameType) {
       usrStmt = usrStmt.bind(gameType)
     }
     try {
       const { results } = await usrStmt.all()
-      return c.json(results);
+      let games = []
+      if (id) {
+        const { results } = await c.env.DB.prepare('SELECT * from games where tournament_id = ?').bind(id).all()
+        games = results
+      }
+      return c.json({
+        tournaments: id ? results[0] : results,
+        games: id ? games : []
+      });
     } catch (e) {
       console.log(e)
       return c.json({ message: JSON.stringify(e) }, 500);

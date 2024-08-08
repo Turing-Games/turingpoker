@@ -36,6 +36,7 @@ app.get("/api/v1/keys/verify", keys.verify);
 
 // TOURNAMENTS
 app.get("/api/v1/tournaments", tournaments.get)
+app.get("/api/v1/tournaments/:id", tournaments.get)
 app.post('/api/v1/tournaments', tournaments.create)
 app.delete('/api/v1/tournaments/:id', tournaments.delete)
 

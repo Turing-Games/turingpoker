@@ -58,7 +58,7 @@ export default function Leaderboard() {
             { value: 'losses', name: 'Losses' },
             { value: 'button', name: '' }
           ]}
-          rows={players.map(t => {
+          rows={(players || []).map(t => {
             return {
               username: t.username,
               wins: t.wins || 0,

@@ -115,11 +115,11 @@ export default class PartyServer implements Party.Server {
       } else if (data.type == "join-game") {
         this.playerJoinGame(websocket.id);
       } else if (data.type == "start-game") {
-        this.startGame();
+        this.startRound();
       } else if (data.type == "spectate") {
         this.playerSpectate(websocket.id);
       } else if (data.type == "reset-game") {
-        this.endGame("system");
+        this.endRound("system");
       } else {
         console.error("Invalid message type", data);
       }
@@ -178,7 +178,7 @@ export default class PartyServer implements Party.Server {
       console.log(err);
     }
     if (this.gameState.state.done) {
-      this.endGame(
+      this.endRound(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );
     }
@@ -198,7 +198,7 @@ export default class PartyServer implements Party.Server {
     this.queuedPlayers = [];
   }
 
-  startGame() {
+  startRound() {
     if (this.gameState && !this.gameState.state.done) {
       return;
     }
@@ -229,7 +229,7 @@ export default class PartyServer implements Party.Server {
     }, 3000);
   }
 
-  endGame(reason: "showdown" | "fold" | "system") {
+  endRound(reason: "showdown" | "fold" | "system") {
     if (!this.gameState) {
       return;
     }
@@ -261,7 +261,7 @@ export default class PartyServer implements Party.Server {
     this.broadcastGameState();
     this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
     if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
-      this.startGame();
+      this.startRound();
     }
   }
 
@@ -361,7 +361,7 @@ export default class PartyServer implements Party.Server {
       this.serverState.gamePhase === "pending" &&
       this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START
     ) {
-      this.startGame();
+      this.startRound();
     } else {
       this.broadcastGameState();
     }
@@ -424,11 +424,11 @@ export default class PartyServer implements Party.Server {
     // it's important to remove the players before ending the game since if autostart is on
     // we don't want the removed player to get added
     if (this.gameState?.state.done) {
-      this.endGame(
+      this.endRound(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );
     } else if (this.inGamePlayers.length < 2) {
-      this.endGame("fold");
+      this.endRound("fold");
     }
 
     this.broadcastGameState();

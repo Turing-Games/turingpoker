@@ -39,6 +39,7 @@
     "react-helmet": "^6.1.0",
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.23.1",
+    "react-svg-pan-zoom": "^3.12.1",
     "styled-components": "^6.1.12"
   },
   "devDependencies": {
