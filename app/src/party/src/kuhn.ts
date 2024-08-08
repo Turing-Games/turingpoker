@@ -33,6 +33,7 @@ export default class PartyServer extends MainPartyServer {
   public inGamePlayers: IPlayer[] = [];
   public spectatorPlayers: IPlayer[] = [];
   public queuedPlayers: IPlayer[] = [];
+  public eliminatedPlayers: IPlayer[] = [];
   public stacks: Record<string, number> = {};
   public serverState: IPartyServerState = {
     gamePhase: "pending",
