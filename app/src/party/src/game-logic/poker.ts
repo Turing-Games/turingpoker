@@ -316,7 +316,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         let target = state.targetBet;
         if (move.type == 'raise') {
             if (move.amount < 0) throw new Error("Raise amount must be non-negative");
-            let oldTarget = target;
+            const oldTarget = target;
             target = Math.max(target, Math.min(move.amount + target, player.stack + player.currentBet));
             if (target > oldTarget) {
                 // update everyone's lastRound to the previous round
@@ -353,7 +353,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
     }
     const nextPlayer = state.players[nextPlayerIndex];
 
-    let roundOver = !nextPlayer.shouldMove;
+    const roundOver = !nextPlayer.shouldMove;
     if (roundOver) {
         // move the round forward
         if (state.round == 'pre-flop') {

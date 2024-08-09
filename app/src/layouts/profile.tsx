@@ -1,3 +1,4 @@
+import React from 'react';
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { SignedIn, SignedOut, SignInButton, UserButton, UserProfile } from "@clerk/clerk-react";
 import Logo from '../../static/images/logo-dark.png'

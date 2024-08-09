@@ -12,7 +12,7 @@ export default function Home() {
 
   const [game, setGame] = React.useState<string>('');
   const [join, setJoin] = React.useState<boolean>(false);
-  let { gameId, gameType } = useParams();
+  const { gameId, gameType } = useParams();
 
   const games = [
     { label: 'Select a game', value: 'all' },

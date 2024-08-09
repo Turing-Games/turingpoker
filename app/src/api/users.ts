@@ -20,7 +20,7 @@ export const users = {
   },
   delete: async (c) => {
     const id = c.req.param('id')
-    let usrStmt = c.env.DB.prepare('DELETE from users where clerk_id = ? or ID = ?').bind(id, id)
+    const usrStmt = c.env.DB.prepare('DELETE from users where clerk_id = ? or ID = ?').bind(id, id)
     try {
       const { results } = await usrStmt.run()
       return c.json(results);
@@ -31,7 +31,7 @@ export const users = {
   },
   getKeys: async (c) => {
     const id = c.req.param('id')
-    let usrStmt = c.env.DB.prepare('SELECT * from api_keys where user_id = ? ').bind(id)
+    const usrStmt = c.env.DB.prepare('SELECT * from api_keys where user_id = ? ').bind(id)
     try {
       const { results } = await usrStmt.all()
       return c.json(results);

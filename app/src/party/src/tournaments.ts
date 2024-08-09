@@ -63,7 +63,7 @@ export default class TournamntsServer extends PartyServer {
 
   /** Fetches list of active rooms */
   async getTournaments(req?: any): Promise<any[]> {
-    let tournaments = await this.party.storage.list<any>();
+    const tournaments = await this.party.storage.list<any>();
     // if (gameType) {
     //   rooms = Array.from(rooms?.values())?.filter(room => {
     //     if (gameType && room.gameType !== gameType) return false;

@@ -83,8 +83,8 @@ export const tournaments = {
       const tournamentConfigValues = tournamentConfigOptionLength > 0 ? Object.values(tournamentConfig) : []
 
       // insert tournament and tournament config
-      let tournamentStmt = c.env.DB.prepare('INSERT into tournaments (id, title, game_type) VALUES (?, ?, ?) ').bind(tournamentId, title, gameType)
-      let tournamentConfigStmt = c.env.DB.prepare(`INSERT into tournament_configs(id, tournament_id, ${tournamentConfigValueColumns}) VALUES(?, ?, ${tournamentConfigValuesPlaceholders})`)
+      const tournamentStmt = c.env.DB.prepare('INSERT into tournaments (id, title, game_type) VALUES (?, ?, ?) ').bind(tournamentId, title, gameType)
+      const tournamentConfigStmt = c.env.DB.prepare(`INSERT into tournament_configs(id, tournament_id, ${tournamentConfigValueColumns}) VALUES(?, ?, ${tournamentConfigValuesPlaceholders})`)
         .bind(tournamentConfigId, tournamentId, ...tournamentConfigValues)
       await tournamentStmt.run()
       await tournamentConfigStmt.run()
@@ -101,9 +101,9 @@ export const tournaments = {
   delete: async (c) => {
     const id = c.req.param('id')
     try {
-      let gameStmt = c.env.DB.prepare('DELETE from games where tournament_id = ? ').bind(id)
-      let configStmt = c.env.DB.prepare('DELETE from tournament_configs where tournament_id = ? ').bind(id)
-      let tournamentStmt = c.env.DB.prepare('DELETE from tournaments where id = ? ').bind(id)
+      const gameStmt = c.env.DB.prepare('DELETE from games where tournament_id = ? ').bind(id)
+      const configStmt = c.env.DB.prepare('DELETE from tournament_configs where tournament_id = ? ').bind(id)
+      const tournamentStmt = c.env.DB.prepare('DELETE from tournaments where id = ? ').bind(id)
       await configStmt.all();
       await gameStmt.all()
       await tournamentStmt.all()

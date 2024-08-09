@@ -4,7 +4,7 @@ const buildDbQuery = (c: any, event = '', data = {}) => {
       const uuid = crypto.randomUUID()
       return new Promise(async (resolve, reject) => {
         try {
-          let { results } = await c.env.DB.prepare(
+          const { results } = await c.env.DB.prepare(
             'INSERT into users (id, clerk_id, username, profile_image_url) VALUES (?, ?, ?, ?)'
           )
             .bind(`${uuid}`, data?.data?.id, data?.data?.username, data?.data?.profile_image_url)
@@ -19,7 +19,7 @@ const buildDbQuery = (c: any, event = '', data = {}) => {
     'user.updated': async () => {
       return new Promise(async (resolve, reject) => {
         try {
-          let { results } = await c.env.DB.prepare(
+          const { results } = await c.env.DB.prepare(
             'UPDATE users SET username = ?, profile_image_url = ? WHERE clerk_id = ?'
           )
             .bind(data?.data?.username, data?.data?.profile_image_url, data?.data?.id)
@@ -33,7 +33,7 @@ const buildDbQuery = (c: any, event = '', data = {}) => {
     'user.deleted': async () => {
       return new Promise(async (resolve, reject) => {
         try {
-          let { results } = await c.env.DB.prepare(
+          const { results } = await c.env.DB.prepare(
             'DELETE FROM users WHERE clerk_id = ?'
           )
             .bind(data?.data?.id)

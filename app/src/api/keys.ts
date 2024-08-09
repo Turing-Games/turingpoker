@@ -21,7 +21,7 @@ export const keys = {
     }
 
     try {
-      let { results } = await c.env.DB.prepare(
+      const { results } = await c.env.DB.prepare(
         'UPDATE api_keys SET key = ?, name = ?, viewed = ? where id = ?'
       )
         .bind(keyToSave, name, viewed, id)
@@ -34,7 +34,7 @@ export const keys = {
   },
   delete: async (c) => {
     const id = c.req.param('id')
-    let usrStmt = c.env.DB.prepare('DELETE from api_keys where id = ? ').bind(id)
+    const usrStmt = c.env.DB.prepare('DELETE from api_keys where id = ? ').bind(id)
     try {
       const { results } = await usrStmt.all()
       return c.json(results);
@@ -58,7 +58,7 @@ export const keys = {
       const token = await sign(payload, c.env.BOT_SECRET_KEY)
 
 
-      let { results } = await c.env.DB.prepare(
+      const { results } = await c.env.DB.prepare(
         'INSERT into api_keys (id, user_id, bot_id, name, key) VALUES (?, ?, ?, ?, ?)'
       )
         .bind(uuid, userId, botId, name, token)

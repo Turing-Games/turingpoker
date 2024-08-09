@@ -143,7 +143,7 @@ describe("Poker logic", () => {
         expect(game.state.players[4].currentBet).toBe(2);
     })
     test("Small blind folding immediately skips turn in subsequent rounds", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        const game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
         expect(game.state.players[4].stack).toBe(99);
         expect(game.state.players[4].currentBet).toBe(1);
@@ -201,7 +201,7 @@ describe("Poker logic", () => {
             // find the best hand
             let best = [];
             for (let i = 0; i < 5; i++) {
-                let cmpVal = (Number(!best.length) || poker.handCmp(poker.best5(game.hands[i].concat(game.state.cards)), poker.best5(game.hands[best[0]].concat(game.state.cards))));
+                const cmpVal = (Number(!best.length) || poker.handCmp(poker.best5(game.hands[i].concat(game.state.cards)), poker.best5(game.hands[best[0]].concat(game.state.cards))));
                 if (cmpVal > 0) best = [];
                 if (cmpVal >= 0) best.push(i);
             }

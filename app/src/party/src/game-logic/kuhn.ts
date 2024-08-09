@@ -19,7 +19,7 @@ export function parseCard(card: string): Card {
   if (rank in cardVals) rankNum = cardVals[rank as (keyof typeof cardVals)] as Rank;
   else rankNum = parseInt(rank) as Rank;
 
-  let suitName: Suit = 'hearts';
+  const suitName: Suit = 'hearts';
   return { rank: rankNum, suit: suitName };
 }
 export function formatCard(card: Card): string {
@@ -304,7 +304,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
     out = { next: { state, config, hands, deck }, log };
   }
   else if (move.type == 'call' || move.type == 'raise') {
-    let target = state.targetBet;
+    const target = state.targetBet;
     if (move.type == 'raise') {
       state.targetBet = target;
       log.push(`Player ${who} raises ${move.amount.toFixed(2)}`);
@@ -336,7 +336,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
     nextPlayer.shouldMove = true;
   }
 
-  let roundOver = !nextPlayer.shouldMove;
+  const roundOver = !nextPlayer.shouldMove;
   if (roundOver) {
     state.round = 'showdown';
     state.done = true;

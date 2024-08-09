@@ -21,7 +21,7 @@ export type ClientState = {
 };
 
 export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: string, gameType?: string }) {
-  let [clientState, setClientState] = useState<ClientState>(DEFAULT_CLIENT_STATE);
+  const [clientState, setClientState] = useState<ClientState>(DEFAULT_CLIENT_STATE);
 
   const games = {
     'poker': PokerGame,
