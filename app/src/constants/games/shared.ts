@@ -1,6 +1,3 @@
-import { AUTO_START } from "@tg/poker"
-import { TABLE_STATE_VERSION } from "@tg/shared"
-
 export const GAMES = [
   { label: 'Poker', value: 'poker' },
   { label: 'Kuhn', value: 'kuhn' }

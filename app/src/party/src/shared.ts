@@ -56,7 +56,13 @@ export type TableState = {
     config: Poker.IPokerConfig;
     gameState: Poker.IPokerSharedState | null;
     gameType: string;
-    // bump this when making breaking changes so the client doesn't try to render it
-    version: number;
 }
-export const TABLE_STATE_VERSION = 0;
+
+export type TournamentState = {
+    id: string;
+    players: IPlayer[];
+    eliminatedPlayers: IPlayer[];
+    winner: IPlayer | null;
+    // config: Poker.IPokerConfig;
+    gameType: string;
+}

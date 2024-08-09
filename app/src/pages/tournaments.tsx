@@ -30,7 +30,7 @@ export default function Tournaments() {
     size: 2,
     private: false,
     min_players: 2,
-    max_players: 8,
+    max_players: 2,
   })
   const [gameConfig, setGameConfig] = React.useState({})
 
@@ -40,7 +40,6 @@ export default function Tournaments() {
     setLoading(true)
     try {
       const tournaments = await queryClient('tournaments?populate=tournament_configs', 'GET')
-      console.log(tournaments)
       setTournaments(tournaments)
     } catch (err) {
       console.log(err)
@@ -218,7 +217,9 @@ export default function Tournaments() {
                         display: 'flex',
                         gap: '8px',
                         alignItems: 'center',
-                      } : {}}
+                      } : {
+                        display: property.type === 'hidden' ? 'none' : 'block',
+                      }}
                     >
                       <label htmlFor={property.value}>{property.label}</label>
                       <input

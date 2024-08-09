@@ -1,6 +1,6 @@
 import type * as Party from 'partykit/server';
 import * as Kuhn from '@app/party/src/game-logic/kuhn'
-import { ClientMessage, ServerStateMessage, ServerUpdateMessage, TABLE_STATE_VERSION, TableState } from './shared';
+import { ClientMessage, TableState, ServerStateMessage, ServerUpdateMessage } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from './utils/response';
 import { RoomDeleteRequest, RoomInfoUpdateRequest } from './tables';
@@ -316,7 +316,6 @@ export default class PartyServer extends MainPartyServer {
       config: this.gameConfig,
       gameState: this.gameState?.state ?? null,
       id: this.party.id,
-      version: TABLE_STATE_VERSION,
       gameType: 'kuhn'
     }
 
@@ -325,7 +324,7 @@ export default class PartyServer extends MainPartyServer {
       body: JSON.stringify({
         id: this.party.id,
         action: 'update',
-        tableState
+        game
       }),
     });
   }

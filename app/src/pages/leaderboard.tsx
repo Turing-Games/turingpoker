@@ -1,9 +1,7 @@
 import * as React from 'react'
 import Main from '@app/layouts/main';
 import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { ChevronDownIcon, Cross1Icon, DotsHorizontalIcon, ExitIcon, EyeOpenIcon, GearIcon, PlusIcon, Share1Icon, TrashIcon } from '@radix-ui/react-icons';
 import { SignedIn, useUser } from '@clerk/clerk-react';
-import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
 import { Heading, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';
 import Modal from 'react-modal';
@@ -56,26 +54,12 @@ export default function Leaderboard() {
             { value: 'username', name: 'User' },
             { value: 'wins', name: 'Wins' },
             { value: 'losses', name: 'Losses' },
-            { value: 'button', name: '' }
           ]}
           rows={(players || []).map(t => {
             return {
               username: t.username,
               wins: t.wins || 0,
-              losses: t.losses || 0,
-              button: (
-                (isAdmin &&
-                  <div
-                    className='cursor-pointer'
-                    onClick={async () => {
-                      await queryClient(`users/${t.id}`, 'DELETE')
-                      getPlayers()
-                    }}
-                  >
-                    <TrashIcon className="text-[red]" />
-                  </div>
-                )
-              )
+              losses: t.losses || 0
             }
           })}
         />

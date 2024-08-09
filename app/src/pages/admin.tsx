@@ -41,7 +41,6 @@ export default function Admin() {
       const data = await res.json() ?? []
       console.log(data)
       setData(data)
-      // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     } catch (err) {
       console.log(err)
     }

@@ -1,5 +1,4 @@
 import { AUTO_START } from "@tg/poker";
-import { TABLE_STATE_VERSION } from "@tg/shared";
 
 export const DEFAULT_TABLE_STATE = {
   queuedPlayers: [],
@@ -14,8 +13,7 @@ export const DEFAULT_TABLE_STATE = {
     minPlayers: 2
   },
   gameState: null,
-  gameType: '',
-  version: TABLE_STATE_VERSION
+  gameType: ''
 }
 
 export const CONFIGURABLE_PROPERTIES = [

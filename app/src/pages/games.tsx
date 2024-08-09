@@ -5,7 +5,7 @@ import { ChevronDownIcon, Cross1Icon, DotsHorizontalIcon, ExitIcon, EyeOpenIcon,
 import { SignedIn, useUser } from '@clerk/clerk-react';
 import { sendMessage } from '@tg/utils/websocket';
 import { Link } from 'react-router-dom';
-import { TABLE_STATE_VERSION, TableState } from '@tg/shared';
+import { TableState } from '@tg/shared';
 import { Heading, SegmentedControl, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';
 import Modal from 'react-modal';

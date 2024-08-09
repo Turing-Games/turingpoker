@@ -1,11 +1,8 @@
 import pages from "@hono/vite-cloudflare-pages";
 import devServer from "@hono/vite-dev-server";
 import { defineConfig, loadEnv } from "vite";
-import adapter from "@hono/vite-dev-server";
 import cloudflareAdapter from '@hono/vite-dev-server/cloudflare'
 import tsconfigPaths from "vite-tsconfig-paths";
-import path from "path";
-import react from '@vitejs/plugin-react'
 
 export default defineConfig(({ command, mode }) => {
   const paths = tsconfigPaths();
