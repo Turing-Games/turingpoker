@@ -324,7 +324,7 @@ export default class PartyServer extends MainPartyServer {
       body: JSON.stringify({
         id: this.party.id,
         action: 'update',
-        game
+        tableState
       }),
     });
   }

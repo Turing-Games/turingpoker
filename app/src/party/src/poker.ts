@@ -310,7 +310,6 @@ export default class PartyServer implements Party.Server {
       config: this.gameConfig,
       gameState: this.gameState?.state ?? null,
       id: this.party.id,
-      version: TABLE_STATE_VERSION,
       gameType: 'poker'
     }
 
