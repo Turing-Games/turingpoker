@@ -56,6 +56,7 @@ export type TableState = {
     config: Poker.IPokerConfig;
     gameState: Poker.IPokerSharedState | null;
     gameType: string;
+    tournamentId?: string;
 }
 
 export type TournamentState = {

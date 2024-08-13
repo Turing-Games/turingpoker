@@ -3,7 +3,7 @@ import * as Poker from '@app/party/src/game-logic/poker'
 import { ClientMessage, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from './utils/response';
-import { RoomDeleteRequest, RoomInfoUpdateRequest } from './tables';
+import { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 
 export interface IPlayer {
   playerId: string;
@@ -474,7 +474,7 @@ export default class PartyServer implements Party.Server {
   /** Updates list of active rooms with information received from chatroom */
   async updateRoomInfo(req: Party.Request) {
     const update = (await req.json()) as
-      | RoomInfoUpdateRequest
+      | RoomUpdateRequest
       | RoomDeleteRequest;
 
     if (update.action === "delete") {

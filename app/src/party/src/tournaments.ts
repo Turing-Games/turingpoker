@@ -10,7 +10,7 @@ import PartyServer from "./main";
 export const SINGLETON_ROOM_ID = "tournaments";
 
 /** Poker room sends an update whenever server state changes */
-export type RoomInfoUpdateRequest = {
+export type RoomUpdateRequest = {
   action: 'update';
   id: string;
   tableState: TableState;
@@ -76,7 +76,7 @@ export default class TournamntsServer extends PartyServer {
   /** Updates list of active rooms with information received from chatroom */
   async updateRoomInfo(req: Party.Request) {
     const update = (await req.json()) as
-      | RoomInfoUpdateRequest
+      | RoomUpdateRequest
       | RoomDeleteRequest;
 
     if (update.action === "delete") {

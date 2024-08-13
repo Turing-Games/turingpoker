@@ -10,7 +10,13 @@ import PartyServer from "./main";
 export const SINGLETON_ROOM_ID = "games";
 
 /** Poker room sends an update whenever server state changes */
-export type RoomInfoUpdateRequest = {
+export type RoomCreateRequest = {
+  action: 'create';
+  id: string;
+  tableState: TableState;
+};
+
+export type RoomUpdateRequest = {
   action: 'update';
   id: string;
   tableState: TableState;
@@ -75,11 +81,12 @@ export default class TablesServer extends PartyServer {
 
     return [...rooms.values()];
   }
-  /** Updates list of active rooms with information received from chatroom */
+  /** Updates table with information received from game */
   async updateRoomInfo(req: Party.Request) {
     const update = (await req.json()) as
-      | RoomInfoUpdateRequest
-      | RoomDeleteRequest;
+      | RoomUpdateRequest
+      | RoomDeleteRequest
+      | RoomCreateRequest;
 
     if (update.action === "delete") {
       await this.party.storage.delete(update.id);
@@ -89,7 +96,7 @@ export default class TablesServer extends PartyServer {
     const info = update.tableState;
     const totalPlayers = info?.queuedPlayers?.length + info?.spectatorPlayers?.length + info?.inGamePlayers?.length;
 
-    this.party.storage.put(update.id, info);
+    await this.party.storage.put(update.id, info);
     return this.getActiveRooms();
   }
 }

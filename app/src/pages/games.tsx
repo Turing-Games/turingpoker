@@ -1,9 +1,8 @@
 import * as React from 'react'
 import Main from '@app/layouts/main';
 import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { ChevronDownIcon, Cross1Icon, DotsHorizontalIcon, ExitIcon, EyeOpenIcon, GearIcon, PlusIcon, Share1Icon, TrashIcon } from '@radix-ui/react-icons';
-import { SignedIn, useUser } from '@clerk/clerk-react';
-import { sendMessage } from '@tg/utils/websocket';
+import { Cross1Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { useUser } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import { TableState } from '@tg/shared';
 import { Heading, SegmentedControl, Text } from '@radix-ui/themes';
@@ -15,10 +14,7 @@ import { CONFIGURABLE_PROPERTIES as POKER_CONFIG } from '@app/constants/games/po
 import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuhn';
 import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
 import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
-import { Helmet } from "react-helmet";
 import TgTable from '@app/components/Table';
-import { TableCard } from '@app/components/TableCard';
-import { EyeIcon } from '@heroicons/react/16/solid';
 
 
 export default function Games() {
@@ -27,10 +23,9 @@ export default function Games() {
   const [tables, setTables] = React.useState<TableState[]>([])
   const [gameType, setGameType] = React.useState('')
   const [gameTypeForm, setGameTypeForm] = React.useState('')
-  const [gameStatus, setGameStatus] = React.useState('active')
+  const [gameStatus, setGameStatus] = React.useState('pending')
   const [isOpen, setIsOpen] = React.useState(false)
   const [gameConfig, setGameConfig] = React.useState({})
-  const [gameId, setGameId] = React.useState('')
 
   const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
@@ -116,7 +111,7 @@ export default function Games() {
         <div className="flex items-center gap-[8px] mt-[16px] mb-[32px]">
 
           <SegmentedControl.Root
-            defaultValue={'active'}
+            defaultValue={gameStatus}
             style={{ height: 40 }}
           >
             {
@@ -143,7 +138,7 @@ export default function Games() {
           tables.length > 0 ?
             // <div className="h-[200px]">
             <TgTable
-              loading={loading}
+              progressPending={loading}
               selectableRows={false}
               headers={[
                 { value: 'id', name: 'Table' },
@@ -211,17 +206,12 @@ export default function Games() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            const roomId = Math.round(Math.random() * 10000);
-            new PartySocket({
-              host: PARTYKIT_URL,
-              room: roomId.toString(),
-              party: gameTypeForm
-            });
+            const uuid = crypto.randomUUID()
             await fetch(partyUrl, {
               method: "POST",
               body: JSON.stringify({
                 action: "create",
-                id: roomId,
+                id: uuid,
                 ...gameConfig
               })
             });
@@ -255,7 +245,9 @@ export default function Games() {
                         display: 'flex',
                         gap: '8px',
                         alignItems: 'center',
-                      } : {}}
+                      } : {
+                        display: property.type === 'hidden' ? 'none' : 'block'
+                      }}
                     >
                       <label htmlFor={property.value}>{property.label}</label>
                       <input
