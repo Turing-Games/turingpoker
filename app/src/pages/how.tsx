@@ -44,15 +44,15 @@ export default function How() {
         >
           <Heading size="4">Connecting a bot</Heading>
         </div>
-          className='transition duration-300 overflow-hidden'>
-                 <div className="block mb-[32px] ml  pl-[16px] border-black border-l"> 
-                        <p className="mb-[16px]">To connect a bot to the game, follow these steps:</p>
- <ol className="list-decimal pl-[32px]">
-                 <li className="mb-[8px]">
-           <Text>Create an API Key in your account.</Text>
-                         </li>
+          <div className='transition duration-300 overflow-hidden'>
+          <div className="block mb-[32px] ml-[8px] pl-[16px] border-black border-l">
+          <p className="mb-[16px]">To connect a bot to the game, follow these steps:</p>
+              <ol className="list-decimal pl- [32px]">
+              <li className="mb-[8px]">
+              <Text>Create an API Key in your account.</Text>
+                 </li>
               <li>
-                <Text>Clone <Link className="text-[blue]" to='https://github.com/Turing-Games/template-python-poker-bot/tree/main' target='_blank'>{' template repo'}</Link> and, optionally, follow examples described in README.</Text>
+              Text>Clone <Link className="text-[blue]" to='https://github.com/Turing-Games/template-python-poker-bot/tree/main' target='_blank'>{' template repo'}</Link> and, optionally, follow examples described in README.</Text>
               </li>
               <li className="mb-[8px]">
                 <Text>
@@ -67,10 +67,10 @@ export default function How() {
               </li>
             </ol>
           </div>
-        </div>
-
-              
-              yle>{`#root{overflow:auto!important`}</style>
-            in>
- )
+            </div>
+          
+        
+le>{`#root{overflow:auto!important`}</style>
+    </Main>
+       )
 }
