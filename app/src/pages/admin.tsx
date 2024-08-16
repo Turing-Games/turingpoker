@@ -39,7 +39,6 @@ export default function Admin() {
     try {
       const res = await fetch(`/api/v1/${resource}${resourceRelations}`)
       const data = await res.json() ?? []
-      console.log(data)
       setData(data)
     } catch (err) {
       console.log(err)
@@ -47,7 +46,6 @@ export default function Admin() {
     setLoading(false)
   }
 
-  console.log(data)
   React.useEffect(() => {
     getData()
   }, [resource])

@@ -11,7 +11,7 @@ export default function Header() {
   const { isSignedIn } = useUser();
 
   const menuItems = [
-    { link: "/games", label: "Games", include: isSignedIn },
+    { link: "/games", label: "Games", include: true },
     { link: "/tournaments", label: "Tournaments", include: true },
     { link: "/leaderboard", label: "Leaderboard", include: true },
     {

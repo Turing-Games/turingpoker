@@ -15,7 +15,7 @@ export default function How() {
       <div className="pt-[48px] px-[20px]">
         <div
           className="flex items-center gap-[8px] mb-[16px]"
-        // onClick={() => openInfo === 'why' ? setOpenInfo('') : setOpenInfo('why')}
+          // onClick={() => openInfo === 'why' ? setOpenInfo('') : setOpenInfo('why')}
         >
           {/* <PlusIcon
             className='transition duration-300'

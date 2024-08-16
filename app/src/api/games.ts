@@ -1,11 +1,19 @@
 export const games = {
 
   get: async (c) => {
-    const usrStmt = c.env.DB.prepare('SELECT * from games;')
+    const tournamentId = c.req.query('tournament_id')
+    let sql = 'SELECT * from games'
+    if (tournamentId) {
+      sql += ' WHERE tournament_id = ?'
+    }
+
+    let gameStmt = c.env.DB.prepare(sql).bind(tournamentId)
+
     try {
-      const { results } = await usrStmt.all()
+      const { results } = await gameStmt.all()
       return c.json(results);
     } catch (e) {
+      console.log(e)
       return c.json({ message: JSON.stringify(e) }, 500);
     }
   },

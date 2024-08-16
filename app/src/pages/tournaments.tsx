@@ -40,7 +40,6 @@ export default function Tournaments() {
     setLoading(true)
     try {
       const data = await queryClient('tournaments', 'GET')
-      console.log(data)
       setTournaments(data?.tournaments || [])
     } catch (err) {
       console.log(err)
@@ -107,16 +106,22 @@ export default function Tournaments() {
                   { value: 'id', name: 'Tournament' },
                   { value: 'gameType', name: 'Game Type' },
                   { value: 'size', name: 'Pool Size' },
+                  { value: 'view', name: '' }
                 ]}
                 rows={tournaments.map(t => {
                   return {
                     id: (
-                      <Link to={`/tournaments/${t.id}`}>
+                      <Link to={`/tournaments/${t.id}?title=${t.title || t.id}`}>
                         {t.title || t.id}
                       </Link>
                     ),
                     gameType: t.game_type,
-                    size: t.games_count
+                    size: t.games_count,
+                    view: (
+                      <button>
+                        <Link to={`/tournaments/${t.id}?title=${t.title || t.id}`}>View</Link>
+                      </button>
+                    )
                   }
                 })}
               />
