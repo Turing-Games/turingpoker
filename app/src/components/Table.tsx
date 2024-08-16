@@ -39,10 +39,14 @@ export default function TgTable({
       }))}
       data={rows}
       theme='light'
+      striped={true}
       customStyles={{
         table: {
           style: {
-            maxWidth: maxWidth
+            border: '1px solid rgba(0,0,0,.12)',
+            borderRadius: '12px',
+            maxWidth: maxWidth,
+            overflow: 'hidden',
           }
         }
       }}

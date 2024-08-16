@@ -1,5 +1,4 @@
 export const games = {
-
   get: async (c) => {
     const tournamentId = c.req.query('tournament_id')
     let sql = 'SELECT * from games'

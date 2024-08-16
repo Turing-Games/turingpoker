@@ -4,7 +4,7 @@ import React from 'react'
 export default function Learn() {
   return (
     <Main pageTitle='Learn'>
-      <div style={{ padding: 20 }}>
+      <div className="p-[20px] max-w-[750px]">
         <h1>Basic Poker Rules</h1>
         <div className="rules-section">
           <h2>Overview</h2>
