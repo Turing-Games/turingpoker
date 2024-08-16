@@ -37,22 +37,13 @@ export default function How() {
         </div>
 
 
-        <div
-          className="flex items-center gap-[8px] mb-[16px] cursor-pointer"
-          onClick={() => openInfo === 'how' ? setOpenInfo('') : setOpenInfo('how')}
-        >
-          <PlusIcon
-            className='transition duration-300'
-            style={{
-              transform: openInfo === 'how' ? 'rotate(45deg)' : 'rotate(0deg)'
-            }}
-          />
+        <div className="flex items-center gap-[8px] mb-[16px]">
           <Heading size="4">How it works</Heading>
         </div>
         <div
           className='transition duration-300 overflow-hidden'
           style={{
-            height: openInfo === 'how' ? 'auto' : 0,
+            // height: openInfo === 'how' ? 'auto' : 0,
           }}
         >
           <div className="block mb-[32px] ml-[8px] pl-[16px] border-black border-l">
@@ -61,22 +52,13 @@ export default function How() {
         </div>
 
 
-        <div
-          className="flex items-center gap-[8px] mb-[16px] cursor-pointer"
-          onClick={() => openInfo === 'connecting' ? setOpenInfo('') : setOpenInfo('connecting')}
-        >
-          <PlusIcon
-            className='transition duration-300'
-            style={{
-              transform: openInfo === 'connecting' ? 'rotate(45deg)' : 'rotate(0deg)'
-            }}
-          />
+        <div className="flex items-center gap-[8px] mb-[16px]">
           <Heading size="4">Connecting a bot</Heading>
         </div>
         <div
           className='transition duration-300 overflow-hidden'
           style={{
-            height: openInfo === 'connecting' ? 'auto' : 0,
+            // height: openInfo === 'connecting' ? 'auto' : 0,
           }}
         >
           <div className="block mb-[32px] ml-[8px] pl-[16px] border-black border-l">
