@@ -39,8 +39,9 @@ export default function Tournaments() {
   const getTournaments = async () => {
     setLoading(true)
     try {
-      const tournaments = await queryClient('tournaments?populate=tournament_configs', 'GET')
-      setTournaments(tournaments)
+      const data = await queryClient('tournaments', 'GET')
+      console.log(data)
+      setTournaments(data?.tournaments || [])
     } catch (err) {
       console.log(err)
     }
@@ -114,8 +115,8 @@ export default function Tournaments() {
                         {t.title || t.id}
                       </Link>
                     ),
-                    gameType: t.gameType,
-                    size: t.size
+                    gameType: t.game_type,
+                    size: t.games_count
                   }
                 })}
               />

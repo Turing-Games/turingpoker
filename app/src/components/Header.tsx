@@ -18,8 +18,8 @@ export default function Header() {
       link: "/resources",
       label: "Resources",
       submenu: [
+        { link: "/resources/how-it-works", label: "How it works" },
         { link: "/resources/learn", label: "Learn" },
-        // { link: "/resources/speakers", label: "Speakers" }
       ],
       include: true
     },

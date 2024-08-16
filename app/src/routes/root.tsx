@@ -22,6 +22,7 @@ import Leaderboard from '@app/pages/leaderboard';
 import Admin from '@app/pages/admin';
 import Interactions from '@app/pages/interactions';
 import Tournament from '@app/pages/tournament';
+import How from '@app/pages/how';
 
 export type ClientState = {
   isConnected: boolean;
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
       {
         path: "learn",
         element: <Learn />
+      },
+      {
+        path: 'how-it-works',
+        element: <How />
       }
     ]
   },
