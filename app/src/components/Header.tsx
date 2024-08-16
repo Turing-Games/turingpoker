@@ -72,7 +72,7 @@ export default function Header() {
                         <NavLink
                           key={subitem.link}
                           to={subitem.link}
-                          className={`block p-[8px] hover:bg-gray-100 cursor-pointer w-full`}
+                          className={`block p-[8px] hover:bg-gray-100 cursor-pointer w-full whitespace-nowrap`}
                         >
                           {subitem.label}
                         </NavLink>
