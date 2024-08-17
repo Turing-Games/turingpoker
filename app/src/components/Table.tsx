@@ -41,14 +41,30 @@ export default function TgTable({
       theme='light'
       striped={true}
       customStyles={{
-        table: {
+        responsiveWrapper: { // remove max height
+          style: {
+            maxHeight: 'calc(100% - 250px)'
+          },
+        },
+        headRow: {
           style: {
             border: '1px solid rgba(0,0,0,.12)',
-            borderRadius: '12px',
+            borderTopLeftRadius: 12,
+            borderTopRightRadius: 12
+          },
+        },
+        table: {
+          style: {
+            borderBottom: '1px solid rgba(0,0,0,.12)',
             maxWidth: maxWidth,
-            overflow: 'hidden',
           }
-        }
+        },
+        rows: {
+          style: {
+            borderLeft: '1px solid rgba(0,0,0,.12)',
+            borderRight: '1px solid rgba(0,0,0,.12)',
+          }
+        },
       }}
     />
   );
