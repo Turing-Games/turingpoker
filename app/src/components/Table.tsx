@@ -43,7 +43,7 @@ export default function TgTable({
       customStyles={{
         responsiveWrapper: { // remove max height
           style: {
-            maxHeight: 'calc(100% - 250px)'
+            maxHeight: 'calc(100vh - 300px)'
           },
         },
         headRow: {
