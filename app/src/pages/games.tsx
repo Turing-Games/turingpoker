@@ -147,6 +147,7 @@ export default function Games() {
                 // { value: 'spectatorPlayers', name: 'Spectators', sortable: true },
                 { value: 'queuedPlayers', name: 'Queued', sortable: true },
                 { value: 'players', name: 'In-Game', sortable: true },
+                { value: 'ai_enabled', name: 'AI?', sortable: false },
                 { value: 'view', name: '', align: 'center' },
                 { value: 'delete', name: '', align: 'center' },
                 // { value: 'quickview', name: '', align: 'right' }
@@ -160,6 +161,7 @@ export default function Games() {
                   spectatorPlayers: spectatorCount,
                   queuedPlayers: table?.queuedPlayers?.length || 0,
                   players: `${table?.gameState?.players?.length || 0}/${table.config?.maxPlayers || 0}`,
+                  ai_enabled: !!table?.gameState?.players.filter(player => player.isBot)?.length,
                   delete: (isAdmin &&
                     <div
                       className='cursor-pointer'
