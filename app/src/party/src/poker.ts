@@ -69,7 +69,8 @@ export default class PartyServer implements Party.Server {
       this.serverState.gamePhase = "pending";
     }
 
-    this.addPlayer(conn.id);
+    const isBot = !!ctx.request.headers.get("tg-bot-authorization")
+    this.addPlayer(conn.id, isBot);
   }
 
   async onRequest(req: Party.Request) {
@@ -338,6 +339,9 @@ export default class PartyServer implements Party.Server {
   }
 
   playerJoinGame(playerId: string) {
+    console.log('join game')
+    const allPlayers = [...this.inGamePlayers, ...this.spectatorPlayers, ...this.queuedPlayers];
+    const newPlayer = allPlayers.find((player) => player.playerId === playerId) || { playerId };
     if (
       this.queuedPlayers.find((player) => player.playerId === playerId) ||
       this.inGamePlayers.find((player) => player.playerId === playerId)
@@ -348,19 +352,13 @@ export default class PartyServer implements Party.Server {
       (player) => player.playerId !== playerId
     );
     if (this.serverState.gamePhase === "pending") {
-      this.inGamePlayers.push({
-        playerId,
-      });
+      this.inGamePlayers.push(newPlayer);
       this.queuedUpdates.push({
         type: "player-joined",
-        player: {
-          playerId,
-        },
+        player: newPlayer,
       });
     } else {
-      this.queuedPlayers.push({
-        playerId,
-      });
+      this.queuedPlayers.push(newPlayer);
     }
 
     if (
