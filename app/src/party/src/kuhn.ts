@@ -74,7 +74,6 @@ export default class PartyServer extends MainPartyServer {
     }
 
     const isBot = !!ctx.request.headers.get("tg-bot-authorization")
-    console.log({ isBot })
     this.addPlayer(conn.id, isBot);
   }
 
@@ -220,7 +219,7 @@ export default class PartyServer extends MainPartyServer {
     this.processQueuedPlayers();
     this.gameState = Kuhn.createPokerGame(
       this.gameConfig,
-      this.inGamePlayers.map((p) => p.playerId),
+      this.inGamePlayers,
       this.inGamePlayers.map((p) => this.stacks[p.playerId])
     );
     this.serverState.gamePhase = "active";
@@ -298,7 +297,6 @@ export default class PartyServer extends MainPartyServer {
   }
 
   broadcastGameState() {
-    console.log(this.spectatorPlayers)
     for (const player of this.inGamePlayers
       .concat(this.spectatorPlayers)
       .concat(this.queuedPlayers)) {
@@ -381,7 +379,6 @@ export default class PartyServer extends MainPartyServer {
   }
 
   addPlayer(playerId: string, isBot = false) {
-    console.log({ isBot })
     if (this.playerExists(playerId)) return;
     this.stacks[playerId] = defaultStack;
     this.spectatorPlayers.push({

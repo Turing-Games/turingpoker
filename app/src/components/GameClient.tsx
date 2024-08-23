@@ -104,8 +104,6 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     };
   }, [setClientState]);
 
-  console.log(clientState)
-
   if (games[gameType]) {
     return (
       React.createElement(games[gameType], { clientState, previousActions })

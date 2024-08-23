@@ -1,5 +1,6 @@
 import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/poker";
 import combinations from "@app/party/src/utils/combinations";
+import { IPlayer } from "@tg/kuhn";
 
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
@@ -67,6 +68,7 @@ export interface IPokerPlayer {
     currentBet: number;
     lastRound: PokerRound | null;
     shouldMove: boolean;
+    isBot?: boolean;
 }
 
 export interface IPokerConfig {
@@ -128,17 +130,17 @@ function dealHands(players: PlayerID[], deck: Card[]): Record<PlayerID, [Card, C
     return hands;
 }
 
-export function createPokerGame(config: IPokerConfig, players: PlayerID[], stacks: number[]): IPokerGame {
+export function createPokerGame(config: IPokerConfig, players: IPlayer[], stacks: number[]): IPokerGame {
     if (players.length != stacks.length) throw new Error("Number of players and stacks must be equal")
     if (players.length < 2) throw new Error("Must have at least 2 players");
     if (players.length > config.maxPlayers) throw new Error("Too many players");
     const deck = shuffleDeck(createDeck());
-    const hands = dealHands(players, deck);
+    const hands = dealHands(players.map(p => p.playerId), deck);
     const playerCompletedRound: Record<PlayerID, PokerRound> = {};
     const playerCurrentBet: Record<PlayerID, number> = {};
     for (const player of players) {
-        playerCompletedRound[player] = 'pre-flop';
-        playerCurrentBet[player] = 0;
+        playerCompletedRound[player.playerId] = 'pre-flop';
+        playerCurrentBet[player.playerId] = 0;
     }
 
     const sb = (config.dealerPosition - 1 + players.length) % players.length;
@@ -147,14 +149,14 @@ export function createPokerGame(config: IPokerConfig, players: PlayerID[], stack
         state: { // shared state
             done: false,
             pot: 0,
-            players: players.map((id, i) => ({ lastRound: null, id, stack: stacks[i], folded: false, currentBet: 0, shouldMove: true })),
+            players: players.map((player, i) => ({ lastRound: null, id: player.playerId, isBot: player.isBot, stack: stacks[i], folded: false, currentBet: 0, shouldMove: true })),
             round: 'pre-flop',
             targetBet: config.bigBlind,
             dealerPosition: config.dealerPosition,
             smallBlind: config.smallBlind,
             bigBlind: config.bigBlind,
             cards: [],
-            whoseTurn: players[(config.dealerPosition - 1 + players.length) % players.length],
+            whoseTurn: players[(config.dealerPosition - 1 + players.length) % players.length]?.playerId,
         },
         deck,
         config,

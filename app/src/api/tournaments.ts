@@ -14,7 +14,6 @@ const generateTournamentGames = async (c, tournamentId: string, gameType = '', c
       const gameStmt = c.env.DB.prepare("INSERT INTO games (id, tournament_id, game_type) VALUES (?, ?, ?)")
       const gameBatch = gameIds.map((id) => gameStmt.bind(id, tournamentId, gameType))
       const games = await c.env.DB.batch(gameBatch)
-      console.log({ games })
 
       // create one config for each game)
       const gameConfigIds = Array(size).fill('_').map(() => crypto.randomUUID())

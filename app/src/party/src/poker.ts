@@ -213,7 +213,7 @@ export default class PartyServer implements Party.Server {
     this.processQueuedPlayers();
     this.gameState = Poker.createPokerGame(
       this.gameConfig,
-      this.inGamePlayers.map((p) => p.playerId),
+      this.inGamePlayers,
       this.inGamePlayers.map((p) => this.stacks[p.playerId])
     );
     this.serverState.gamePhase = "active";
@@ -372,11 +372,12 @@ export default class PartyServer implements Party.Server {
     }
   }
 
-  addPlayer(playerId: string) {
+  addPlayer(playerId: string, isBot = false) {
     if (this.playerExists(playerId)) return;
     this.stacks[playerId] = defaultStack;
     this.spectatorPlayers.push({
       playerId,
+      isBot
     });
 
     this.broadcastGameState();
