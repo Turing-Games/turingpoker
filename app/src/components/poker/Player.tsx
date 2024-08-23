@@ -72,7 +72,7 @@ const Player = ({ player, hand, hands, className, style, title, showCards, deale
         <div>{player.folded ? 'Folded' : `$${player.currentBet.toFixed(2)}`} / ${player.stack.toFixed(2)}</div>
 
         {dealer && <div className="border border-black absolute bg-[white] text-[black] w-[20px] h-[20px] rounded-md top-[-6px] right-[-6px] flex justify-center items-center text-center w-[40px]">D</div>}
-        {dealer && <div className="border border-black absolute bg-[#5887ff] text-[black] w-[20px] h-[20px] rounded-md top-[16px] right-[-6px] flex justify-center items-center text-center w-[40px] text-white">AI</div>}
+        {player.isBot && <div className="border border-black absolute bg-[#5887ff] text-[black] w-[20px] h-[20px] rounded-md top-[16px] right-[-6px] flex justify-center items-center text-center w-[40px] text-white">AI</div>}
       </div>
       <div style={{
         display: 'flex', gap: '6px', margin: '16px 0',
