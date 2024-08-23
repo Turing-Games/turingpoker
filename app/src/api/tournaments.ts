@@ -1,6 +1,6 @@
 // Tournament tables will default to min of 2 players, max of 8, auto start is false
 const generateTournamentGames = async (c, tournamentId: string, gameType = '', config: any, size: number) => {
-  console.log(config)
+
   // game config
   const gameConfigOptionLength = Object.keys(config).length
   const gameConfigValuesPlaceholders = gameConfigOptionLength > 0 ? `${Array(gameConfigOptionLength).fill('?').join(',')}` : ''
@@ -88,8 +88,6 @@ export const tournaments = {
       await tournamentStmt.run()
       await tournamentConfigStmt.run()
 
-      console.log(gameConfig)
-      console.log(tournamentConfig)
       await generateTournamentGames(c, tournamentId, gameType, gameConfig, parseInt(tournamentConfig.size))
       return c.json()
     } catch (e) {
