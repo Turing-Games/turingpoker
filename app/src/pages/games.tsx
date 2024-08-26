@@ -161,7 +161,7 @@ export default function Games() {
                   spectatorPlayers: spectatorCount,
                   queuedPlayers: table?.queuedPlayers?.length || 0,
                   players: `${table?.gameState?.players?.length || 0}/${table.config?.maxPlayers || 0}`,
-                  ai_enabled: !!table?.gameState?.players.filter(player => player.isBot)?.length,
+                  ai_enabled: JSON.stringify(!!table?.gameState?.players.filter(player => player.isBot)?.length),
                   delete: (isAdmin &&
                     <div
                       className='cursor-pointer'
@@ -254,8 +254,8 @@ export default function Games() {
                       <label htmlFor={property.value}>{property.label}</label>
                       <input
                         id={property.value}
-                        min={0}
-                        value={property.default}
+                        min={property.value === 'min_players' ? 2 : 0}
+                        defaultValue={property.default}
                         type={property.type}
                         onChange={(e) => setGameConfig({ ...gameConfig, [property.value]: e.target.value })}
                         className="border border-black rounded-[4px] p-[8px] w-full text-sm"

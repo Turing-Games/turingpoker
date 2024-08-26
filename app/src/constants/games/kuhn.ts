@@ -7,7 +7,7 @@ export const DEFAULT_TABLE_STATE = {
   config: {
     dealerPosition: 0,
     bigBlind: 1,
-    maxPlayers: 10,
+    maxPlayers: 2,
     smallBlind: 1,
     autoStart: AUTO_START,
     minPlayers: 2
@@ -17,7 +17,5 @@ export const DEFAULT_TABLE_STATE = {
 }
 
 export const CONFIGURABLE_PROPERTIES = [
-  { label: 'Min Players', value: 'min_players', type: 'hidden', default: 2 },
-  { label: 'Max Players', value: 'max_players', type: 'hidden', default: 2 },
   { label: 'Auto Start', value: 'auto_start', type: 'checkbox', default: AUTO_START }
 ] as any
