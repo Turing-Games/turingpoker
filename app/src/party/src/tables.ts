@@ -40,7 +40,8 @@ export default class TablesServer extends PartyServer {
 
   async onConnect(connection: Party.Connection) {
     // when a websocket connection is established, send them a list of rooms
-    connection.send(JSON.stringify(await this.getActiveRooms()));
+    // await this.party.storage.deleteAll();
+    connection.send(JSON.stringify(await this.getRooms()));
   }
 
   async onRequest(req: Party.Request) {
@@ -48,7 +49,8 @@ export default class TablesServer extends PartyServer {
     if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
     // Clients fetch list of rooms for server rendering pages via HTTP GET
-    if (req.method === "GET") return json(await this.getActiveRooms(req));
+    // await this.party.storage.deleteAll();
+    if (req.method === "GET") return json(await this.getRooms(req));
 
     // Chatrooms report their connections via HTTP POST
     // update room info and notify all connected clients
@@ -68,7 +70,8 @@ export default class TablesServer extends PartyServer {
   }
 
   /** Fetches list of active rooms */
-  async getActiveRooms(req?: any): Promise<TableState[]> {
+  // await this.party.storage.deleteAll();
+  async getRooms(req?: any): Promise<TableState[]> {
     const gameType = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameType");
     const gameStatus = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameStatus");
     let rooms = await this.party.storage.list<TableState>();
@@ -90,13 +93,15 @@ export default class TablesServer extends PartyServer {
 
     if (update.action === "delete") {
       await this.party.storage.delete(update.id);
-      return this.getActiveRooms();
+      // await this.party.storage.deleteAll();
+      return this.getRooms();
     }
 
     const info = update.tableState;
     const totalPlayers = info?.queuedPlayers?.length + info?.spectatorPlayers?.length + info?.inGamePlayers?.length;
 
     await this.party.storage.put(update.id, info);
-    return this.getActiveRooms();
+    // await this.party.storage.deleteAll();
+    return this.getRooms();
   }
 }

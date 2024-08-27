@@ -207,7 +207,7 @@ export default function Games() {
           className='flex justify-between items-center mb-[16px]'
         >
           <h2 className="font-barlow font-medium text-[18px]">Create a game</h2>
-          <div onClick={() => setIsOpen(false)}>
+          <div onClick={() => { setIsOpen(false); setGameTypeForm('') }}>
             <Cross1Icon />
           </div>
         </div>
@@ -219,13 +219,17 @@ export default function Games() {
             await fetch(partyUrl, {
               method: "POST",
               body: JSON.stringify({
-                action: "create",
                 id: uuid,
-                ...gameConfig
+                tableState: {
+                  ...gameConfig,
+                  id: uuid,
+                },
+                action: "create",
               })
             });
             getTables()
             setIsOpen(false)
+            setGameTypeForm('')
           }}
           className="flex flex-col gap-[8px] mt-[16px]"
         >

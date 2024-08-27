@@ -13,7 +13,8 @@ export const DEFAULT_TABLE_STATE = {
     minPlayers: 2
   },
   gameState: null,
-  gameType: ''
+  gameType: '',
+  gamePhase: 'pending',
 }
 
 export const CONFIGURABLE_PROPERTIES = [
