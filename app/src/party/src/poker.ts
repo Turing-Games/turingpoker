@@ -1,18 +1,9 @@
 import type * as Party from 'partykit/server';
 import * as Poker from '@app/party/src/game-logic/poker'
-import { ClientMessage, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
+import { ClientMessage, GamePhase, IPlayer, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from './utils/response';
 import { RoomDeleteRequest, RoomUpdateRequest } from './tables';
-
-export interface IPlayer {
-  playerId: string;
-  isBot?: boolean;
-}
-
-export interface IPartyServerState {
-  gamePhase: 'pending' | 'active'
-}
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
@@ -29,13 +20,12 @@ export default class PartyServer implements Party.Server {
     autoStart: AUTO_START,
     minPlayers: MIN_PLAYERS_AUTO_START
   };
+  public winner: IPlayer = { playerId: '', isBot: false }
   public inGamePlayers: IPlayer[] = [];
   public spectatorPlayers: IPlayer[] = [];
   public queuedPlayers: IPlayer[] = [];
   public stacks: Record<string, number> = {};
-  public serverState: IPartyServerState = {
-    gamePhase: "pending",
-  };
+  public gamePhase = "pending"
   public lastActed: Record<string, number> = {};
 
   public timeoutLoopInterval: NodeJS.Timeout | null = null;
@@ -52,7 +42,7 @@ export default class PartyServer implements Party.Server {
         if (this.gameState?.state.whoseTurn != player.playerId)
           this.lastActed[player.playerId] = Date.now();
         if (
-          this.serverState.gamePhase == "active" &&
+          this.gamePhase == "active" &&
           this.lastActed[player.playerId] &&
           Date.now() - this.lastActed[player.playerId] > 300000
         ) {
@@ -66,7 +56,7 @@ export default class PartyServer implements Party.Server {
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
     if (this.inGamePlayers.length < 2) {
-      this.serverState.gamePhase = "pending";
+      this.gamePhase = "pending";
     }
 
     const isBot = !!ctx.request.headers.get("tg-bot-authorization")
@@ -216,7 +206,7 @@ export default class PartyServer implements Party.Server {
       this.inGamePlayers,
       this.inGamePlayers.map((p) => this.stacks[p.playerId])
     );
-    this.serverState.gamePhase = "active";
+    this.gamePhase = "active";
 
     this.queuedUpdates.push({
       type: "game-started",
@@ -252,18 +242,24 @@ export default class PartyServer implements Party.Server {
         (this.gameState.state.players.find((player) => player.id == playerId)
           ?.stack ?? 0) + payouts[playerId];
     }
-    this.serverState.gamePhase = "pending";
-    this.queuedUpdates.push({
-      type: "game-ended",
-      payouts,
-      reason,
-    });
+    //this.gamePhase = "pending";
     this.gameState = null;
     this.eliminatePlayers();
-    this.broadcastGameState();
-    this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
-    if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
+    // check if remaining players, for game winner
+    if (this.inGamePlayers.length == 1) {
+      this.queuedUpdates.push({
+        type: "game-ended",
+        payouts,
+        reason,
+      });
+      this.endGame();
+      this.broadcastGameState();
+    } else if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
+      this.broadcastGameState();
+      this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
       this.startRound();
+    } else {
+      this.broadcastGameState();
     }
   }
 
@@ -274,6 +270,14 @@ export default class PartyServer implements Party.Server {
     );
   }
 
+  // record winner to 
+  endGame() {
+    if (this.inGamePlayers.length === 1 && this.gamePhase !== 'pending') {
+      this.winner = this.inGamePlayers[0]
+      this.gamePhase = "final"
+    }
+  }
+
   getStateMessage(playerId: string): ServerStateMessage {
     const isSpectator =
       this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
@@ -281,16 +285,19 @@ export default class PartyServer implements Party.Server {
       gameState: this.gameState?.state ?? null,
       hand: this.gameState?.hands?.[playerId] ?? null,
       inGamePlayers: this.inGamePlayers,
+      winner: this.winner,
       spectatorPlayers: this.spectatorPlayers,
       queuedPlayers: this.queuedPlayers,
       config: this.gameConfig,
-      state: this.serverState,
+      gamePhase: this.gamePhase,
+      state: this.gamePhase,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
     };
   }
 
   broadcastGameState() {
+    console.log(this.gamePhase)
     for (const player of this.inGamePlayers
       .concat(this.spectatorPlayers)
       .concat(this.queuedPlayers)) {
@@ -311,7 +318,9 @@ export default class PartyServer implements Party.Server {
       config: this.gameConfig,
       gameState: this.gameState?.state ?? null,
       id: this.party.id,
-      gameType: 'poker'
+      gameType: 'poker',
+      winner: this.winner,
+      gamePhase: this.gamePhase
     }
 
     return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
@@ -339,7 +348,6 @@ export default class PartyServer implements Party.Server {
   }
 
   playerJoinGame(playerId: string) {
-    console.log('join game')
     const allPlayers = [...this.inGamePlayers, ...this.spectatorPlayers, ...this.queuedPlayers];
     const newPlayer = allPlayers.find((player) => player.playerId === playerId) || { playerId };
     if (
@@ -351,7 +359,7 @@ export default class PartyServer implements Party.Server {
     this.spectatorPlayers = this.spectatorPlayers.filter(
       (player) => player.playerId !== playerId
     );
-    if (this.serverState.gamePhase === "pending") {
+    if (this.gamePhase === "pending") {
       this.inGamePlayers.push(newPlayer);
       this.queuedUpdates.push({
         type: "player-joined",
@@ -363,7 +371,7 @@ export default class PartyServer implements Party.Server {
 
     if (
       this.gameConfig.autoStart &&
-      this.serverState.gamePhase === "pending" &&
+      this.gamePhase === "pending" &&
       this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START
     ) {
       this.startRound();
@@ -397,7 +405,7 @@ export default class PartyServer implements Party.Server {
   removePlayer(playerId: string) {
     // Attempt to remove from players list first
     // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
-    if (this.serverState.gamePhase == "active" && this.gameState) {
+    if (this.gamePhase == "active" && this.gameState) {
       try {
         const { next, log } = Poker.forcedFold(this.gameState, playerId);
         this.gameState = next;

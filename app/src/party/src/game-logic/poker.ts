@@ -1,10 +1,5 @@
-import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/poker";
 import combinations from "@app/party/src/utils/combinations";
-import { IPlayer } from "@tg/kuhn";
-
-export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
-export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
-export type Card = { rank: Rank, suit: Suit };
+import { Card, Rank, Suit, IPlayer, GamePhase } from "@tg/shared";
 
 const cardNames = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
 const cardVals = { 'A': 1, 'T': 10, 'J': 11, 'Q': 12, 'K': 13 }
@@ -98,6 +93,7 @@ export interface IPokerSharedState {
 
 export interface IPokerGame {
     state: IPokerSharedState;
+    gamePhase: GamePhase;
     config: IPokerConfig;
     hands: Record<PlayerID, [Card, Card]>;
     deck: Card[];

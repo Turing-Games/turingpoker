@@ -5,7 +5,7 @@ import { Cross1Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
 import { useUser } from '@clerk/clerk-react';
 import { Link } from 'react-router-dom';
 import { TableState } from '@tg/shared';
-import { Heading, SegmentedControl, Text } from '@radix-ui/themes';
+import { Heading, SegmentedControl, Table, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';
 import Modal from 'react-modal';
 import Select from '@app/components/Select';
@@ -42,6 +42,19 @@ export default function Games() {
     getTables()
   }
 
+  const getGamePhase = (table: TableState) => {
+    switch (table.gamePhase) {
+      case 'active':
+        return `In game: ${table.gameState?.round}`
+      case 'pending':
+        return 'Waiting...'
+      case 'final':
+        return 'Final'
+      default:
+        return 'Unknown'
+    }
+  }
+
   const getTables = async () => {
     setLoading(true)
     try {
@@ -58,17 +71,12 @@ export default function Games() {
           }
         })
       let rooms = ((await res.json()) ?? []) as TableState[];
+      console.log(rooms)
       if (gameStatus) {
-        if (gameStatus === 'pending') {
-          rooms = rooms.filter(room => !room.gameState)
-        }
-
-        if (gameStatus === 'active') {
-          rooms = rooms.filter(room => room.gameState)
-        }
+        rooms = rooms.filter(room => room.gamePhase === gameStatus)
       }
+
       setTables(rooms)
-      // setTables(rooms.filter(room => room.version >= TABLE_STATE_VERSION))
     } catch (err) {
       console.log(err)
     }
@@ -143,7 +151,7 @@ export default function Games() {
               headers={[
                 { value: 'id', name: 'Table' },
                 { value: 'gameType', name: 'Game Type' },
-                { value: 'gameState', name: 'Status' },
+                { value: 'gamePhase', name: 'Status' },
                 // { value: 'spectatorPlayers', name: 'Spectators', sortable: true },
                 { value: 'queuedPlayers', name: 'Queued', sortable: true },
                 { value: 'players', name: 'In-Game', sortable: true },
@@ -157,7 +165,7 @@ export default function Games() {
                 return {
                   id: table.name || table.id,
                   gameType: table.gameType,
-                  gameState: table.gameState ? `In game: ${table.gameState.round}` : `Waiting...`,
+                  gamePhase: getGamePhase(table),
                   spectatorPlayers: spectatorCount,
                   queuedPlayers: table?.queuedPlayers?.length || 0,
                   players: `${table?.gameState?.players?.length || 0}/${table.config?.maxPlayers || 0}`,

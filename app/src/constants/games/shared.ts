@@ -34,6 +34,7 @@ export const GAME_STATUS_FILTERS = [
   // { label: 'All', value: 'all' },
   { label: 'Active', value: 'active' },
   { label: 'Pending', value: 'pending' },
+  { label: 'Final', value: 'final' },
 ]
 
 export const GAME_TYPE_FILTERS = [

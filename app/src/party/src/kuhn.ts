@@ -1,19 +1,10 @@
 import type * as Party from 'partykit/server';
 import * as Kuhn from '@app/party/src/game-logic/kuhn'
-import { ClientMessage, TableState, ServerStateMessage, ServerUpdateMessage } from './shared';
+import { ClientMessage, TableState, ServerStateMessage, ServerUpdateMessage, IPlayer, GamePhase } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from './utils/response';
 import { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 import MainPartyServer from './main';
-
-export interface IPlayer {
-  playerId: string;
-  isBot?: boolean;
-}
-
-export interface IPartyServerState {
-  gamePhase: 'pending' | 'active'
-}
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
@@ -35,9 +26,7 @@ export default class PartyServer extends MainPartyServer {
   public queuedPlayers: IPlayer[] = [];
   public eliminatedPlayers: IPlayer[] = [];
   public stacks: Record<string, number> = {};
-  public serverState: IPartyServerState = {
-    gamePhase: "pending",
-  };
+  public gamePhase = "pending"
   public lastActed: Record<string, number> = {};
 
   public timeoutLoopInterval: NodeJS.Timeout | null = null;
@@ -56,7 +45,7 @@ export default class PartyServer extends MainPartyServer {
         if (this.gameState?.state.whoseTurn != player.playerId)
           this.lastActed[player.playerId] = Date.now();
         if (
-          this.serverState.gamePhase == "active" &&
+          this.gamePhase == "active" &&
           this.lastActed[player.playerId] &&
           Date.now() - this.lastActed[player.playerId] > 300000
         ) {
@@ -70,7 +59,7 @@ export default class PartyServer extends MainPartyServer {
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
     if (this.inGamePlayers.length < 2) {
-      this.serverState.gamePhase = "pending";
+      this.gamePhase = "pending";
     }
 
     const isBot = !!ctx.request.headers.get("tg-bot-authorization")
@@ -222,7 +211,7 @@ export default class PartyServer extends MainPartyServer {
       this.inGamePlayers,
       this.inGamePlayers.map((p) => this.stacks[p.playerId])
     );
-    this.serverState.gamePhase = "active";
+    this.gamePhase = "active";
 
     this.queuedUpdates.push({
       type: "game-started",
@@ -258,7 +247,7 @@ export default class PartyServer extends MainPartyServer {
         (this.gameState.state.players.find((player) => player.id == playerId)
           ?.stack ?? 0) + payouts[playerId];
     }
-    this.serverState.gamePhase = "pending";
+    this.gamePhase = "pending";
     this.queuedUpdates.push({
       type: "game-ended",
       payouts,
@@ -290,7 +279,7 @@ export default class PartyServer extends MainPartyServer {
       spectatorPlayers: this.spectatorPlayers,
       queuedPlayers: this.queuedPlayers,
       config: this.gameConfig,
-      state: this.serverState,
+      gamePhase: this.gamePhase,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
     };
@@ -345,7 +334,6 @@ export default class PartyServer extends MainPartyServer {
   }
 
   playerJoinGame(playerId: string) {
-    console.log('join game')
     const allPlayers = [...this.inGamePlayers, ...this.spectatorPlayers, ...this.queuedPlayers];
     const newPlayer = allPlayers.find((player) => player.playerId === playerId) || { playerId };
     if (
@@ -357,7 +345,7 @@ export default class PartyServer extends MainPartyServer {
     this.spectatorPlayers = this.spectatorPlayers.filter(
       (player) => player.playerId !== playerId
     );
-    if (this.serverState.gamePhase === "pending") {
+    if (this.gamePhase === "pending") {
       this.inGamePlayers.push(newPlayer);
       this.queuedUpdates.push({
         type: "player-joined",
@@ -369,7 +357,7 @@ export default class PartyServer extends MainPartyServer {
 
     if (
       this.gameConfig.autoStart &&
-      this.serverState.gamePhase === "pending" &&
+      this.gamePhase === "pending" &&
       this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START
     ) {
       this.startRound();
@@ -403,7 +391,7 @@ export default class PartyServer extends MainPartyServer {
   removePlayer(playerId: string) {
     // Attempt to remove from players list first
     // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers
-    if (this.serverState.gamePhase == "active" && this.gameState) {
+    if (this.gamePhase == "active" && this.gameState) {
       try {
         const { next, log } = Kuhn.forcedFold(this.gameState, playerId);
         this.gameState = next;
