@@ -55,6 +55,7 @@ export default class PartyServer implements Party.Server {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
+    if (this.gamePhase === 'final') return
     if (this.inGamePlayers.length < 2) {
       this.gamePhase = "pending";
     }
@@ -65,12 +66,17 @@ export default class PartyServer implements Party.Server {
 
   async onRequest(req: Party.Request) {
     // Clients fetch list of rooms for server rendering pages via HTTP GET
-    if (req.method === "GET") return json(await this.getActiveRooms());
+    if (req.method === "GET") return json(await this.getRooms());
 
     // Chatrooms report their connections via HTTP POST
     // update room info and notify all connected clients
     if (req.method === "POST") {
-      const roomList = await this.updateRoomInfo(req);
+      let roomList = []
+      if (this.gamePhase !== 'final') {
+        roomList = await this.updateRoomInfo(req);
+      } else {
+        roomList = await this.getRooms();
+      }
       this.party.broadcast(JSON.stringify(roomList));
       return json(roomList);
     }
@@ -297,7 +303,6 @@ export default class PartyServer implements Party.Server {
   }
 
   broadcastGameState() {
-    console.log(this.gamePhase)
     for (const player of this.inGamePlayers
       .concat(this.spectatorPlayers)
       .concat(this.queuedPlayers)) {
@@ -320,7 +325,8 @@ export default class PartyServer implements Party.Server {
       id: this.party.id,
       gameType: 'poker',
       winner: this.winner,
-      gamePhase: this.gamePhase
+      gamePhase: this.gamePhase,
+      version: 1
     }
 
     return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
@@ -472,7 +478,7 @@ export default class PartyServer implements Party.Server {
   }
 
   /** Fetches list of active rooms */
-  async getActiveRooms(): Promise<TableState[]> {
+  async getRooms(): Promise<TableState[]> {
     const rooms = await this.party.storage.list<TableState>();
     return [...rooms.values()];
   }
@@ -485,19 +491,19 @@ export default class PartyServer implements Party.Server {
 
     if (update.action === "delete") {
       await this.party.storage.delete(update.id);
-      return this.getActiveRooms();
+      return this.getRooms();
     }
 
     const info = update.tableState;
     if (info.queuedPlayers.length + info.spectatorPlayers.length + info.inGamePlayers.length == 0) {
       // if no users are present, delete the room
       await this.party.storage.delete(update.id);
-      return this.getActiveRooms();
+      return this.getRooms();
     }
 
     this.party.storage.put(update.id, info);
 
     await this.party.storage.put(update.id, info);
-    return this.getActiveRooms();
+    return this.getRooms();
   }
 }

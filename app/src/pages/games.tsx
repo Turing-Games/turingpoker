@@ -51,7 +51,7 @@ export default function Games() {
       case 'final':
         return 'Final'
       default:
-        return 'Unknown'
+        return 'Waiting...'
     }
   }
 
@@ -71,7 +71,6 @@ export default function Games() {
           }
         })
       let rooms = ((await res.json()) ?? []) as TableState[];
-      console.log(rooms)
       if (gameStatus) {
         rooms = rooms.filter(room => room.gamePhase === gameStatus)
       }
