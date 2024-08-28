@@ -58,6 +58,7 @@ export default class PartyServer extends MainPartyServer {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
+    if (this.gamePhase === 'final') return
     if (this.inGamePlayers.length < 2) {
       this.gamePhase = "pending";
     }

@@ -276,11 +276,12 @@ export default class PartyServer implements Party.Server {
     );
   }
 
-  // record winner to 
+  // record winner to db
   endGame() {
     if (this.inGamePlayers.length === 1 && this.gamePhase !== 'pending') {
       this.winner = this.inGamePlayers[0]
       this.gamePhase = "final"
+      // add winner to game data in sql db
     }
   }
 

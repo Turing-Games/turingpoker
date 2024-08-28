@@ -222,6 +222,7 @@ export default function Games() {
                 id: uuid,
                 tableState: {
                   ...gameConfig,
+                  gameType: gameTypeForm,
                   id: uuid,
                 },
                 action: "create",
