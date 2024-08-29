@@ -1,5 +1,5 @@
 import type * as Party from "partykit/server";
-import { json, notFound } from "./utils/response";
+import { json, notFound } from "../../utils/response";
 import { TableState } from "./shared";
 import PartyServer from "./main";
 

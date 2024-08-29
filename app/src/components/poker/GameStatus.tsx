@@ -1,6 +1,6 @@
 import React from "react";
 import { ClientState } from "@app/client";
-import { sendMessage } from "@app/party/src/utils/websocket";
+import { sendMessage } from "@app/utils/websocket";
 
 const KV = ({ label, value }: { label: string, value: string }) => (
   <div style={{

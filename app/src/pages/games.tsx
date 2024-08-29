@@ -9,21 +9,22 @@ import { Heading, SegmentedControl, Table, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';
 import Modal from 'react-modal';
 import Select from '@app/components/Select';
-import { GAME_STATUS_FILTERS, GAME_TYPE_FILTERS, GAMES, MODAL_STYLES } from '@app/constants/games/shared';
+import { DEFAULT_GAME_FILTERS, GAME_STATUS_FILTERS, GAME_TYPE_FILTERS, GAMES, MODAL_STYLES } from '@app/constants/games/shared';
 import { CONFIGURABLE_PROPERTIES as POKER_CONFIG } from '@app/constants/games/poker';
 import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuhn';
 import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
 import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 import TgTable from '@app/components/Table';
+import deleteFalseyValues from '@app/utils/filters';
+import { buildUrl } from '@app/utils/url';
 
 
 export default function Games() {
 
   const [loading, setLoading] = React.useState(false)
   const [tables, setTables] = React.useState<TableState[]>([])
-  const [gameType, setGameType] = React.useState('')
+  const [filters, setFilters] = React.useState(DEFAULT_GAME_FILTERS)
   const [gameTypeForm, setGameTypeForm] = React.useState('')
-  const [gameStatus, setGameStatus] = React.useState('pending')
   const [isOpen, setIsOpen] = React.useState(false)
   const [gameConfig, setGameConfig] = React.useState({})
 
@@ -58,23 +59,39 @@ export default function Games() {
   const getTables = async () => {
     setLoading(true)
     try {
-      const res = await PartySocket.fetch(
-        {
-          host: PARTYKIT_URL,
-          room: SINGLETON_ROOM_ID,
-          party: 'tables',
-          query: async () => {
-            return {
-              gameType: gameType,
-              gameStatus: gameStatus,
-            }
-          }
-        })
-      let rooms = ((await res.json()) ?? []) as TableState[];
-      if (gameStatus) {
-        rooms = rooms.filter(room => room.gamePhase === gameStatus)
-      }
+      const url = buildUrl('/api/v1/games', filters)
+      const res = await fetch(url)
+      let rooms = await res.json()
+      console.log(rooms)
+      // const res = await PartySocket.fetch(
+      //   {
+      //     host: PARTYKIT_URL,
+      //     room: SINGLETON_ROOM_ID,
+      //     party: 'tables',
+      //     query: async () => {
+      //       return {
+      //         gameType: gameType,
+      //         gameStatus: gameStatus,
+      //       }
+      //     }
+      //   })
+      // let rooms = ((await res.json()) ?? []) as TableState[];
+      // if (gameStatus) {
+      //   rooms = rooms.filter(room => room.gamePhase === gameStatus)
+      // }
 
+      // rooms = rooms.map(async (r, i) => {
+      //   const room = await PartySocket.fetch({
+      //     host: PARTYKIT_URL,
+      //     room: r.id,
+      //     party: 'tables',
+      //   })
+
+      //   return {
+      //     ...r,
+      //     ...room
+      //   }
+      // })
       setTables(rooms)
     } catch (err) {
       console.log(err)
@@ -82,9 +99,10 @@ export default function Games() {
     setLoading(false)
   }
 
+
   React.useEffect(() => {
     getTables()
-  }, [gameType, gameStatus])
+  }, [filters?.gameType, filters?.gameStatus])
 
 
   const checkValidInput = () => {
@@ -118,7 +136,7 @@ export default function Games() {
         <div className="flex items-center gap-[8px] mt-[16px] mb-[32px]">
 
           <SegmentedControl.Root
-            defaultValue={gameStatus}
+            defaultValue={filters?.gameStatus}
             style={{ height: 40 }}
           >
             {
@@ -126,7 +144,7 @@ export default function Games() {
                 return (
                   <SegmentedControl.Item
                     value={filter.value}
-                    onClick={() => setGameStatus(filter.value)}
+                    onClick={() => setFilters({ ...filters, gameStatus: filter.value })}
                   >
                     {filter.label}
                   </SegmentedControl.Item>
@@ -136,9 +154,9 @@ export default function Games() {
           </SegmentedControl.Root>
           <Select
             options={GAME_TYPE_FILTERS}
-            selected={gameType}
+            selected={filters?.gameType}
             placeholder="All Games"
-            onChange={(value) => setGameType(value)}
+            onChange={(value) => setFilters({ ...filters, gameType: value })}
           ></Select>
         </div>
         {
@@ -216,16 +234,24 @@ export default function Games() {
             e.preventDefault()
             checkValidInput()
             const uuid = crypto.randomUUID()
-            await fetch(partyUrl, {
-              method: "POST",
+            // await fetch(partyUrl, {
+            //   method: "POST",
+            //   body: JSON.stringify({
+            //     id: uuid,
+            //     tableState: {
+            //       ...gameConfig,
+            //       gameType: gameTypeForm,
+            //       id: uuid,
+            //     },
+            //     action: "create",
+            //   })
+            // });
+            await fetch('/api/v1/games', {
+              method: 'POST',
               body: JSON.stringify({
-                id: uuid,
-                tableState: {
-                  ...gameConfig,
-                  gameType: gameTypeForm,
-                  id: uuid,
-                },
-                action: "create",
+                // title: gameTypeForm,
+                gameType: gameTypeForm,
+                ...gameConfig
               })
             });
             getTables()

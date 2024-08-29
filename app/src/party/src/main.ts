@@ -1,5 +1,5 @@
 import type * as Party from "partykit/server";
-import authBotConnection from "./utils/auth";
+import authBotConnection from "../../utils/auth";
 
 export default class MainPartyServer implements Party.Server {
   constructor(public party: Party.Party) { }

@@ -1,4 +1,4 @@
-import combinations from "@app/party/src/utils/combinations";
+import combinations from "@app/utils/combinations";
 import { Card, Rank, Suit, IPlayer, GamePhase } from "@tg/shared";
 
 const cardNames = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];

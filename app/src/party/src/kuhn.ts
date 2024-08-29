@@ -2,7 +2,7 @@ import type * as Party from 'partykit/server';
 import * as Kuhn from '@app/party/src/game-logic/kuhn'
 import { ClientMessage, TableState, ServerStateMessage, ServerUpdateMessage, IPlayer, GamePhase } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { json, notFound } from './utils/response';
+import { json, notFound } from '../../utils/response';
 import { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 import MainPartyServer from './main';
 

@@ -41,3 +41,7 @@ export const GAME_TYPE_FILTERS = [
   { label: 'All Games', value: '' },
   ...GAMES
 ]
+
+export const DEFAULT_GAME_FILTERS = {
+  gameStatus: 'active',
+}

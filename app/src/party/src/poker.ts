@@ -2,7 +2,7 @@ import type * as Party from 'partykit/server';
 import * as Poker from '@app/party/src/game-logic/poker'
 import { ClientMessage, GamePhase, IPlayer, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { json, notFound } from './utils/response';
+import { json, notFound } from '../../utils/response';
 import { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 
 export const AUTO_START = true;
@@ -282,6 +282,7 @@ export default class PartyServer implements Party.Server {
       this.winner = this.inGamePlayers[0]
       this.gamePhase = "final"
       // add winner to game data in sql db
+      // await fetch('/')
     }
   }
 

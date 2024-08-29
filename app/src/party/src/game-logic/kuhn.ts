@@ -1,5 +1,5 @@
 import { AUTO_START, MAX_PLAYERS, MIN_PLAYERS_AUTO_START } from "@app/party/src/kuhn";
-import combinations from "@app/party/src/utils/combinations";
+import combinations from "@app/utils/combinations";
 import { IPlayer } from "@tg/poker";
 
 export type Rank = 11 | 12 | 13;

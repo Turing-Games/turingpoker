@@ -9,7 +9,7 @@ import Card from "../Card";
 import GameStatus from "./GameStatus";
 import Cards from "./Cards";
 import { GameInfo } from "./GameInfo";
-import { sendMessage } from "@tg/utils/websocket";
+import { sendMessage } from "@app/utils/websocket";
 import useSmallScreen from "@app/hooks/useSmallScreen";
 
 interface Props {

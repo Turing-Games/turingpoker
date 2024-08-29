@@ -25,7 +25,9 @@ app.delete("/api/v1/users/:id", users.delete);
 
 // GAMES
 app.get("/api/v1/games", games.get)
+app.get("/api/v1/games/:id", games.get)
 app.post('/api/v1/games', games.create)
+app.put('/api/v1/games/:id', games.update)
 
 // KEYS
 app.get("/api/v1/keys", keys.get)
