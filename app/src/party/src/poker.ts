@@ -4,13 +4,14 @@ import { ClientMessage, GamePhase, IPlayer, ServerStateMessage, ServerUpdateMess
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from '../../utils/response';
 import { RoomDeleteRequest, RoomUpdateRequest } from './tables';
+import MainPartyServer from './main';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
 export const MAX_PLAYERS = 8
 
 const defaultStack = 1000;
-export default class PartyServer implements Party.Server {
+export default class PartyServer extends MainPartyServer {
   public gameState: Poker.IPokerGame | null = null;
   public gameConfig: Poker.IPokerConfig = {
     dealerPosition: 0,
@@ -20,19 +21,14 @@ export default class PartyServer implements Party.Server {
     autoStart: AUTO_START,
     minPlayers: MIN_PLAYERS_AUTO_START
   };
-  public winner: IPlayer = { playerId: '', isBot: false }
-  public inGamePlayers: IPlayer[] = [];
-  public spectatorPlayers: IPlayer[] = [];
-  public queuedPlayers: IPlayer[] = [];
+
   public stacks: Record<string, number> = {};
-  public gamePhase = "pending"
-  public lastActed: Record<string, number> = {};
-
   public timeoutLoopInterval: NodeJS.Timeout | null = null;
-
   public queuedUpdates: ServerUpdateMessage[] = [];
 
-  constructor(public readonly party: Party.Party) { }
+  constructor(public readonly party: Party.Party) {
+    super(party)
+  }
 
   onStart(): void | Promise<void> {
     this.timeoutLoopInterval = setInterval(() => {

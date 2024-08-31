@@ -70,8 +70,6 @@ export interface IPokerPlayer {
 
 export interface IPokerConfig {
   dealerPosition: number;
-  smallBlind: number;
-  bigBlind: number;
   maxPlayers: number;
   autoStart: boolean
   minPlayers: number

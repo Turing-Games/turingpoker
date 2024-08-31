@@ -15,22 +15,13 @@ export default class PartyServer extends MainPartyServer {
   public gameState: Kuhn.IPokerGame | null = null;
   public gameConfig: Kuhn.IPokerConfig = {
     dealerPosition: 0,
-    bigBlind: 1,
     maxPlayers: MAX_PLAYERS,
-    smallBlind: 1,
     autoStart: AUTO_START,
     minPlayers: MIN_PLAYERS_AUTO_START
   };
-  public inGamePlayers: IPlayer[] = [];
-  public spectatorPlayers: IPlayer[] = [];
-  public queuedPlayers: IPlayer[] = [];
-  public eliminatedPlayers: IPlayer[] = [];
+
   public stacks: Record<string, number> = {};
-  public gamePhase = "pending"
-  public lastActed: Record<string, number> = {};
-
   public timeoutLoopInterval: NodeJS.Timeout | null = null;
-
   public queuedUpdates: ServerUpdateMessage[] = [];
 
   constructor(public readonly party: Party.Party) {
@@ -287,6 +278,7 @@ export default class PartyServer extends MainPartyServer {
   }
 
   broadcastGameState() {
+    console.log('broadcasr')
     for (const player of this.inGamePlayers
       .concat(this.spectatorPlayers)
       .concat(this.queuedPlayers)) {

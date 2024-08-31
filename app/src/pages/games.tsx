@@ -181,7 +181,7 @@ export default function Games() {
                 const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
                 return {
                   id: table.name || table.id,
-                  gameType: table.gameType,
+                  gameType: table.game_type,
                   gamePhase: getGamePhase(table),
                   spectatorPlayers: spectatorCount,
                   queuedPlayers: table?.queuedPlayers?.length || 0,
@@ -205,7 +205,7 @@ export default function Games() {
                   // ),
                   view: (
                     <button>
-                      <Link to={`/games/${table.id}/${table.gameType}`}>View</Link>
+                      <Link to={`/games/${table.id}/${table.game_type}`}>View</Link>
                     </button>
                   )
                 }
