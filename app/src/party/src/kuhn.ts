@@ -268,17 +268,19 @@ export default class PartyServer extends MainPartyServer {
       gameState: this.gameState?.state ?? null,
       hand: this.gameState?.hands?.[playerId] ?? null,
       inGamePlayers: this.inGamePlayers,
+      winner: this.winner,
       spectatorPlayers: this.spectatorPlayers,
       queuedPlayers: this.queuedPlayers,
       config: this.gameConfig,
       gamePhase: this.gamePhase,
+      state: this.gamePhase,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
     };
   }
 
   broadcastGameState() {
-    console.log('broadcasr')
+    console.log('broadcast')
     for (const player of this.inGamePlayers
       .concat(this.spectatorPlayers)
       .concat(this.queuedPlayers)) {
@@ -292,14 +294,17 @@ export default class PartyServer extends MainPartyServer {
     }
     this.queuedUpdates = [];
 
-    const tableState: TableState = {
+    const state: TableState = {
       queuedPlayers: this.queuedPlayers,
       spectatorPlayers: this.spectatorPlayers,
       inGamePlayers: this.inGamePlayers,
       config: this.gameConfig,
       gameState: this.gameState?.state ?? null,
       id: this.party.id,
-      gameType: 'kuhn'
+      gameType: 'kuhn',
+      winner: this.winner,
+      gamePhase: this.gamePhase,
+      version: 1
     }
 
     return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
@@ -307,7 +312,7 @@ export default class PartyServer extends MainPartyServer {
       body: JSON.stringify({
         id: this.party.id,
         action: 'update',
-        tableState
+        state
       }),
     });
   }

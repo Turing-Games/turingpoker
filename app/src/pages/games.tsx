@@ -17,6 +17,7 @@ import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/
 import TgTable from '@app/components/Table';
 import deleteFalseyValues from '@app/utils/filters';
 import { buildUrl } from '@app/utils/url';
+import { deleteGame } from '@app/utils/api/games';
 
 
 export default function Games() {
@@ -32,13 +33,7 @@ export default function Games() {
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
 
   const deleteTable = async (id: string) => {
-    await fetch(partyUrl, {
-      method: "POST",
-      body: JSON.stringify({
-        action: "delete",
-        id: id
-      })
-    });
+    await deleteGame(id)
 
     getTables()
   }

@@ -45,6 +45,7 @@ export default class TablesServer extends PartyServer {
   }
 
   async onRequest(req: Party.Request) {
+    console.log({ req })
     // we only allow one instance of chatRooms party
     if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
@@ -62,8 +63,8 @@ export default class TablesServer extends PartyServer {
 
     // admin api for clearing all rooms (not used in UI)
     if (req.method === "DELETE") {
-      await this.party.storage.deleteAll();
-      return json({ message: "All room history cleared" });
+      // await this.party.storage.delete(this.party.id);
+      return json({ message: `Deleted room` });
     }
 
     return notFound();

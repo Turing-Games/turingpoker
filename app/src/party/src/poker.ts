@@ -314,7 +314,7 @@ export default class PartyServer extends MainPartyServer {
     }
     this.queuedUpdates = [];
 
-    const tableState: TableState = {
+    const state: TableState = {
       queuedPlayers: this.queuedPlayers,
       spectatorPlayers: this.spectatorPlayers,
       inGamePlayers: this.inGamePlayers,
@@ -332,7 +332,7 @@ export default class PartyServer extends MainPartyServer {
       body: JSON.stringify({
         id: this.party.id,
         action: 'update',
-        tableState
+        state
       }),
     });
   }
