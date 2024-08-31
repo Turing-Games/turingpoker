@@ -60,8 +60,14 @@ export default function Games() {
       const url = buildUrl('/api/v1/games', filters)
       const res = await fetch(url)
       let rooms = await res.json()
-      const pkRoom = await fetch(`${partyUrl}/${rooms[0].id}`)
-      console.log(pkRoom)
+      const res2 = await PartySocket.fetch(
+        {
+          host: PARTYKIT_URL,
+          room: SINGLETON_ROOM_ID,
+          party: 'tables',
+
+        })
+      console.log(res2)
 
       setTables(rooms)
     } catch (err) {
