@@ -45,12 +45,12 @@ export default class TablesServer extends PartyServer {
   }
 
   async onRequest(req: Party.Request) {
-    console.log({ req })
     // we only allow one instance of chatRooms party
     if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
     // Clients fetch list of rooms for server rendering pages via HTTP GET
-    // await this.party.storage.deleteAll();
+    const body = await req.json();
+    console.log({ body })
     if (req.method === "GET") return json(await this.getRooms(req));
 
     // Chatrooms report their connections via HTTP POST
@@ -63,8 +63,8 @@ export default class TablesServer extends PartyServer {
 
     // admin api for clearing all rooms (not used in UI)
     if (req.method === "DELETE") {
-      // await this.party.storage.delete(this.party.id);
-      return json({ message: `Deleted room` });
+      await this.party.storage.deleteAll();
+      return json({ message: "All room history cleared" });
     }
 
     return notFound();
@@ -72,18 +72,23 @@ export default class TablesServer extends PartyServer {
 
   /** Fetches list of active rooms */
   // await this.party.storage.deleteAll();
-  async getRooms(req?: any): Promise<TableState[]> {
-    const gameType = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameType");
-    const gameStatus = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameStatus");
-    let rooms = await this.party.storage.list<TableState>();
-    if (gameType) {
-      rooms = Array.from(rooms?.values())?.filter(room => {
-        if (gameType && room.gameType !== gameType) return false;
-        return true;
-      })
-    }
+  async getRooms(req?: any, id?: string): Promise<TableState[] | TableState> {
+    if (id) {
+      const room = await this.party.storage.get<TableState>(id);
+      return room;
+    } else {
+      const gameType = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameType");
+      const gameStatus = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameStatus");
+      let rooms = await this.party.storage.list<TableState>();
+      if (gameType) {
+        rooms = Array.from(rooms?.values())?.filter(room => {
+          if (gameType && room.gameType !== gameType) return false;
+          return true;
+        })
+      }
 
-    return [...rooms.values()];
+      return [...rooms.values()];
+    }
   }
   /** Updates table with information received from game */
   async updateRoomInfo(req: Party.Request) {

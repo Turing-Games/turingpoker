@@ -15,9 +15,8 @@ import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuh
 import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
 import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 import TgTable from '@app/components/Table';
-import deleteFalseyValues from '@app/utils/filters';
 import { buildUrl } from '@app/utils/url';
-import { deleteGame } from '@app/utils/api/games';
+import { createGame, deleteGame } from '@app/utils/api/games';
 
 
 export default function Games() {
@@ -27,13 +26,17 @@ export default function Games() {
   const [filters, setFilters] = React.useState(DEFAULT_GAME_FILTERS)
   const [gameTypeForm, setGameTypeForm] = React.useState('')
   const [isOpen, setIsOpen] = React.useState(false)
-  const [gameConfig, setGameConfig] = React.useState({})
+  const [gameConfig, setGameConfig] = React.useState<any>({})
 
   const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
 
-  const deleteTable = async (id: string) => {
+  // use both partykit storage id and d1 id until standardized to d1
+  const deleteTable = async (id: string, gameId?: string) => {
     await deleteGame(id)
+    if (gameId !== id && gameId) {
+      await deleteGame(gameId)
+    }
 
     getTables()
   }
@@ -57,36 +60,9 @@ export default function Games() {
       const url = buildUrl('/api/v1/games', filters)
       const res = await fetch(url)
       let rooms = await res.json()
-      console.log(rooms)
-      // const res = await PartySocket.fetch(
-      //   {
-      //     host: PARTYKIT_URL,
-      //     room: SINGLETON_ROOM_ID,
-      //     party: 'tables',
-      //     query: async () => {
-      //       return {
-      //         gameType: gameType,
-      //         gameStatus: gameStatus,
-      //       }
-      //     }
-      //   })
-      // let rooms = ((await res.json()) ?? []) as TableState[];
-      // if (gameStatus) {
-      //   rooms = rooms.filter(room => room.gamePhase === gameStatus)
-      // }
+      const pkRoom = await fetch(`${partyUrl}/${rooms[0].id}`)
+      console.log(pkRoom)
 
-      // rooms = rooms.map(async (r, i) => {
-      //   const room = await PartySocket.fetch({
-      //     host: PARTYKIT_URL,
-      //     room: r.id,
-      //     party: 'tables',
-      //   })
-
-      //   return {
-      //     ...r,
-      //     ...room
-      //   }
-      // })
       setTables(rooms)
     } catch (err) {
       console.log(err)
@@ -174,6 +150,7 @@ export default function Games() {
               ]}
               rows={tables.map(table => {
                 const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
+                console.log({ table })
                 return {
                   id: table.name || table.id,
                   gameType: table.game_type,
@@ -186,7 +163,7 @@ export default function Games() {
                     <div
                       className='cursor-pointer'
                       onClick={async () => {
-                        await deleteTable(table.id)
+                        await deleteTable(table.id, table.game_id)
                       }}
                     >
                       <TrashIcon className="text-[red]" />
@@ -228,27 +205,7 @@ export default function Games() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            const uuid = crypto.randomUUID()
-            // await fetch(partyUrl, {
-            //   method: "POST",
-            //   body: JSON.stringify({
-            //     id: uuid,
-            //     tableState: {
-            //       ...gameConfig,
-            //       gameType: gameTypeForm,
-            //       id: uuid,
-            //     },
-            //     action: "create",
-            //   })
-            // });
-            await fetch('/api/v1/games', {
-              method: 'POST',
-              body: JSON.stringify({
-                // title: gameTypeForm,
-                gameType: gameTypeForm,
-                ...gameConfig
-              })
-            });
+            await createGame(gameConfig?.config, gameTypeForm)
             getTables()
             setIsOpen(false)
             setGameTypeForm('')

@@ -18,7 +18,6 @@ interface Props {
 }
 
 const PokerGame = ({ clientState, previousActions }: Props) => {
-  console.log(clientState)
   const serverState = clientState.serverState;
   if (!serverState) {
     return <div style={{
