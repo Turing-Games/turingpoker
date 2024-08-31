@@ -1,5 +1,7 @@
 import { PARTYKIT_URL, SERVER_URL } from "@app/constants/partykit"
 import { SINGLETON_ROOM_ID } from "@tg/tables";
+import { buildUrl } from "../url";
+import PartySocket from "partysocket";
 
 const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
 
@@ -76,6 +78,31 @@ export function createGame(gameConfig: any, gameType: string) {
       });
 
       resolve(true)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export function getGamesWithSocketData(url: string) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const res = await fetch(url)
+      const rooms = await res.json()
+      // const pkData = await fetch(`${partyUrl}/${rooms[0].id}`, {
+      //   method: "GET"
+      // })
+      const pkData = await PartySocket.fetch({
+        host: PARTYKIT_URL,
+        room: SINGLETON_ROOM_ID,
+        party: 'tables',
+        id: rooms[0].id,
+      })
+      const pkDataJson = await pkData.json()
+      resolve([
+        rooms,
+        pkDataJson
+      ])
     } catch (e) {
       reject(e)
     }

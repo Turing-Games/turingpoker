@@ -16,7 +16,7 @@ import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games
 import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 import TgTable from '@app/components/Table';
 import { buildUrl } from '@app/utils/url';
-import { createGame, deleteGame } from '@app/utils/api/games';
+import { createGame, deleteGame, getGamesWithSocketData } from '@app/utils/api/games';
 
 
 export default function Games() {
@@ -58,17 +58,10 @@ export default function Games() {
     setLoading(true)
     try {
       const url = buildUrl('/api/v1/games', filters)
+      const games = await getGamesWithSocketData(url)
+      console.log(games)
       const res = await fetch(url)
       let rooms = await res.json()
-      const res2 = await PartySocket.fetch(
-        {
-          host: PARTYKIT_URL,
-          room: SINGLETON_ROOM_ID,
-          party: 'tables',
-
-        })
-      console.log(res2)
-
       setTables(rooms)
     } catch (err) {
       console.log(err)
@@ -156,7 +149,6 @@ export default function Games() {
               ]}
               rows={tables.map(table => {
                 const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
-                console.log({ table })
                 return {
                   id: table.name || table.id,
                   gameType: table.game_type,
