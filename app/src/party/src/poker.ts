@@ -3,15 +3,14 @@ import * as Poker from '@app/party/src/game-logic/poker'
 import { ClientMessage, GamePhase, IPlayer, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from '../../utils/response';
-import { RoomDeleteRequest, RoomUpdateRequest } from './tables';
-import MainPartyServer from './main';
+import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
 export const MAX_PLAYERS = 8
 
 const defaultStack = 1000;
-export default class PartyServer extends MainPartyServer {
+export default class PartyServer extends TablesServer {
   public gameState: Poker.IPokerGame | null = null;
   public gameConfig: Poker.IPokerConfig = {
     dealerPosition: 0,
@@ -58,32 +57,6 @@ export default class PartyServer extends MainPartyServer {
 
     const isBot = !!ctx.request.headers.get("tg-bot-authorization")
     this.addPlayer(conn.id, isBot);
-  }
-
-  async onRequest(req: Party.Request) {
-    // Clients fetch list of rooms for server rendering pages via HTTP GET
-    if (req.method === "GET") return json(await this.getRooms());
-
-    // Chatrooms report their connections via HTTP POST
-    // update room info and notify all connected clients
-    if (req.method === "POST") {
-      let roomList = []
-      if (this.gamePhase !== 'final') {
-        roomList = await this.updateRoomInfo(req);
-      } else {
-        roomList = await this.getRooms();
-      }
-      this.party.broadcast(JSON.stringify(roomList));
-      return json(roomList);
-    }
-
-    // admin api for clearing all rooms (not used in UI)
-    if (req.method === "DELETE") {
-      await this.party.storage.deleteAll();
-      return json({ message: "All room history cleared" });
-    }
-
-    return notFound();
   }
 
   onClose(conn: Party.Connection) {
