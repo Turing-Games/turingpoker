@@ -34,8 +34,8 @@ export default function TgTable({
       columns={headers.map(header => ({
         ...header,
         selector: (row: any) => row[header.value],
-        right: header.align === 'right',
-        center: header.align === 'center',
+        right: (header.align === 'right').toString(),
+        center: (header.align === 'center').toString(),
       }))}
       data={rows}
       theme='light'
