@@ -113,6 +113,7 @@ export default function Games() {
               GAME_STATUS_FILTERS.map((filter, i) => {
                 return (
                   <SegmentedControl.Item
+                    key={filter.value}
                     value={filter.value}
                     onClick={() => setFilters({ ...filters, gameStatus: filter.value })}
                   >
@@ -232,6 +233,7 @@ export default function Games() {
                 configurableProperties[gameTypeForm]?.map((property, i) => {
                   return (
                     <div
+                      key={property.value}
                       style={property.type === 'checkbox' ? {
                         display: 'flex',
                         gap: '8px',
