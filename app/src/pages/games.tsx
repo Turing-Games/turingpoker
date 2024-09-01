@@ -28,7 +28,7 @@ export default function Games() {
   const [isOpen, setIsOpen] = React.useState(false)
   const [gameConfig, setGameConfig] = React.useState<any>({})
 
-  const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
+  // const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
 
   // use both partykit storage id and d1 id until standardized to d1
@@ -150,7 +150,14 @@ export default function Games() {
               rows={tables.map(table => {
                 const spectatorCount = (table?.spectatorPlayers?.length + table?.queuedPlayers?.length) || 0;
                 return {
-                  id: table.name || table.id,
+                  id: (
+                    <Link
+                      className="underline"
+                      to={`/games/${table.id}/${table.game_type}`}
+                    >
+                      {table.name || table.id}
+                    </Link>
+                  ),
                   gameType: table.game_type,
                   gamePhase: getGamePhase(table),
                   spectatorPlayers: spectatorCount,
@@ -167,12 +174,6 @@ export default function Games() {
                       <TrashIcon className="text-[red]" />
                     </div>
                   ),
-                  // quickview: (
-                  //   <div>
-                  //     <EyeOpenIcon />
-                  //   </div>
-
-                  // ),
                   view: (
                     <button>
                       <Link to={`/games/${table.id}/${table.game_type}`}>View</Link>

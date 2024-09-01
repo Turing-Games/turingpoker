@@ -95,9 +95,10 @@ export function getGamesWithSocketData(url: string) {
       const pkData = await PartySocket.fetch({
         host: PARTYKIT_URL,
         room: SINGLETON_ROOM_ID,
-        party: 'tables',
-        id: rooms[0].id,
+        party: 'tables'
       })
+
+
       const pkDataJson = await pkData.json()
       resolve([
         rooms,

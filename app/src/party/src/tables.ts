@@ -47,7 +47,7 @@ export default class TablesServer extends PartyServer {
   async onRequest(req: Party.Request) {
     console.log({ req })
     // we only allow one instance of chatRooms party
-    if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
+    // if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
     // Clients fetch list of rooms for server rendering pages via HTTP GET
     if (req.method === "GET") return json(await this.getRooms(req));
@@ -71,10 +71,11 @@ export default class TablesServer extends PartyServer {
 
   /** Fetches list of active rooms */
   // await this.party.storage.deleteAll();
-  async getRooms(req?: any, id?: string): Promise<TableState[] | TableState> {
-    console.log({ id })
-    if (id) {
-      const room = await this.party.storage.get<TableState>(id);
+  async getRooms(req?: any): Promise<TableState[] | TableState> {
+    const partyId = this.party.id
+    if (partyId !== SINGLETON_ROOM_ID) {
+      const room = await this.party.storage.get<TableState>(partyId);
+      console.log(room)
       return room;
     } else {
       const gameType = new URLSearchParams(req?.url?.split("?")?.[1]).get("gameType");
