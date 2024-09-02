@@ -13,13 +13,13 @@ export const SINGLETON_ROOM_ID = "games";
 export type RoomCreateRequest = {
   action: 'create';
   id: string;
-  tableState: TableState;
+  state: TableState;
 };
 
 export type RoomUpdateRequest = {
   action: 'update';
   id: string;
-  tableState: TableState;
+  state: TableState;
 };
 
 export type RoomDeleteRequest = {
@@ -43,7 +43,7 @@ export default class TablesServer implements Party.Server {
     // allows for a higher number of concurrent connections
   };
 
-  constructor(public party: Party.Party) { }
+  constructor(readonly room: Party.Room) { }
 
   async onRequest(req: Party.Request) {
     // we only allow one instance of chatRooms party
@@ -61,13 +61,13 @@ export default class TablesServer implements Party.Server {
       } else {
         roomList = await this.getRoom();
       }
-      this.party.broadcast(JSON.stringify(roomList));
+      this.room.broadcast(JSON.stringify(roomList));
       return json(roomList);
     }
 
     // admin api for clearing all rooms (not used in UI)
     if (req.method === "DELETE") {
-      await this.party.storage.delete(this.party.id);
+      await this.room.storage.delete(this.room.id);
       return json({ message: "Room history cleared" });
     }
 
@@ -76,8 +76,8 @@ export default class TablesServer implements Party.Server {
 
   /** Fetches list of active rooms */
   // await this.party.storage.deleteAll();
-  async getRoom(): Promise<TableState> {
-    const room = await this.party.storage.get<TableState>(this.party.id);
+  async getRoom(): Promise<TableState[] | TableState> {
+    const room = await this.room.storage?.get(this.room.id)
     return room;
   }
   /** Updates table with information received from game */
@@ -88,14 +88,19 @@ export default class TablesServer implements Party.Server {
       | RoomCreateRequest;
 
     if (update.action === "delete") {
-      await this.party.storage.delete(update.id);
+      await this.room.storage.delete(update.id);
       return this.getRoom();
     }
 
-    const info = update.tableState;
-    const totalPlayers = info?.queuedPlayers?.length + info?.spectatorPlayers?.length + info?.inGamePlayers?.length;
-
-    await this.party.storage.put(update.id, info);
-    return this.getRoom();
+    if (update.action === 'create' || update.action === 'update') {
+      const info = update.state;
+      const totalPlayers = info?.queuedPlayers?.length + info?.spectatorPlayers?.length + info?.inGamePlayers?.length;
+      // await this.room.storage.put(update.id, info);
+      console.log('this.room')
+      console.log(this.room.id)
+      console.log(this.room)
+      // await this.room.context.parties[update.gameType]?.storage.put(update.id, info)
+      return this.getRoom();
+    }
   }
 }

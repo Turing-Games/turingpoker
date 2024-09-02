@@ -1,7 +1,6 @@
 export const games = {
   get: async (c) => {
     const queryParams = c.req.query()
-    console.log(queryParams)
     const id = c.req.param('id')
     let sql = 'SELECT * from games join game_configs on games.id = game_configs.game_id'
 
@@ -51,6 +50,7 @@ export const games = {
       await gameConfigStmt.run()
       return c.json(results);
     } catch (e) {
+      console.log(e)
       return c.json({ message: JSON.stringify(e) }, 500);
     }
   },

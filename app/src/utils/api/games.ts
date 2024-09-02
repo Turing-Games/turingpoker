@@ -56,26 +56,28 @@ export function createGame(gameConfig: any, gameType: string) {
   return new Promise(async (resolve, reject) => {
     try {
       // d1
-      await fetch('/api/v1/games', {
-        method: 'POST',
-        body: JSON.stringify({
-          gameType,
-          ...gameConfig
-        })
-      });
+      // await fetch('/api/v1/games', {
+      //   method: 'POST',
+      //   body: JSON.stringify({
+      //     gameType,
+      //     ...gameConfig
+      //   })
+      // });
       // partykit
-      await fetch(partyUrl, {
-        method: "POST",
-        body: JSON.stringify({
-          id: uuid,
-          tableState: {
-            ...gameConfig,
-            gameType,
+      await fetch(
+        `${PARTYKIT_URL}/parties/${gameType}/${uuid}`,
+        {
+          method: "POST",
+          body: JSON.stringify({
             id: uuid,
-          },
-          action: "create",
-        })
-      });
+            tableState: {
+              ...gameConfig,
+              gameType,
+              id: uuid,
+            },
+            action: "create",
+          })
+        });
 
       resolve(true)
     } catch (e) {
@@ -89,20 +91,27 @@ export function getGamesWithSocketData(url: string) {
     try {
       const res = await fetch(url)
       const rooms = await res.json()
-      // const pkData = await fetch(`${partyUrl}/${rooms[0].id}`, {
-      //   method: "GET"
+      //       game_id
+      // : 
+      // "57d89f61-af0e-40ec-89a6-d82a3bbfe920"
+      // game_type
+      // : 
+      // "poker"
+      // id
+      // : 
+      // "98141857-cde1-44bb-ad70-db90f9c12d56"
+
+      // const pkData = await PartySocket.fetch({
+      //   host: PARTYKIT_URL,
+      //   room: rooms[0]?.id,
+      //   party: rooms[0].game_type
       // })
-      const pkData = await PartySocket.fetch({
-        host: PARTYKIT_URL,
-        room: SINGLETON_ROOM_ID,
-        party: 'tables'
-      })
 
 
-      const pkDataJson = await pkData.json()
+      // const pkDataJson = await pkData.json()
       resolve([
         rooms,
-        pkDataJson
+        // pkDataJson
       ])
     } catch (e) {
       reject(e)

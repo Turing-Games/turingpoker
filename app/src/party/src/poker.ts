@@ -447,34 +447,4 @@ export default class PartyServer extends TablesServer {
       // await this.removeRoomFromRoomList(id);
     }
   }
-
-  /** Fetches list of active rooms */
-  async getRooms(): Promise<TableState[]> {
-    const rooms = await this.party.storage.list<TableState>();
-    return [...rooms.values()];
-  }
-
-  /** Updates list of active rooms with information received from chatroom */
-  async updateRoomInfo(req: Party.Request) {
-    const update = (await req.json()) as
-      | RoomUpdateRequest
-      | RoomDeleteRequest;
-
-    if (update.action === "delete") {
-      await this.party.storage.delete(update.id);
-      return this.getRooms();
-    }
-
-    const info = update.tableState;
-    if (info.queuedPlayers.length + info.spectatorPlayers.length + info.inGamePlayers.length == 0) {
-      // if no users are present, delete the room
-      await this.party.storage.delete(update.id);
-      return this.getRooms();
-    }
-
-    this.party.storage.put(update.id, info);
-
-    await this.party.storage.put(update.id, info);
-    return this.getRooms();
-  }
 }
