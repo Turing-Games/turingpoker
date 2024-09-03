@@ -55,6 +55,10 @@ app.get('/api/v1/auth/bots', keys.verify)
 // BOTS
 app.get('/api/v1/bots', c => c.json({ message: 'Not implemented' }, 501))
 
+// partykit
+app.post("/api/v1/pk/games/:id", games.pk.create)
+app.delete('/api/v1/pk/games/:id', games.delete)
+
 // handles assets, serving client
 app.get("*", (c) => {
   const assetsFolder = c?.env?.HONO_ENV === "production" ? "/assets" : "/static";

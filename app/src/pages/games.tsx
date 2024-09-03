@@ -32,10 +32,10 @@ export default function Games() {
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
 
   // use both partykit storage id and d1 id until standardized to d1
-  const deleteTable = async (id: string, gameId?: string) => {
-    await deleteGame(id)
+  const deleteTable = async (id: string, gameId?: string, gameType: string) => {
+    await deleteGame(id, gameType)
     if (gameId !== id && gameId) {
-      await deleteGame(gameId)
+      await deleteGame(gameId, gameType)
     }
 
     getTables()
@@ -58,8 +58,7 @@ export default function Games() {
     setLoading(true)
     try {
       const url = buildUrl('/api/v1/games', filters)
-      const games = await getGamesWithSocketData(url)
-      console.log(games)
+      // const games = await getGamesWithSocketData(url)
       const res = await fetch(url)
       let rooms = await res.json()
       setTables(rooms)
@@ -169,7 +168,7 @@ export default function Games() {
                     <div
                       className='cursor-pointer'
                       onClick={async () => {
-                        await deleteTable(table.id, table.game_id)
+                        await deleteTable(table.id, table.game_id, table.game_type)
                       }}
                     >
                       <TrashIcon className="text-[red]" />

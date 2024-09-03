@@ -3,15 +3,14 @@ import * as Kuhn from '@app/party/src/game-logic/kuhn'
 import { ClientMessage, TableState, ServerStateMessage, ServerUpdateMessage, IPlayer, GamePhase } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from '../../utils/response';
-import { RoomDeleteRequest, RoomUpdateRequest } from './tables';
-import MainPartyServer from './main';
+import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
 export const MAX_PLAYERS = 2
 
 const defaultStack = 3;
-export default class PartyServer extends MainPartyServer {
+export default class PartyServer extends TablesServer {
   public gameState: Kuhn.IPokerGame | null = null;
   public gameConfig: Kuhn.IPokerConfig = {
     dealerPosition: 0,

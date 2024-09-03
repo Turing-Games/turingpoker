@@ -70,9 +70,24 @@ export const games = {
     const gameStmt = c.env.DB.prepare('DELETE FROM games WHERE id = ?').bind(id)
     try {
       const { results } = await gameStmt.run()
+
+      // pk test
+      // await fetch(`${PARTYKIT_URL}/parties/${gameType}/${gameId}`, {
+      //   method: "DELETE",
+      //   body: JSON.stringify({
+      //     action: "delete",
+      //     id: gameId
+      //   })
+      // })
       return c.json(results);
     } catch (e) {
       return c.json({ message: JSON.stringify(e) }, 500);
+    }
+  },
+  // partykit proxy routes
+  pk: {
+    get: async (c) => {
+
     }
   }
 }

@@ -50,7 +50,10 @@ export default class TablesServer implements Party.Server {
     // if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
     // Clients fetch list of rooms for server rendering pages via HTTP GET
-    if (req.method === "GET") return json(await this.getRoom());
+    if (req.method === "GET") {
+      console.log('get tables')
+      return json(await this.getRoom());
+    }
 
     // Chatrooms report their connections via HTTP POST
     // update room info and notify all connected clients
@@ -67,6 +70,9 @@ export default class TablesServer implements Party.Server {
 
     // admin api for clearing all rooms (not used in UI)
     if (req.method === "DELETE") {
+      console.log(this.party.name)
+      console.log('this.room')
+      console.log(this.room.id)
       await this.room.storage.delete(this.room.id);
       return json({ message: "Room history cleared" });
     }
@@ -96,9 +102,7 @@ export default class TablesServer implements Party.Server {
       const info = update.state;
       const totalPlayers = info?.queuedPlayers?.length + info?.spectatorPlayers?.length + info?.inGamePlayers?.length;
       // await this.room.storage.put(update.id, info);
-      console.log('this.room')
-      console.log(this.room.id)
-      console.log(this.room)
+      await this.room.storage.put(update.id, info)
       // await this.room.context.parties[update.gameType]?.storage.put(update.id, info)
       return this.getRoom();
     }
