@@ -4,7 +4,7 @@ export function buildUrl(path: string, params: any) {
 }
 
 export function urlFilters(params: any) {
-  return `?filters=${new URLSearchParams(deleteFalseyValues(params)).toString()}`
+  return `?${new URLSearchParams(deleteFalseyValues(params)).toString()}`
 }
 
 export function deleteFalseyValues(obj: any) {

@@ -104,7 +104,7 @@ export default function Games() {
         {/* filters */}
         <div className="flex items-center gap-[8px] mt-[16px] mb-[32px]">
 
-          <SegmentedControl.Root
+          {/* <SegmentedControl.Root
             defaultValue={filters?.gameStatus}
             style={{ height: 40 }}
           >
@@ -121,7 +121,7 @@ export default function Games() {
                 )
               })
             }
-          </SegmentedControl.Root>
+          </SegmentedControl.Root> */}
           <Select
             options={GAME_TYPE_FILTERS}
             selected={filters?.gameType}

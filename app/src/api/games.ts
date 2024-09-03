@@ -1,17 +1,33 @@
 export const games = {
   get: async (c) => {
     const queryParams = c.req.query()
+    console.log(queryParams)
     const id = c.req.param('id')
     let sql = 'SELECT * from games join game_configs on games.id = game_configs.game_id'
 
     if (id) {
       sql += ' WHERE id = ? '
+      if (queryParams.gameType) {
+        sql += ' AND game_type = ? '
+      }
+    } else {
+      if (queryParams.gameType) {
+        sql += ' WHERE game_type = ? '
+      }
     }
 
 
     let gameStmt = c.env.DB.prepare(sql)
     if (id) {
-      gameStmt = gameStmt.bind(id)
+      if (queryParams.gameType) {
+        gameStmt = gameStmt.bind(id, queryParams.gameType)
+      } else {
+        gameStmt = gameStmt.bind(id)
+      }
+    } else {
+      if (queryParams.gameType) {
+        gameStmt = gameStmt.bind(queryParams.gameType)
+      }
     }
 
     try {
