@@ -22,7 +22,9 @@ export type ClientState = {
 };
 
 export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: string, gameType?: string }) {
+
   const [clientState, setClientState] = useState<ClientState>(DEFAULT_CLIENT_STATE);
+  const [socket, setSocket] = useState<any>()
 
   const gamesComponents = {
     'poker': PokerGame,
@@ -49,78 +51,78 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
       const game = await games.get(id)
       if (game) return
     }
+
+    const socket = new PartySocket({
+      host: PARTYKIT_URL,
+      room: gameId ?? gameId.toString(),
+      party: gameType
+    });
+
+    socket.addEventListener("open", () => {
+      setClientState((prevState) => ({
+        ...prevState,
+        isConnected: true,
+        playerId: socket.id,
+        socket: socket,
+        gameType: gameType
+      }));
+    });
+
+    socket.addEventListener("message", (event) => {
+      try {
+        const data: ServerStateMessage = JSON.parse(event.data);
+        if (!data.state) return;
+        for (const update of data.lastUpdates) {
+          if (update.type == 'game-ended') {
+            setPreviousActions({})
+          }
+          if (update.type == 'action') {
+            setPreviousActions((prevState) => ({
+              ...prevState,
+              [update.player.playerId]: update.action,
+            }));
+          }
+        }
+        startTransition(() => {
+          setClientState((prevState) => ({
+            ...prevState,
+            serverState: data,
+            updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-500),
+          }));
+        });
+      } catch {
+        setClientState((prevState) => ({
+          ...prevState,
+          serverState: null,
+        }));
+      }
+    });
+
+    socket.addEventListener("close", () => {
+      setClientState((prevState) => ({
+        ...prevState,
+        isConnected: false,
+      }));
+    });
+
+    socket.addEventListener("error", (event) => {
+      console.error("WebSocket error:", event);
+    });
+
+    setClientState((prevState) => ({
+      ...prevState,
+      socket: socket,
+    }));
+
+    setSocket(socket)
   }
 
   useEffect(() => {
-    // const roomId = crypto.randomUUID();
     initializeGame(gameId)
-    // const socket = new PartySocket({
-    //   host: PARTYKIT_URL,
-    //   room: gameId ?? roomId.toString(),
-    //   party: gameType
-    // });
-
-    // socket.addEventListener("open", () => {
-    //   setClientState((prevState) => ({
-    //     ...prevState,
-    //     isConnected: true,
-    //     playerId: socket.id,
-    //     socket: socket,
-    //     gameType: gameType
-    //   }));
-    // });
-
-    // socket.addEventListener("message", (event) => {
-    //   try {
-    //     const data: ServerStateMessage = JSON.parse(event.data);
-    //     if (!data.state) return;
-    //     for (const update of data.lastUpdates) {
-    //       if (update.type == 'game-ended') {
-    //         setPreviousActions({})
-    //       }
-    //       if (update.type == 'action') {
-    //         setPreviousActions((prevState) => ({
-    //           ...prevState,
-    //           [update.player.playerId]: update.action,
-    //         }));
-    //       }
-    //     }
-    //     startTransition(() => {
-    //       setClientState((prevState) => ({
-    //         ...prevState,
-    //         serverState: data,
-    //         updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-500),
-    //       }));
-    //     });
-    //   } catch {
-    //     setClientState((prevState) => ({
-    //       ...prevState,
-    //       serverState: null,
-    //     }));
-    //   }
-    // });
-
-    // socket.addEventListener("close", () => {
-    //   setClientState((prevState) => ({
-    //     ...prevState,
-    //     isConnected: false,
-    //   }));
-    // });
-
-    // socket.addEventListener("error", (event) => {
-    //   console.error("WebSocket error:", event);
-    // });
-
-    // setClientState((prevState) => ({
-    //   ...prevState,
-    //   socket: socket,
-    // }));
-
-
-    // return () => {
-    //   socket.close();
-    // };
-  }, [setClientState]);
+    return () => {
+      socket.close()
+    }
+  }, []);
 
   if (gamesComponents[gameType]) {
     return (
