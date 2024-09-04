@@ -16,7 +16,7 @@ import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games
 import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 import TgTable from '@app/components/Table';
 import { buildUrl } from '@app/utils/url';
-import { createGame, deleteGame, getGamesWithSocketData } from '@app/utils/api/games';
+import { games } from '@app/utils/api/games';
 
 
 export default function Games() {
@@ -32,10 +32,10 @@ export default function Games() {
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
 
   // use both partykit storage id and d1 id until standardized to d1
-  const deleteTable = async (id: string, gameId?: string, gameType: string) => {
-    await deleteGame(id, gameType)
+  const deleteTable = async (id: string, gameType: string, gameId?: string) => {
+    await games.delete(id, gameType)
     if (gameId !== id && gameId) {
-      await deleteGame(gameId, gameType)
+      await games.delete(gameId, gameType)
     }
 
     getTables()
@@ -168,7 +168,7 @@ export default function Games() {
                     <div
                       className='cursor-pointer'
                       onClick={async () => {
-                        await deleteTable(table.id, table.game_id, table.game_type)
+                        await deleteTable(table.id, table.game_type, table.game_id)
                       }}
                     >
                       <TrashIcon className="text-[red]" />
@@ -204,7 +204,7 @@ export default function Games() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            await createGame(gameConfig?.config, gameTypeForm)
+            // await createGame(gameConfig?.config, gameTypeForm)
             getTables()
             setIsOpen(false)
             setGameTypeForm('')

@@ -1,4 +1,4 @@
-const queryClient = async (resource = '', method = '', query = {}) => {
+export default async function queryClient(resource = '', method = '', query = {}) {
   try {
     if (['GET', 'DELETE'].includes(method)) {
       const res = await fetch(`/api/v1/${resource}`, { method })
@@ -14,5 +14,3 @@ const queryClient = async (resource = '', method = '', query = {}) => {
     console.log(err)
   }
 }
-
-export default queryClient;

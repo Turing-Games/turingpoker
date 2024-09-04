@@ -44,6 +44,7 @@ export const games = {
   },
   create: async (c) => {
     const {
+      id = '',
       title = '',
       tournamentId = null,
       gameType,
@@ -51,7 +52,7 @@ export const games = {
       maxPlayers,
       autoStart
     } = await c.req.json()
-    const gameId = crypto.randomUUID()
+    const gameId = id || crypto.randomUUID()
     const gameConfigId = crypto.randomUUID()
     console.log('create game...')
     const gameStmt = c.env.DB.prepare(`

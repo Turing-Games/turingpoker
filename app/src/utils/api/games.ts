@@ -3,12 +3,19 @@ import { SINGLETON_ROOM_ID } from "@tg/tables";
 import { buildUrl } from "../url";
 import PartySocket from "partysocket";
 
+type GAME_CONFIG = {
+  id?: string,
+  minPlayers: number,
+  maxPlayers: number,
+  autoStart?: boolean
+}
+
 const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
 
-export default function recordWinner(gameId: string, winnerId: string) {
+function recordWinner(gameId: string, winnerId: string) {
   return new Promise(async (resolve, reject) => {
     try {
-      const res = await fetch(`http://127.0.0.1:5173/api/v1/games/${gameId}`, {
+      const res = await fetch(`/api/v1/games/${gameId}`, {
         method: 'PUT',
         body: JSON.stringify({ winnerId }),
         headers: {
@@ -24,8 +31,7 @@ export default function recordWinner(gameId: string, winnerId: string) {
 }
 
 // deleteGame deletes from partykit storage and d1
-export function deleteGame(gameId: string, gameType: string) {
-  console.log('deleting game', gameId)
+function deleteGame(gameId: string, gameType: string) {
   return new Promise(async (resolve, reject) => {
     try {
       // await fetch(`${PARTYKIT_URL}/parties/${gameType}/${gameId}`, {
@@ -47,7 +53,10 @@ export function deleteGame(gameId: string, gameType: string) {
 }
 
 // createGame creates a game in partykit storage and d1
-export function createGame(gameConfig: any, gameType: string) {
+function createGame(
+  gameConfig: GAME_CONFIG,
+  gameType: string
+) {
   const uuid = crypto.randomUUID()
   console.log({
     gameType,
@@ -70,7 +79,7 @@ export function createGame(gameConfig: any, gameType: string) {
   })
 }
 
-export function getGamesWithSocketData(url: string) {
+function listGames(url: string) {
   return new Promise(async (resolve, reject) => {
     try {
       const res = await fetch(url)
@@ -80,4 +89,24 @@ export function getGamesWithSocketData(url: string) {
       reject(e)
     }
   })
+}
+
+function getGame(gameId: string) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const res = await fetch(`/api/v1/games/${gameId}`)
+      const game = await res.json()
+      resolve(game)
+    } catch (e) {
+      reject(e)
+    }
+  })
+}
+
+export const games = {
+  recordWinner,
+  get: getGame,
+  delete: deleteGame,
+  create: createGame,
+  list: listGames
 }
