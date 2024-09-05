@@ -95,22 +95,32 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     const roomId = crypto.randomUUID();
 
     if (!id) { // no id to create or join game with
-      await games.create(
-        {
-          id: roomId,
-          autoStart: true,
-          minPlayers: 2,
-          maxPlayers: gameType === 'kuhn' ? 2 : 10,
-        },
-        gameType
-      )
-      window.history.pushState({}, '', `/games/${roomId}/${gameType}`);
+      try {
+        await games.create(
+          {
+            id: roomId,
+            autoStart: true,
+            minPlayers: 2,
+            maxPlayers: gameType === 'kuhn' ? 2 : 10,
+          },
+          gameType
+        )
+        const socket = new PartySocket({
+          host: PARTYKIT_URL,
+          room: roomId,
+          party: gameType
+        });
+        handleSocket(socket)
+        window.history.pushState({}, '', `/games/${roomId}/${gameType}`);
+      } catch (e) {
+        console.log(e)
+      }
     } else { // there is an id in url
       const game = await games.get(id)
       if (game.id) { // game in found in d1
         const socket = new PartySocket({
           host: PARTYKIT_URL,
-          room: id,
+          room: game.game_id,
           party: gameType
         });
         handleSocket(socket)
@@ -123,10 +133,12 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
 
   useEffect(() => {
     initializeGame(gameId)
+    console.log('clientState.serverState')
+    console.log(clientState.serverState)
     return () => {
       clientState?.socket?.close()
     }
-  }, []);
+  }, [setClientState]);
 
   if (gamesComponents[gameType]) {
     return (

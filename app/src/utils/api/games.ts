@@ -71,7 +71,7 @@ function createGame(
       });
       resolve(true)
     } catch (e) {
-      reject(e)
+      throw new Error(e)
     }
   })
 }
