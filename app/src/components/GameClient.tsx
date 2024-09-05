@@ -124,17 +124,13 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
           party: gameType
         });
         handleSocket(socket)
-      } else { // game not found in d1
-
-      }
+      } // else game not found, do not create new one right now
     }
 
   }
 
   useEffect(() => {
     initializeGame(gameId)
-    console.log('clientState.serverState')
-    console.log(clientState.serverState)
     return () => {
       clientState?.socket?.close()
     }
