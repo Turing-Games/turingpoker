@@ -33,31 +33,7 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
 
   const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
 
-  const initializeGame = async (id?: string) => {
-    const roomId = crypto.randomUUID();
-
-    if (!id) {
-      await games.create(
-        {
-          id: roomId,
-          autoStart: true,
-          minPlayers: 2,
-          maxPlayers: gameType === 'kuhn' ? 2 : 10,
-        },
-        gameType
-      )
-      window.history.pushState({}, '', `/games/${roomId}/${gameType}`);
-    } else {
-      const game = await games.get(id)
-      if (game) return
-    }
-
-    const socket = new PartySocket({
-      host: PARTYKIT_URL,
-      room: id || roomId,
-      party: gameType
-    });
-
+  const handleSocket = (socket: PartySocket) => {
     socket.addEventListener("open", () => {
       setClientState((prevState) => ({
         ...prevState,
@@ -113,6 +89,36 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
       ...prevState,
       socket: socket,
     }));
+  }
+
+  const initializeGame = async (id?: string) => {
+    const roomId = crypto.randomUUID();
+
+    if (!id) { // no id to create or join game with
+      await games.create(
+        {
+          id: roomId,
+          autoStart: true,
+          minPlayers: 2,
+          maxPlayers: gameType === 'kuhn' ? 2 : 10,
+        },
+        gameType
+      )
+      window.history.pushState({}, '', `/games/${roomId}/${gameType}`);
+    } else { // there is an id in url
+      const game = await games.get(id)
+      if (game.id) { // game in found in d1
+        const socket = new PartySocket({
+          host: PARTYKIT_URL,
+          room: id,
+          party: gameType
+        });
+        handleSocket(socket)
+      } else { // game not found in d1
+
+      }
+    }
+
   }
 
   useEffect(() => {

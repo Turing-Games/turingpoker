@@ -279,7 +279,6 @@ export default class PartyServer extends TablesServer {
   }
 
   broadcastGameState() {
-    console.log('broadcast')
     for (const player of this.inGamePlayers
       .concat(this.spectatorPlayers)
       .concat(this.queuedPlayers)) {

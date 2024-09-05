@@ -32,7 +32,7 @@ export const games = {
     try {
       const { results } = await gameStmt.all()
       if (id) {
-        return c.json(results[0]);
+        return c.json(results ? results[0] : {});
       } else {
         return c.json(results);
       }
@@ -53,11 +53,11 @@ export const games = {
     } = await c.req.json()
     const gameId = id || crypto.randomUUID()
     const gameConfigId = crypto.randomUUID()
-    console.log('create game...')
+
     const gameStmt = c.env.DB.prepare(`
       INSERT into games (id, title, tournament_id, game_type) VALUES (?, ?, ?, ?) `)
       .bind(gameId, title, tournamentId, gameType)
-    console.log('create game config...')
+
     try {
       const { results } = await gameStmt.run()
       const gameConfigStmt = c.env.DB.prepare(`

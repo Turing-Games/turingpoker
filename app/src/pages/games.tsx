@@ -153,9 +153,9 @@ export default function Games() {
                   id: (
                     <Link
                       className="underline"
-                      to={`/games/${table.id}/${table.game_type}`}
+                      to={`/games/${table.game_id}/${table.game_type}`}
                     >
-                      {table.name || table.id}
+                      {table.name || table.game_id}
                     </Link>
                   ),
                   gameType: table.game_type,

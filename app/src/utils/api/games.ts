@@ -58,14 +58,11 @@ function createGame(
   gameType: string
 ) {
   const uuid = crypto.randomUUID()
-  console.log({
-    gameType,
-    ...gameConfig
-  })
+
   return new Promise(async (resolve, reject) => {
     try {
       // d1
-      await fetch('/api/v1/games', {
+      const game = await fetch('/api/v1/games', {
         method: 'POST',
         body: JSON.stringify({
           gameType,

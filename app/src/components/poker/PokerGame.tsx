@@ -11,6 +11,7 @@ import Cards from "./Cards";
 import { GameInfo } from "./GameInfo";
 import { sendMessage } from "@app/utils/websocket";
 import useSmallScreen from "@app/hooks/useSmallScreen";
+import ConnectionFailed from "../ConnectionFailed";
 
 interface Props {
   clientState: ClientState;
@@ -20,18 +21,7 @@ interface Props {
 const PokerGame = ({ clientState, previousActions }: Props) => {
   const serverState = clientState.serverState;
   if (!serverState) {
-    return <div style={{
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      flexDirection: 'column',
-      height: '100%',
-      width: '100%',
-      flex: 1
-    }}>
-      <h2>No connection to poker engine...</h2>
-      <CardLoader />
-    </div>;
+    return <ConnectionFailed />;
   }
 
   const socket = clientState.socket
