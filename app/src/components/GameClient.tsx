@@ -54,7 +54,7 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
 
     const socket = new PartySocket({
       host: PARTYKIT_URL,
-      room: gameId ?? gameId.toString(),
+      room: id || roomId,
       party: gameType
     });
 
@@ -113,14 +113,12 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
       ...prevState,
       socket: socket,
     }));
-
-    setSocket(socket)
   }
 
   useEffect(() => {
     initializeGame(gameId)
     return () => {
-      socket.close()
+      clientState?.socket?.close()
     }
   }, []);
 

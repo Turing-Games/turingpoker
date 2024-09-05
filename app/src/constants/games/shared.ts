@@ -27,7 +27,8 @@ export const DEFAULT_CLIENT_STATE = {
   lastServerState: null,
   playerId: null,
   updateLog: [],
-  gameType: ''
+  gameType: '',
+  socket: null
 }
 
 export const GAME_STATUS_FILTERS = [
