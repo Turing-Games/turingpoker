@@ -129,7 +129,7 @@ describe("Poker logic", () => {
         expect(game.state.whoseTurn).toBe('2');
         game = poker.step(game, { type: 'fold' }).next;
 
-        expect(game.state.done).toBeTruthy();
+        expect(game.state.roundOver).toBeTruthy();
     });
 
     test("Small blind calling sets its bet to big blind", () => {
@@ -157,7 +157,7 @@ describe("Poker logic", () => {
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.step(game, { type: 'fold' }).next;
-        expect(game.state.done).toBeTruthy();
+        expect(game.state.roundOver).toBeTruthy();
         expect(poker.payout(game.state, game.hands).payouts).toMatchObject({ '4': game.state.pot });
     });
 
@@ -176,7 +176,7 @@ describe("Poker logic", () => {
         game = poker.step(game, { type: 'call' }).next;
         game = poker.step(game, { type: 'call' }).next;
         expect(game.state.cards.length).toBe(5);
-        expect(game.state.done).toBeTruthy();
+        expect(game.state.roundOver).toBeTruthy();
     });
 
     test("Going to showdown causes payout to best hand", () => {
@@ -184,7 +184,7 @@ describe("Poker logic", () => {
             let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
             let iters = 0;
-            while (!game.state.done) {
+            while (!game.state.roundOver) {
                 // obviously it should never reach 1000 iterations
                 expect(iters++).toBeLessThan(1000);
                 // pre-flop, flop, turn, river => raised 4 times
@@ -221,7 +221,7 @@ describe("Poker logic", () => {
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.forcedFold(game, '1').next;
-        expect(game.state.done).toBeTruthy();
+        expect(game.state.roundOver).toBeTruthy();
         // the only player left should get the pot
         expect(poker.payout(game.state, game.hands).payouts).toMatchObject({ '4': game.state.pot });
     });
@@ -235,7 +235,7 @@ describe("Poker logic", () => {
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.forcedFold(game, '4').next;
         expect(game.state.whoseTurn).toBe('1');
-        expect(game.state.done).toBeTruthy();
+        expect(game.state.roundOver).toBeTruthy();
         // the only player left should get the pot
         expect(poker.payout(game.state, game.hands).payouts).toMatchObject({ '1': game.state.pot });
     });
@@ -311,7 +311,7 @@ describe("Poker logic", () => {
         game = poker.step(game, { type: 'call' }).next;
         game = poker.step(game, { type: 'call' }).next;
 
-        expect(game.state.done).toBeTruthy();
+        expect(game.state.roundOver).toBeTruthy();
 
         game.hands['0'] = [{ rank: 1, suit: 'clubs' }, { rank: 1, suit: 'diamonds' }];
 

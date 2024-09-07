@@ -125,7 +125,7 @@ export default class PartyServer extends TablesServer {
 
     if (
       this.gameState.state.whoseTurn !== playerId ||
-      this.gameState.state.done
+      this.gameState.state.roundOver
     ) {
       console.log("Player attempted to make action out of turn", playerId);
       return;
@@ -148,7 +148,7 @@ export default class PartyServer extends TablesServer {
     } catch (err) {
       console.log(err);
     }
-    if (this.gameState.state.done) {
+    if (this.gameState.state.roundOver) {
       this.endRound(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );
@@ -170,14 +170,16 @@ export default class PartyServer extends TablesServer {
   }
 
   startRound() {
-    if (this.gameState && !this.gameState.state.done) {
+    // if gamestate already exists, do not create a new one
+    if (this.gameState && this.gamePhase !== 'final') {
       return;
     }
-    // if anyone has zero chips just reset them to 1000
+
     for (const player of this.inGamePlayers.concat(this.queuedPlayers)) {
       this.lastActed[player.playerId] = Date.now();
     }
     this.processQueuedPlayers();
+
     this.gameState = Poker.createPokerGame(
       this.gameConfig,
       this.inGamePlayers,
@@ -421,7 +423,7 @@ export default class PartyServer extends TablesServer {
 
     // it's important to remove the players before ending the game since if autostart is on
     // we don't want the removed player to get added
-    if (this.gameState?.state.done) {
+    if (this.gameState?.state.roundOver) {
       this.endRound(
         this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
       );

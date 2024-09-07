@@ -86,7 +86,7 @@ export interface IPokerSharedState {
     // so big blind is (dealerPosition-1)%players.length
     // small blind is (dealerPosition-2)%players.length
     round: PokerRound;
-    done: boolean;
+    roundOver: boolean;
     cards: Card[];
     whoseTurn: PlayerID | null;
 }
@@ -143,7 +143,7 @@ export function createPokerGame(config: IPokerConfig, players: IPlayer[], stacks
     const bb = (config.dealerPosition - 2 + players.length) % players.length;
     const out: IPokerGame = {
         state: { // shared state
-            done: false,
+            roundOver: false,
             pot: 0,
             players: players.map((player, i) => ({ lastRound: null, id: player.playerId, isBot: player.isBot, stack: stacks[i], folded: false, currentBet: 0, shouldMove: true })),
             round: 'pre-flop',
@@ -285,7 +285,7 @@ export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, 
  * @returns The new state after the move
  */
 export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: GameLog } {
-    if (game.state.done) throw new Error("Game is over");
+    if (game.state.roundOver) throw new Error("Game is over");
     const { state, config, hands, deck } = game;
     const log: GameLog = [];
     let out: { next: IPokerGame, log: GameLog } = {
@@ -306,7 +306,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         // set done to true if all players except one have folded
         const remainingPlayers = state.players.filter(p => !p?.folded);
         if (remainingPlayers.length == 1) {
-            state.done = true;
+            state.roundOver = true;
         }
         out = { next: { state, config, hands, deck }, log };
     }
@@ -368,7 +368,7 @@ export function step(game: IPokerGame, move: Action): { next: IPokerGame, log: G
         }
         else if (state.round == 'river') {
             state.round = 'showdown';
-            state.done = true;
+            state.roundOver = true;
         }
         if (state.round != 'showdown') {
             let idx = state.players.length - 1;
@@ -405,7 +405,7 @@ export function forcedFold(game: IPokerGame, playerId: PlayerID): {
     else {
         player.folded = true;
         if (game.state.players.filter(p => !p.folded).length == 1) {
-            game.state.done = true;
+            game.state.roundOver = true;
         }
     }
 
