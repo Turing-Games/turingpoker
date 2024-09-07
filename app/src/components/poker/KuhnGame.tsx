@@ -41,7 +41,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
     if (serverState.spectatorPlayers.find(player => player.playerId === playerId)) return 'spectator'
     if (serverState.queuedPlayers.find(player => player.playerId === playerId)) return 'queued'
 
-    if (serverState.state.gamePhase == 'pending') return 'waiting'
+    if (serverState.gamePhase == 'pending') return 'waiting'
 
     if (gameState?.players.find(player => player.id === playerId)?.folded)
       return 'folded'

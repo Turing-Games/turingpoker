@@ -50,7 +50,11 @@ export default class PartyServer extends TablesServer {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    if (this.gamePhase === 'final') return
+    console.log(this)
+    if (this.gamePhase === 'final') {
+      this.broadcastGameState();
+      return
+    }
     if (this.inGamePlayers.length < 2) {
       this.gamePhase = "pending";
     }
@@ -102,6 +106,7 @@ export default class PartyServer extends TablesServer {
   }
 
   handlePlayerAction(playerId: string, action: Poker.Action) {
+    console.log(this.gamePhase)
     const player = this.inGamePlayers.find((p) => p.playerId === playerId);
     if (!player) {
       console.log(
@@ -110,7 +115,7 @@ export default class PartyServer extends TablesServer {
       );
       return;
     }
-    if (!this.gameState) {
+    if (this.gamePhase !== "active") {
       console.log(
         "Player attempted to make action while game is not active",
         playerId
@@ -171,9 +176,6 @@ export default class PartyServer extends TablesServer {
     // if anyone has zero chips just reset them to 1000
     for (const player of this.inGamePlayers.concat(this.queuedPlayers)) {
       this.lastActed[player.playerId] = Date.now();
-      if (this.stacks[player.playerId] <= 0) {
-        this.stacks[player.playerId] = defaultStack;
-      }
     }
     this.processQueuedPlayers();
     this.gameState = Poker.createPokerGame(
@@ -197,7 +199,10 @@ export default class PartyServer extends TablesServer {
 
   endRound(reason: "showdown" | "fold" | "system") {
     if (!this.gameState) {
-      return;
+      if (this.gamePhase === "final") {
+        this.broadcastGameState();
+      }
+      return
     }
     this.processQueuedPlayers();
 
@@ -217,7 +222,7 @@ export default class PartyServer extends TablesServer {
         (this.gameState.state.players.find((player) => player.id == playerId)
           ?.stack ?? 0) + payouts[playerId];
     }
-    //this.gamePhase = "pending";
+
     this.gameState = null;
     this.eliminatePlayers();
     // check if remaining players, for game winner
@@ -267,16 +272,14 @@ export default class PartyServer extends TablesServer {
       queuedPlayers: this.queuedPlayers,
       config: this.gameConfig,
       gamePhase: this.gamePhase,
-      state: this.gamePhase,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
     };
   }
 
   broadcastGameState() {
-    for (const player of this.inGamePlayers
-      .concat(this.spectatorPlayers)
-      .concat(this.queuedPlayers)) {
+    const allGamePlayers = this.inGamePlayers.concat(this.spectatorPlayers, this.queuedPlayers);
+    for (const player of allGamePlayers) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
       // Send game state; ensure spectators do not receive any cards information
@@ -358,7 +361,11 @@ export default class PartyServer extends TablesServer {
   }
 
   addPlayer(playerId: string, isBot = false) {
-    if (this.playerExists(playerId)) return;
+    if (this.playerExists(playerId)) {
+      this.broadcastGameState();
+      return
+    }
+
     this.stacks[playerId] = defaultStack;
     this.spectatorPlayers.push({
       playerId,

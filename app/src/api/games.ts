@@ -31,10 +31,14 @@ export const games = {
 
     try {
       const { results } = await gameStmt.all()
-      if (id) {
-        return c.json(results ? results[0] : {});
+      if (results.length === 0) {
+        return c.json({ message: 'No games found' }, 404);
       } else {
-        return c.json(results);
+        if (id) {
+          return c.json(results ? results[0] : {});
+        } else {
+          return c.json(results);
+        }
       }
     } catch (e) {
       console.log(e)

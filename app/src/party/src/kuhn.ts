@@ -48,7 +48,10 @@ export default class PartyServer extends TablesServer {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    if (this.gamePhase === 'final') return
+    if (this.gamePhase === 'final') {
+      this.broadcastGameState();
+      return
+    }
     if (this.inGamePlayers.length < 2) {
       this.gamePhase = "pending";
     }
@@ -272,16 +275,14 @@ export default class PartyServer extends TablesServer {
       queuedPlayers: this.queuedPlayers,
       config: this.gameConfig,
       gamePhase: this.gamePhase,
-      state: this.gamePhase,
       clientId: playerId,
       lastUpdates: this.queuedUpdates,
     };
   }
 
   broadcastGameState() {
-    for (const player of this.inGamePlayers
-      .concat(this.spectatorPlayers)
-      .concat(this.queuedPlayers)) {
+    const allGamePlayers = this.inGamePlayers.concat(this.queuedPlayers, this.spectatorPlayers);
+    for (const player of allGamePlayers) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
       // Send game state; ensure spectators do not receive any cards information
@@ -363,7 +364,10 @@ export default class PartyServer extends TablesServer {
   }
 
   addPlayer(playerId: string, isBot = false) {
-    if (this.playerExists(playerId)) return;
+    if (this.playerExists(playerId)) {
+      this.broadcastGameState();
+      return
+    }
     this.stacks[playerId] = defaultStack;
     this.spectatorPlayers.push({
       playerId,

@@ -5,7 +5,6 @@ import { useParams } from 'react-router-dom';
 import LogoDark from '@static/images/logo-dark.png';
 import Select from '@app/components/Select';
 import { Text } from '@radix-ui/themes';
-import { useSignIn } from '@clerk/clerk-react';
 
 
 export default function Home() {

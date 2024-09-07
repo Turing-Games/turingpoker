@@ -1,5 +1,5 @@
 import * as Poker from './game-logic/poker';
-import { IPartyServerState, IPlayer } from './poker';
+import IPartyServerState from './poker';
 
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
@@ -48,7 +48,6 @@ export type ServerStateMessage = {
     winner: IPlayer;
     spectatorPlayers: IPlayer[];
     queuedPlayers: IPlayer[];
-    state: IPartyServerState;
     clientId: string;
     lastUpdates: ServerUpdateMessage[]
     config: Poker.IPokerConfig
