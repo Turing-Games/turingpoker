@@ -8,6 +8,8 @@ import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
 export const MAX_PLAYERS = 8
+export const MAX_GAME_ROUNDS = 100
+export const DEMO_MODE = false
 
 const defaultStack = 1000;
 export default class PartyServer extends TablesServer {
@@ -18,7 +20,9 @@ export default class PartyServer extends TablesServer {
     maxPlayers: MAX_PLAYERS,
     smallBlind: 50,
     autoStart: AUTO_START,
-    minPlayers: MIN_PLAYERS_AUTO_START
+    minPlayers: MIN_PLAYERS_AUTO_START,
+    maxGameRounds: MAX_GAME_ROUNDS,
+    demoMode: DEMO_MODE
   };
 
   public stacks: Record<string, number> = {};
@@ -175,6 +179,12 @@ export default class PartyServer extends TablesServer {
 
     for (const player of this.inGamePlayers.concat(this.queuedPlayers)) {
       this.lastActed[player.playerId] = Date.now();
+
+      if (this.gameConfig.demoMode) {
+        if (this.stacks[player.playerId] <= 0) {
+          this.stacks[player.playerId] = defaultStack;
+        }
+      }
     }
     this.processQueuedPlayers();
 
@@ -232,7 +242,10 @@ export default class PartyServer extends TablesServer {
         payouts,
         reason,
       });
-      this.endGame();
+
+      if (!this.gameConfig.demoMode) {
+        this.endGame();
+      }
       this.broadcastGameState();
     } else if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
       this.broadcastGameState();

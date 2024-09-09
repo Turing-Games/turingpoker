@@ -24,6 +24,7 @@ export type ClientState = {
 export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: string, gameType?: string }) {
 
   const [clientState, setClientState] = useState<ClientState>(DEFAULT_CLIENT_STATE);
+  console.log(clientState)
 
   const gamesComponents = {
     'poker': PokerGame,

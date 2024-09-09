@@ -73,6 +73,8 @@ export interface IPokerConfig {
     maxPlayers: number;
     autoStart: boolean
     minPlayers: number
+    maxGameRounds: number
+    demoMode?: boolean
 }
 
 export interface IPokerSharedState {
@@ -97,7 +99,6 @@ export interface IPokerGame {
     config: IPokerConfig;
     hands: Record<PlayerID, [Card, Card]>;
     deck: Card[];
-    maxGameRounds: number;
 }
 
 export type GameLog = string[];
