@@ -51,7 +51,6 @@ export default class TablesServer implements Party.Server {
 
     // Clients fetch list of rooms for server rendering pages via HTTP GET
     if (req.method === "GET") {
-      console.log('get tables')
       return json(await this.getRoom());
     }
 
@@ -70,9 +69,6 @@ export default class TablesServer implements Party.Server {
 
     // admin api for clearing all rooms (not used in UI)
     if (req.method === "DELETE") {
-      console.log(this.party.name)
-      console.log('this.room')
-      console.log(this.room.id)
       await this.room.storage.delete(this.room.id);
       return json({ message: "Room history cleared" });
     }

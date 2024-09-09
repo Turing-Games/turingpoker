@@ -50,7 +50,6 @@ export default class PartyServer extends TablesServer {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    console.log(this)
     if (this.gamePhase === 'final') {
       this.broadcastGameState();
       return
@@ -106,7 +105,6 @@ export default class PartyServer extends TablesServer {
   }
 
   handlePlayerAction(playerId: string, action: Poker.Action) {
-    console.log(this.gamePhase)
     const player = this.inGamePlayers.find((p) => p.playerId === playerId);
     if (!player) {
       console.log(

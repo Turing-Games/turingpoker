@@ -92,7 +92,6 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
   }
 
   const initializeGame = async (id?: string) => {
-    console.log('init game')
     const roomId = crypto.randomUUID();
 
     if (!id) { // no id to create or join game with
