@@ -18,5 +18,6 @@ export const DEFAULT_TABLE_STATE = {
 }
 
 export const CONFIGURABLE_PROPERTIES = [
-  { label: 'Auto Start', value: 'auto_start', type: 'checkbox', default: AUTO_START }
+  { label: 'Auto Start', value: 'auto_start', type: 'checkbox', default: AUTO_START },
+  { label: 'Max Game Rounds', value: 'maxGameRounds', type: 'number', default: 100 },
 ] as any

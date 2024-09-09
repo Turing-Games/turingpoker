@@ -13,6 +13,7 @@ type GAME_CONFIG = {
 const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
 
 function recordWinner(gameId: string, winnerId: string) {
+
   return new Promise(async (resolve, reject) => {
     try {
       const res = await fetch(`/api/v1/games/${gameId}`, {

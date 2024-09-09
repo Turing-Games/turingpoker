@@ -75,6 +75,7 @@ export const games = {
     }
   },
   update: async (c) => {
+    console.log('update')
     const id = c.req.param('id')
     const { winnerId } = await c.req.json()
     const gameStmt = c.env.DB.prepare('UPDATE games SET winner_id = ? WHERE id = ?').bind(winnerId, id)
@@ -86,6 +87,8 @@ export const games = {
     }
   },
   delete: async (c) => {
+    console.log('delete')
+
     const id = c.req.param('id')
     const gameStmt = c.env.DB.prepare('DELETE FROM games WHERE id = ?').bind(id)
     try {

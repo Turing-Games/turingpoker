@@ -4,6 +4,7 @@ import { ClientMessage, GamePhase, IPlayer, ServerStateMessage, ServerUpdateMess
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from '../../utils/response';
 import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
+import { games } from '@app/utils/api/games';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
@@ -30,6 +31,12 @@ export default class PartyServer extends TablesServer {
   public queuedUpdates: ServerUpdateMessage[] = [];
 
   constructor(public readonly party: Party.Party) {
+    console.log(party.id)
+    party.storage.get(party.id).then((room) => {
+      console.log(room)
+    })
+
+
     super(party)
   }
 
@@ -264,12 +271,14 @@ export default class PartyServer extends TablesServer {
   }
 
   // record winner to db
-  endGame() {
+  async endGame() {
+    console.log('end game')
     if (this.inGamePlayers.length === 1 && this.gamePhase !== 'pending') {
       this.winner = this.inGamePlayers[0]
       this.gamePhase = "final"
       // add winner to game data in sql db
-      // await fetch('/')
+      console.log('winner', this.winner.playerId)
+      await games.recordWinner(this.party.id, this.winner.playerId)
     }
   }
 

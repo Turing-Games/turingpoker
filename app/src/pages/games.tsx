@@ -61,6 +61,7 @@ export default function Games() {
       // const games = await getGamesWithSocketData(url)
       const res = await fetch(url)
       let rooms = await res.json()
+      console.log(rooms)
       setTables(rooms)
     } catch (err) {
       console.log(err)
@@ -137,13 +138,12 @@ export default function Games() {
               selectableRows={false}
               headers={[
                 { value: 'id', name: 'Table' },
-                { value: 'gameType', name: 'Game Type' },
                 { value: 'gamePhase', name: 'Status' },
                 // { value: 'spectatorPlayers', name: 'Spectators', sortable: true },
                 { value: 'queuedPlayers', name: 'Queued', sortable: true },
                 { value: 'players', name: 'In-Game', sortable: true },
                 { value: 'ai_enabled', name: 'AI?', sortable: false },
-                { value: 'view', name: '', align: 'center' },
+                { value: 'winner', name: 'Winner', sortable: false },
                 { value: 'delete', name: '', align: 'center' },
                 // { value: 'quickview', name: '', align: 'right' }
               ]}
@@ -155,15 +155,15 @@ export default function Games() {
                       className="underline"
                       to={`/games/${table.game_id}/${table.game_type}`}
                     >
-                      {table.name || table.game_id}
+                      <div><span className="capitalize no-underline">{table.game_type}:{' '}</span>{table.name || table.game_id}</div>
                     </Link>
                   ),
-                  gameType: table.game_type,
                   gamePhase: getGamePhase(table),
                   spectatorPlayers: spectatorCount,
                   queuedPlayers: table?.queuedPlayers?.length || 0,
                   players: `${table?.gameState?.players?.length || 0}/${table.config?.maxPlayers || 0}`,
                   ai_enabled: JSON.stringify(!!table?.gameState?.players.filter(player => player.isBot)?.length),
+                  winner: table?.winner?.playerId,
                   delete: (isAdmin &&
                     <div
                       className='cursor-pointer'
@@ -173,11 +173,6 @@ export default function Games() {
                     >
                       <TrashIcon className="text-[red]" />
                     </div>
-                  ),
-                  view: (
-                    <button>
-                      <Link to={`/games/${table.id}/${table.game_type}`}>View</Link>
-                    </button>
                   )
                 }
               })}
