@@ -97,6 +97,7 @@ export interface IPokerGame {
     config: IPokerConfig;
     hands: Record<PlayerID, [Card, Card]>;
     deck: Card[];
+    maxGameRounds: number;
 }
 
 export type GameLog = string[];
