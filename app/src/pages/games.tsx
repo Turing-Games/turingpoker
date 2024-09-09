@@ -204,7 +204,7 @@ export default function Games() {
           onSubmit={async (e) => {
             e.preventDefault()
             checkValidInput()
-            // await createGame(gameConfig?.config, gameTypeForm)
+            await games.create(gameConfig?.config, gameTypeForm)
             getTables()
             setIsOpen(false)
             setGameTypeForm('')
