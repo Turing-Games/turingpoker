@@ -145,7 +145,7 @@ export function createPokerGame(config: IPokerConfig, players: IPlayer[], stacks
       pot: 0,
       players: players.map((player, i) => ({ lastRound: null, id: player.playerId, isBot: player.isBot, stack: stacks[i], folded: false, currentBet: 0, shouldMove: true })),
       round: 'pre-flop',
-      targetBet: config.bigBlind,
+      targetBet: config.bigBlind || 1,
       dealerPosition: config.dealerPosition,
       cards: [],
       whoseTurn: players[(config.dealerPosition - 1 + players.length) % players.length]?.playerId,
@@ -154,10 +154,12 @@ export function createPokerGame(config: IPokerConfig, players: IPlayer[], stacks
     config,
     hands
   }
-  out.state.players[0].currentBet = Math.min(config.smallBlind, stacks[0]);
+
+  out.state.players[0].currentBet = Math.min(config.smallBlind, stacks[0]) || 1;
   out.state.players[0].stack -= out.state.players[0].currentBet;
-  out.state.players[1].currentBet = Math.min(config.bigBlind, stacks[1]);
+  out.state.players[1].currentBet = Math.min(config.bigBlind, stacks[1]) || 1;
   out.state.players[1].stack -= out.state.players[1].currentBet;
+
   out.state.pot = out.state.players[0].currentBet + out.state.players[1].currentBet;
 
   return out;
