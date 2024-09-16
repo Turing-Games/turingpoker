@@ -8,6 +8,8 @@ import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
 export const MAX_PLAYERS = 2
+export const MAX_GAME_ROUNDS = 100
+export const DEMO_MODE = false
 
 const defaultStack = 3;
 export default class PartyServer extends TablesServer {
@@ -16,15 +18,17 @@ export default class PartyServer extends TablesServer {
     dealerPosition: 0,
     maxPlayers: MAX_PLAYERS,
     autoStart: AUTO_START,
-    minPlayers: MIN_PLAYERS_AUTO_START
+    minPlayers: MIN_PLAYERS_AUTO_START,
+    maxGameRounds: MAX_GAME_ROUNDS,
+    demoMode: DEMO_MODE
   };
 
   public stacks: Record<string, number> = {};
   public timeoutLoopInterval: NodeJS.Timeout | null = null;
   public queuedUpdates: ServerUpdateMessage[] = [];
 
-  constructor(public readonly party: Party.Party) {
-    super(party);
+  constructor(public readonly room: Party.Room) {
+    super(room);
   }
 
   onStart(): void | Promise<void> {
@@ -68,13 +72,13 @@ export default class PartyServer extends TablesServer {
     // update room info and notify all connected clients
     if (req.method === "POST") {
       const roomList = await this.updateRoomInfo(req);
-      this.party.broadcast(JSON.stringify(roomList));
+      this.room.broadcast(JSON.stringify(roomList));
       return json(roomList);
     }
 
     // admin api for clearing all rooms (not used in UI)
     if (req.method === "DELETE") {
-      await this.party.storage.deleteAll();
+      await this.room.storage.deleteAll();
       return json({ message: "All room history cleared" });
     }
 
@@ -256,13 +260,6 @@ export default class PartyServer extends TablesServer {
     }
   }
 
-  // remove ingame players that have 0 chips
-  eliminatePlayers() {
-    this.inGamePlayers = this.inGamePlayers.filter(
-      (player) => this.stacks[player.playerId] > 0
-    );
-  }
-
   getStateMessage(playerId: string): ServerStateMessage {
     const isSpectator =
       this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
@@ -286,7 +283,7 @@ export default class PartyServer extends TablesServer {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
       // Send game state; ensure spectators do not receive any cards information
-      const conn = this.party.getConnection(player.playerId);
+      const conn = this.room.getConnection(player.playerId);
       if (conn) {
         conn.send(JSON.stringify(message));
       }
@@ -299,17 +296,17 @@ export default class PartyServer extends TablesServer {
       inGamePlayers: this.inGamePlayers,
       config: this.gameConfig,
       gameState: this.gameState?.state ?? null,
-      id: this.party.id,
+      id: this.room.id,
       gameType: 'kuhn',
       winner: this.winner,
       gamePhase: this.gamePhase,
       version: 1
     }
 
-    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.room.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
-        id: this.party.id,
+        id: this.room.id,
         action: 'update',
         state
       }),
@@ -436,7 +433,7 @@ export default class PartyServer extends TablesServer {
 
   /** Remove this room from the room listing party */
   async removeRoomFromRoomList(id: string) {
-    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.room.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id,
@@ -450,7 +447,7 @@ export default class PartyServer extends TablesServer {
    */
   async onAlarm() {
     // alarms don't have access to room id, so retrieve it from storage
-    const id = await this.party.storage.get<string>("id");
+    const id = await this.room.storage.get<string>("id");
     if (id) {
       // await this.removeRoomMessages();
       // await this.removeRoomFromRoomList(id);
@@ -459,7 +456,7 @@ export default class PartyServer extends TablesServer {
 
   /** Fetches list of active rooms */
   async getActiveRooms(): Promise<TableState[]> {
-    const rooms = await this.party.storage.list<TableState>();
+    const rooms = await this.room.storage.list<TableState>();
     return [...rooms.values()];
   }
 
@@ -470,20 +467,20 @@ export default class PartyServer extends TablesServer {
       | RoomDeleteRequest;
 
     if (update.action === "delete") {
-      await this.party.storage.delete(update.id);
+      await this.room.storage.delete(update.id);
       return this.getActiveRooms();
     }
 
     const info = update.tableState;
     if (info.queuedPlayers.length + info.spectatorPlayers.length + info.inGamePlayers.length == 0) {
       // if no users are present, delete the room
-      await this.party.storage.delete(update.id);
+      await this.room.storage.delete(update.id);
       return this.getActiveRooms();
     }
 
-    this.party.storage.put(update.id, info);
+    this.room.storage.put(update.id, info);
 
-    await this.party.storage.put(update.id, info);
+    await this.room.storage.put(update.id, info);
     return this.getActiveRooms();
   }
 }

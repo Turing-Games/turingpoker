@@ -29,6 +29,7 @@ export type RoomDeleteRequest = {
 
 export default class TablesServer implements Party.Server {
 
+  public player: IPlayer = { playerId: '', isBot: false }
   public inGamePlayers: IPlayer[] = [];
   public spectatorPlayers: IPlayer[] = [];
   public queuedPlayers: IPlayer[] = [];
@@ -36,6 +37,7 @@ export default class TablesServer implements Party.Server {
   public gamePhase = "pending"
   public lastActed: Record<string, number> = {};
   public winner: IPlayer = { playerId: '', isBot: false }
+  public stacks: Record<string, number> = {};
 
   options: Party.ServerOptions = {
     hibernate: true,
@@ -57,12 +59,12 @@ export default class TablesServer implements Party.Server {
     // Chatrooms report their connections via HTTP POST
     // update room info and notify all connected clients
     if (req.method === "POST") {
-      let roomList = []
-      if (this.gamePhase !== 'final') {
-        roomList = await this.updateRoomInfo(req);
-      } else {
-        roomList = await this.getRoom();
-      }
+      let roomList = await this.updateRoom(req);
+      // if (this.gamePhase !== 'final') {
+      //   roomList = await this.updateRoom(req);
+      // } else {
+      //   roomList = await this.getRoom();
+      // }
       this.room.broadcast(JSON.stringify(roomList));
       return json(roomList);
     }
@@ -83,7 +85,7 @@ export default class TablesServer implements Party.Server {
     return room;
   }
   /** Updates table with information received from game */
-  async updateRoomInfo(req: Party.Request) {
+  async updateRoom(req: Party.Request) {
     const update = (await req.json()) as
       | RoomUpdateRequest
       | RoomDeleteRequest
@@ -101,6 +103,22 @@ export default class TablesServer implements Party.Server {
       await this.room.storage.put(update.id, info)
       // await this.room.context.parties[update.gameType]?.storage.put(update.id, info)
       return this.getRoom();
+    }
+  }
+
+  // remove ingame players that have 0 chips
+  eliminatePlayers() {
+    this.inGamePlayers = this.inGamePlayers.filter(
+      (player) => this.stacks[player.playerId] > 0
+    );
+  }
+
+  // record winner to db
+  async endGame() {
+    if (this.inGamePlayers.length === 1 && this.gamePhase !== 'pending') {
+      console.log('record winner')
+      this.winner = this.inGamePlayers[0]
+      this.gamePhase = "final"
     }
   }
 }

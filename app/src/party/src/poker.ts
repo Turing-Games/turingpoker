@@ -26,18 +26,11 @@ export default class PartyServer extends TablesServer {
     demoMode: DEMO_MODE
   };
 
-  public stacks: Record<string, number> = {};
   public timeoutLoopInterval: NodeJS.Timeout | null = null;
   public queuedUpdates: ServerUpdateMessage[] = [];
 
-  constructor(public readonly party: Party.Party) {
-    console.log(party.id)
-    party.storage.get(party.id).then((room) => {
-      console.log(room)
-    })
-
-
-    super(party)
+  constructor(public readonly room: Party.Room) {
+    super(room)
   }
 
   onStart(): void | Promise<void> {
@@ -133,8 +126,8 @@ export default class PartyServer extends TablesServer {
     }
 
     if (
-      this.gameState.state.whoseTurn !== playerId ||
-      this.gameState.state.roundOver
+      this.gameState?.state.whoseTurn !== playerId ||
+      this.gameState?.state.roundOver
     ) {
       console.log("Player attempted to make action out of turn", playerId);
       return;
@@ -252,6 +245,7 @@ export default class PartyServer extends TablesServer {
 
       if (!this.gameConfig.demoMode) {
         this.endGame();
+        console.log("Winner")
       }
       this.broadcastGameState();
     } else if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
@@ -260,25 +254,6 @@ export default class PartyServer extends TablesServer {
       this.startRound();
     } else {
       this.broadcastGameState();
-    }
-  }
-
-  // remove ingame players that have 0 chips
-  eliminatePlayers() {
-    this.inGamePlayers = this.inGamePlayers.filter(
-      (player) => this.stacks[player.playerId] > 0
-    );
-  }
-
-  // record winner to db
-  async endGame() {
-    console.log('end game')
-    if (this.inGamePlayers.length === 1 && this.gamePhase !== 'pending') {
-      this.winner = this.inGamePlayers[0]
-      this.gamePhase = "final"
-      // add winner to game data in sql db
-      console.log('winner', this.winner.playerId)
-      await games.recordWinner(this.party.id, this.winner.playerId)
     }
   }
 
@@ -305,7 +280,7 @@ export default class PartyServer extends TablesServer {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
       // Send game state; ensure spectators do not receive any cards information
-      const conn = this.party.getConnection(player.playerId);
+      const conn = this.room.getConnection(player.playerId);
       if (conn) {
         conn.send(JSON.stringify(message));
       }
@@ -318,17 +293,17 @@ export default class PartyServer extends TablesServer {
       inGamePlayers: this.inGamePlayers,
       config: this.gameConfig,
       gameState: this.gameState?.state ?? null,
-      id: this.party.id,
+      id: this.room.id,
       gameType: 'poker',
       winner: this.winner,
       gamePhase: this.gamePhase,
       version: 1
     }
 
-    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.room.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
-        id: this.party.id,
+        id: this.room.id,
         action: 'update',
         state
       }),
@@ -456,7 +431,7 @@ export default class PartyServer extends TablesServer {
 
   /** Remove this room from the room listing party */
   async removeRoomFromRoomList(id: string) {
-    return this.party.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.room.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id,
@@ -470,7 +445,7 @@ export default class PartyServer extends TablesServer {
    */
   async onAlarm() {
     // alarms don't have access to room id, so retrieve it from storage
-    const id = await this.party.storage.get<string>("id");
+    const id = await this.room.storage.get<string>("id");
     if (id) {
       // await this.removeRoomMessages();
       // await this.removeRoomFromRoomList(id);

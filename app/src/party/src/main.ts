@@ -6,6 +6,7 @@ export default class MainPartyServer implements Party.Server {
 
   static async onBeforeRequest(request: Party.Request) {
     // console.log('onbeforerequest')
+    // console.log(this.room)
     // try {
     //   const res = await authBotConnection(request);
     //   console.log({ res })

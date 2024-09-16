@@ -77,16 +77,13 @@ export interface IPokerConfig {
     demoMode?: boolean
 }
 
-export interface IPokerSharedState {
+export interface IPokerState {
     dealerPosition: number;
-    smallBlind: number;
-    bigBlind: number;
+    smallBlind: number; // (dealerPosition-2)%players.length
+    bigBlind: number; // (dealerPosition-1)%players.length
     pot: number;
     targetBet: number;
-    // clockwise order
     players: IPokerPlayer[];
-    // so big blind is (dealerPosition-1)%players.length
-    // small blind is (dealerPosition-2)%players.length
     round: PokerRound;
     roundOver: boolean;
     cards: Card[];
@@ -94,7 +91,7 @@ export interface IPokerSharedState {
 }
 
 export interface IPokerGame {
-    state: IPokerSharedState;
+    state: IPokerState;
     gamePhase: GamePhase;
     config: IPokerConfig;
     hands: Record<PlayerID, [Card, Card]>;
@@ -183,7 +180,7 @@ export function createPokerGame(config: IPokerConfig, players: IPlayer[], stacks
  * @param hands 
  * @returns A record of player ids to the number of chips they won, and any new lines that should be added to a log. Payouts will be null if the game is not over.
  */
-export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card, Card]>): {
+export function payout(state: IPokerState, hands: Record<PlayerID, [Card, Card]>): {
     payouts: Record<PlayerID, number>,
     log: GameLog
 } {

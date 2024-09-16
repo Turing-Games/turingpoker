@@ -42,7 +42,7 @@ export type ServerUpdateMessage = {
 }
 
 export type ServerStateMessage = {
-    gameState: Poker.IPokerSharedState | null;
+    gameState: Poker.IPokerState | null;
     hand: [Poker.Card, Poker.Card] | null | [Poker.Card];
     inGamePlayers: IPlayer[];
     winner: IPlayer;
@@ -61,7 +61,7 @@ export type TableState = {
     inGamePlayers: IPlayer[];
     winner: IPlayer;
     config: Poker.IPokerConfig;
-    gameState: Poker.IPokerSharedState | null;
+    gameState: Poker.IPokerState | null;
     gameType: string;
     tournamentId?: string;
     gamePhase: string

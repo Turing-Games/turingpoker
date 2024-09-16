@@ -73,9 +73,11 @@ export interface IPokerConfig {
   maxPlayers: number;
   autoStart: boolean
   minPlayers: number
+  maxGameRounds: number;
+  demoMode?: boolean
 }
 
-export interface IPokerSharedState {
+export interface IPokerState {
   dealerPosition: number;
   pot: number;
   targetBet: number;
@@ -90,7 +92,7 @@ export interface IPokerSharedState {
 }
 
 export interface IPokerGame {
-  state: IPokerSharedState;
+  state: IPokerState;
   config: IPokerConfig;
   hands: Record<PlayerID, [Card]>;
   deck: Card[];
@@ -175,7 +177,7 @@ export function createPokerGame(config: IPokerConfig, players: IPlayer[], stacks
  * @param hands 
  * @returns A record of player ids to the number of chips they won, and any new lines that should be added to a log. Payouts will be null if the game is not over.
  */
-export function payout(state: IPokerSharedState, hands: Record<PlayerID, [Card]>): {
+export function payout(state: IPokerState, hands: Record<PlayerID, [Card]>): {
   payouts: Record<PlayerID, number>,
   log: GameLog
 } {
