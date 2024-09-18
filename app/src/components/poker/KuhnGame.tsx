@@ -25,6 +25,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
   }
 
   const socket = clientState.socket
+  const playerId = clientState.playerId
   const spectatorPlayers = serverState?.spectatorPlayers.map(player => player.playerId)
   const gameState = serverState.gameState;
   const gameHasEnoughPlayers = serverState?.inGamePlayers?.length >= serverState.config.minPlayers
@@ -139,6 +140,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
     }
   }
 
+  console.log(clientState.serverState?.inGamePlayers)
 
   // show game table
   return (
@@ -195,9 +197,11 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
           </div>
           <GameStatus clientState={clientState} gameType={'kuhn'} />
         </div>
-        <div className="p-[8px]">
-          <GameControls clientState={clientState} joinLeave={!smallScreen} gameType={'kuhn'} />
-        </div>
+        {inGamePlayers?.map(p => p.id).indexOf(playerId) !== -1 &&
+          <div className="p-[8px]">
+            <GameControls clientState={clientState} joinLeave={!smallScreen} gameType={'kuhn'} />
+          </div>
+        }
       </div>
       {smallScreen && joinButton}
     </div>

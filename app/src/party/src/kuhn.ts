@@ -129,7 +129,12 @@ export default class PartyServer extends TablesServer {
 
   handlePlayerAction(playerId: string, action: Kuhn.Action) {
     const player = this.inGamePlayers.find((p) => p.playerId === playerId);
-    if (!player) {
+    // this is firing before endgame which means that
+    // endgame does not get a change to run
+    // before handling action we need to check if game is over
+
+    // validate action
+    if (!player) { // this should not be a possibility via UI
       console.log(
         "Player attempted to make action while not in game",
         playerId
@@ -151,7 +156,7 @@ export default class PartyServer extends TablesServer {
       console.log("Player attempted to make action out of turn", playerId);
       return;
     }
-
+    // record action and advance game via step()
     try {
       const { next, log } = Kuhn.step(this.gameState, action);
       for (const message of log) {
@@ -223,9 +228,17 @@ export default class PartyServer extends TablesServer {
     }, 3000);
   }
 
+  // endRound
+  /* ends the current hand and handles:
+  ** payouts, eliminations, and 
+  ** ends the game if applicable
+  */
   endRound(reason: "showdown" | "fold" | "system") {
     if (!this.gameState) {
-      return;
+      if (this.gamePhase === "final") {
+        this.broadcastGameState();
+      }
+      return
     }
     this.processQueuedPlayers();
 
@@ -245,22 +258,35 @@ export default class PartyServer extends TablesServer {
         (this.gameState.state.players.find((player) => player.id == playerId)
           ?.stack ?? 0) + payouts[playerId];
     }
-    this.gamePhase = "pending";
-    this.queuedUpdates.push({
-      type: "game-ended",
-      payouts,
-      reason,
-    });
+
     this.gameState = null;
     this.eliminatePlayers();
-    this.broadcastGameState();
-    this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
-    if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
+    // check if remaining players, for game winner
+    if (this.inGamePlayers.length == 1) {
+      this.queuedUpdates.push({
+        type: "game-ended",
+        payouts,
+        reason,
+      });
+
+      if (!this.gameConfig.demoMode) {
+        this.endGame();
+        console.log("Winner")
+        console.log(this.inGamePlayers)
+      }
+      this.broadcastGameState();
+    } else if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
+      this.broadcastGameState();
+      this.gameConfig.dealerPosition = (this.gameConfig.dealerPosition + 1) % this.inGamePlayers.length;
       this.startRound();
+    } else {
+      this.broadcastGameState();
     }
   }
 
   getStateMessage(playerId: string): ServerStateMessage {
+    console.log('getStateMessage')
+    console.log(this.inGamePlayers)
     const isSpectator =
       this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
     return {
@@ -278,6 +304,8 @@ export default class PartyServer extends TablesServer {
   }
 
   broadcastGameState() {
+    console.log('broadcast')
+    console.log(this.inGamePlayers)
     const allGamePlayers = this.inGamePlayers.concat(this.queuedPlayers, this.spectatorPlayers);
     for (const player of allGamePlayers) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
@@ -289,6 +317,8 @@ export default class PartyServer extends TablesServer {
       }
     }
     this.queuedUpdates = [];
+    console.log('broadcast 2')
+    console.log(this.inGamePlayers)
 
     const state: TableState = {
       queuedPlayers: this.queuedPlayers,

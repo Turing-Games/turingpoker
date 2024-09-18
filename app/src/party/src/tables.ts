@@ -108,13 +108,15 @@ export default class TablesServer implements Party.Server {
 
   // remove ingame players that have 0 chips
   eliminatePlayers() {
+    console.log('eliminate players')
     this.inGamePlayers = this.inGamePlayers.filter(
       (player) => this.stacks[player.playerId] > 0
     );
   }
 
   // record winner to db
-  async endGame() {
+  endGame() {
+    console.log('end game')
     if (this.inGamePlayers.length === 1 && this.gamePhase !== 'pending') {
       console.log('record winner')
       this.winner = this.inGamePlayers[0]
