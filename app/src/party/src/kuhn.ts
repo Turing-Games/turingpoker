@@ -391,31 +391,6 @@ export default class PartyServer extends TablesServer {
     }
   }
 
-  addPlayer(playerId: string, isBot = false) {
-    if (this.playerExists(playerId)) {
-      this.broadcastGameState();
-      return
-    }
-    this.stacks[playerId] = defaultStack;
-    this.spectatorPlayers.push({
-      playerId,
-      isBot,
-    });
-
-    this.broadcastGameState();
-  }
-
-  playerExists(playerId: string) {
-    return (
-      this.inGamePlayers.find((player) => player.playerId === playerId) !==
-      undefined ||
-      this.spectatorPlayers.find((player) => player.playerId === playerId) !==
-      undefined ||
-      this.queuedPlayers.find((player) => player.playerId === playerId) !==
-      undefined
-    );
-  }
-
   removePlayer(playerId: string) {
     // Attempt to remove from players list first
     // remove from all of spectatorPlayers, players, and inGamePlayers, and queuedPlayers

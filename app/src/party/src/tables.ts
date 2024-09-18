@@ -27,6 +27,8 @@ export type RoomDeleteRequest = {
   action: "delete";
 };
 
+const defaultStack = 1000;
+
 export default class TablesServer implements Party.Server {
 
   public player: IPlayer = { playerId: '', isBot: false }
@@ -111,6 +113,27 @@ export default class TablesServer implements Party.Server {
     console.log('eliminate players')
     this.inGamePlayers = this.inGamePlayers.filter(
       (player) => this.stacks[player.playerId] > 0
+    );
+  }
+
+  addPlayer(playerId: string, isBot = false) {
+    if (!this.playerExists(playerId)) {
+      this.stacks[playerId] = defaultStack;
+      this.spectatorPlayers.push({
+        playerId,
+        isBot
+      });
+    }
+  }
+
+  playerExists(playerId: string) {
+    return (
+      this.inGamePlayers.find((player) => player.playerId === playerId) !==
+      undefined ||
+      this.spectatorPlayers.find((player) => player.playerId === playerId) !==
+      undefined ||
+      this.queuedPlayers.find((player) => player.playerId === playerId) !==
+      undefined
     );
   }
 

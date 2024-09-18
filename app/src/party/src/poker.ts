@@ -63,6 +63,7 @@ export default class PartyServer extends TablesServer {
 
     const isBot = !!ctx.request.headers.get("tg-bot-authorization")
     this.addPlayer(conn.id, isBot);
+    this.broadcastGameState();
   }
 
   onClose(conn: Party.Connection) {
@@ -354,32 +355,6 @@ export default class PartyServer extends TablesServer {
     } else {
       this.broadcastGameState();
     }
-  }
-
-  addPlayer(playerId: string, isBot = false) {
-    if (this.playerExists(playerId)) {
-      this.broadcastGameState();
-      return
-    }
-
-    this.stacks[playerId] = defaultStack;
-    this.spectatorPlayers.push({
-      playerId,
-      isBot
-    });
-
-    this.broadcastGameState();
-  }
-
-  playerExists(playerId: string) {
-    return (
-      this.inGamePlayers.find((player) => player.playerId === playerId) !==
-      undefined ||
-      this.spectatorPlayers.find((player) => player.playerId === playerId) !==
-      undefined ||
-      this.queuedPlayers.find((player) => player.playerId === playerId) !==
-      undefined
-    );
   }
 
   removePlayer(playerId: string) {
