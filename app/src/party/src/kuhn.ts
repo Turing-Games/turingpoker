@@ -1,9 +1,10 @@
 import type * as Party from 'partykit/server';
 import * as Kuhn from '@app/party/src/game-logic/kuhn'
-import { ClientMessage, TableState, ServerStateMessage, ServerUpdateMessage, IPlayer, GamePhase } from './shared';
+import { ClientMessage, TableState, ServerStateMessage, ServerUpdateMessage, IPlayer, GamePhase, Action } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from '../../utils/response';
 import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
+import { isAction } from './game-logic/shared';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
@@ -102,7 +103,7 @@ export default class PartyServer extends TablesServer {
       }
 
       // TODO: you shouldn't be able to start/reset game unless you are an admin
-      if (data.type == "action" && Kuhn.isAction(data.action)) {
+      if (data.type == "action" && isAction(data.action)) {
         this.handlePlayerAction(websocket.id, data.action);
       } else if (data.type == "join-game") {
         this.playerJoinGame(websocket.id);
@@ -127,7 +128,7 @@ export default class PartyServer extends TablesServer {
     }
   }
 
-  handlePlayerAction(playerId: string, action: Kuhn.Action) {
+  handlePlayerAction(playerId: string, action: Action) {
     const player = this.inGamePlayers.find((p) => p.playerId === playerId);
     // this is firing before endgame which means that
     // endgame does not get a change to run

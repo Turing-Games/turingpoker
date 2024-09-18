@@ -7,45 +7,6 @@ const { handCmp } = poker;
 const names = " A23456789TJQK";
 const suits = "cdhs";
 
-/*
-// Commented out because it's too slow
-describe("Hand evaluation", () => {
-    // generate a fraction of all 2.5M hands by choosing all 5-card combinations of 36 randomly chosen cards
-    // I've run it on the full set of 2.5M hands, and it works
-    test("All hands", () => {
-        const cards = [];
-        for (let i = 1; i <= 13; i++) {
-            for (let j = 0; j < 4; j++) {
-                cards.push(names[i] + suits[j]);
-            }
-        }
-        while (cards.length > 36) {
-            cards.splice(Math.floor(Math.random() * cards.length), 1);
-        }
-        const handsA: any[] = [], handsB: poker.Hand[] = [];
-        const indexA = [], indexB = [];
-        let i = 0;
-        for (const hand of combinations(cards, 5)) {
-            if (Math.random() > 0.1) continue;
-            indexA.push(i);
-            indexB.push(i);
-            i++;
-            handsA.push(Hand.solve(hand));
-            handsB.push(hand.map(poker.parseCard) as poker.Hand);
-        }
-        indexA.sort((u, v) => {
-            const a = handsA[u], b = handsA[v];
-            const best = Hand.winners([a, b]);
-            if (best.length == 2) return 0;
-            if (best[0] == a) return 1;
-            if (best[0] == b) return -1;
-            return 0;
-        });
-        indexB.sort((a, b) => handCmp(handsB[a], handsB[b]));
-        expect(indexA).toEqual(indexB);
-    });
-})*/
-
 describe("Poker logic", () => {
     const defaultConfig: poker.IPokerConfig = {
         bigBlind: 2,

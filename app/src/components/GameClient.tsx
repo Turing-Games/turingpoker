@@ -3,8 +3,7 @@ import * as React from 'react';
 import PartySocket from "partysocket";
 import PokerGame from "./poker/PokerGame";
 import KuhnGame from "./poker/KuhnGame";
-import * as PokerLogic from "../party/src/game-logic/poker";
-import { ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
+import { Action, ServerStateMessage, ServerUpdateMessage } from "../party/src/shared";
 
 import '@static/styles/styles.css'
 import { PARTYKIT_URL } from '@app/constants/partykit';
@@ -31,7 +30,7 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     'kuhn': KuhnGame,
   } as any
 
-  const [previousActions, setPreviousActions] = useState<Record<string, PokerLogic.Action>>({});
+  const [previousActions, setPreviousActions] = useState<Record<string, Action>>({});
 
   const handleSocket = (socket: PartySocket) => {
     const ws = socket

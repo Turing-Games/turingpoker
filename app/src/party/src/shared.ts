@@ -1,5 +1,4 @@
 import * as Poker from './game-logic/poker';
-import IPartyServerState from './poker';
 
 export type Rank = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 export type Suit = 'hearts' | 'diamonds' | 'clubs' | 'spades';
@@ -7,7 +6,7 @@ export type Card = { rank: Rank, suit: Suit };
 
 export type ClientMessage = {
     type: 'action',
-    action: Poker.Action
+    action: Action
 } | {
     type: 'start-game'
 } | {
@@ -24,7 +23,7 @@ export type ServerUpdateMessage = {
     reason: 'showdown' | 'fold' | 'system' | 'final';
 } | {
     type: 'action',
-    action: Poker.Action
+    action: Action
     player: IPlayer
 } | {
     type: 'player-joined',
@@ -84,4 +83,11 @@ export interface IPlayer {
 
 export interface GamePhase {
     gamePhase: 'pending' | 'active' | 'final'
+}
+
+export type Action = {
+    type: 'raise'
+    amount: number
+} | {
+    type: 'fold' | 'call'
 }

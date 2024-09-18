@@ -12,10 +12,11 @@ import { GameInfo } from "./GameInfo";
 import { sendMessage } from "@app/utils/websocket";
 import useSmallScreen from "@app/hooks/useSmallScreen";
 import ConnectionFailed from "../ConnectionFailed";
+import { Action } from "@tg/shared";
 
 interface Props {
   clientState: ClientState;
-  previousActions: Record<string, Poker.Action>;
+  previousActions: Record<string, Action>;
 }
 
 const PokerGame = ({ clientState, previousActions }: Props) => {

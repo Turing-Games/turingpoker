@@ -1,10 +1,9 @@
 import type * as Party from 'partykit/server';
 import * as Poker from '@app/party/src/game-logic/poker'
-import { ClientMessage, GamePhase, IPlayer, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
+import { Action, ClientMessage, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
 import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { json, notFound } from '../../utils/response';
-import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
-import { games } from '@app/utils/api/games';
+import TablesServer from './tables';
+import { isAction } from './game-logic/shared';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
@@ -83,7 +82,7 @@ export default class PartyServer extends TablesServer {
       }
 
       // TODO: you shouldn't be able to start/reset game unless you are an admin
-      if (data.type == "action" && Poker.isAction(data.action)) {
+      if (data.type == "action" && isAction(data.action)) {
         this.handlePlayerAction(websocket.id, data.action);
       } else if (data.type == "join-game") {
         this.playerJoinGame(websocket.id);
@@ -108,7 +107,7 @@ export default class PartyServer extends TablesServer {
     }
   }
 
-  handlePlayerAction(playerId: string, action: Poker.Action) {
+  handlePlayerAction(playerId: string, action: Action) {
     const player = this.inGamePlayers.find((p) => p.playerId === playerId);
     if (!player) {
       console.log(

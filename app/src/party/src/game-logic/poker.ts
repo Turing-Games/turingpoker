@@ -1,58 +1,10 @@
 import combinations from "@app/utils/combinations";
-import { Card, Rank, Suit, IPlayer, GamePhase } from "@tg/shared";
-
-const cardNames = ['', 'A', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K'];
-const cardVals = { 'A': 1, 'T': 10, 'J': 11, 'Q': 12, 'K': 13 }
+import { Card, Rank, Suit, IPlayer, GamePhase, Action } from "@tg/shared";
+import { lexicoCompare } from "./shared";
 
 const eps = 1e-9;
 
-export function parseCard(card: string): Card {
-    const rank = card[0];
-    const suit = card[1];
-
-    let rankNum: Rank = 1;
-    // Why is this casting bs necessary, 'in' should act as a type guard???
-    if (rank in cardVals) rankNum = cardVals[rank as (keyof typeof cardVals)] as Rank;
-    else rankNum = parseInt(rank) as Rank;
-
-    let suitName: Suit = 'hearts';
-    if (suit == 'c') suitName = 'clubs';
-    else if (suit == 'd') suitName = 'diamonds';
-    else if (suit == 's') suitName = 'spades';
-    return { rank: rankNum, suit: suitName };
-}
-export function formatCard(card: Card): string {
-    return `${card.suit}_${card.rank}`;
-}
-export type Action = {
-    type: 'raise'
-    amount: number
-} | {
-    type: 'fold' | 'call'
-}
-
-export function isAction(action: unknown): action is Action {
-    if (typeof action != 'object' || action == null) return false;
-    if (!('type' in action)) return false;
-    if (typeof action['type'] != 'string') return false;
-    if (action['type'] == 'raise') {
-        if (!('amount' in action)) return false;
-        if (typeof action['amount'] != 'number') return false;
-    }
-    return true;
-
-}
-
 export type PokerRound = 'pre-flop' | 'flop' | 'turn' | 'river' | 'showdown';
-const roundOrder = [null, 'pre-flop', 'flop', 'turn', 'river', 'showdown'];
-
-function nextRound(round: PokerRound | null): PokerRound {
-    return roundOrder[roundOrder.indexOf(round) + 1] as PokerRound;
-}
-
-function prevRound(round: PokerRound | null): PokerRound {
-    return roundOrder[roundOrder.indexOf(round) - 1] as PokerRound;
-}
 
 export type PlayerID = string;
 
@@ -412,14 +364,6 @@ export function forcedFold(game: IPokerGame, playerId: PlayerID): {
         next: game,
         log: []
     }
-}
-
-function lexicoCompare(a: number[], b: number[]): number {
-    for (let i = 0; i < a.length; i++) {
-        if (a[i] < b[i]) return -1;
-        if (a[i] > b[i]) return 1;
-    }
-    return 0;
 }
 
 export type Hand = [Card, Card, Card, Card, Card];
