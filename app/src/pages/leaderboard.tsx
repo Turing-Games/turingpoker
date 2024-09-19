@@ -1,6 +1,5 @@
 import * as React from 'react'
 import Main from '@app/layouts/main';
-import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { SignedIn, useUser } from '@clerk/clerk-react';
 import { Heading, Text } from '@radix-ui/themes';
 import PartySocket from 'partysocket';

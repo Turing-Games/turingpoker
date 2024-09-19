@@ -1,10 +1,10 @@
-import React from 'react'
 import GameClient from '@app/components/GameClient';
-import Main from '@app/layouts/main';
-import { useParams } from 'react-router-dom';
-import LogoDark from '@static/images/logo-dark.png';
 import Select from '@app/components/Select';
+import Main from '@app/layouts/main';
 import { Text } from '@radix-ui/themes';
+import LogoDark from '@static/images/logo-dark.png';
+import React from 'react';
+import { useParams } from 'react-router-dom';
 
 
 export default function Home() {

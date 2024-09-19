@@ -1,3 +1,5 @@
+import { Action } from "@tg/shared";
+
 export function lexicoCompare(a: number[], b: number[]): number {
   for (let i = 0; i < a.length; i++) {
     if (a[i] < b[i]) return -1;

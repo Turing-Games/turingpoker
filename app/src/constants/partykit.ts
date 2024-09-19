@@ -15,4 +15,6 @@ if (typeof location !== 'undefined') {
 
 export const PARTYKIT_URL = `${PARTYKIT_PROTOCOL}://${PARTYKIT_HOST}`;
 export const SERVER_URL = `${SERVER_PROTOCOL}://${SERVER_HOST}`;
-export const SINGLETON_ROOM_ID = 'games'
+
+export const SINGLETON_GAME_ID = 'games'
+export const SINGLETON_TOURNAMENT_ID = 'tournaments'

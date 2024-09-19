@@ -6,9 +6,9 @@ import TgTable from '@app/components/Table';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import PartySocket from 'partysocket';
 import { PARTYKIT_URL } from '@app/constants/partykit';
-import { SINGLETON_ROOM_ID } from '@tg/tables';
 import { TableState } from '@tg/shared';
 
+const SINGLETON_ROOM_ID = 'tournaments'
 
 export default function Tournament() {
 

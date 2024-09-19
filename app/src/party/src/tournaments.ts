@@ -1,35 +1,24 @@
 import type * as Party from "partykit/server";
 import { json, notFound } from "../../utils/response";
-import { TableState } from "./shared";
 import PartyServer from "./main";
+import { RoomDeleteRequest, RoomUpdateRequest } from "@app/types/message";
 
 /**
  * The tables party's purpose is to keep track of all games, so we want
  * every client to connect to the same room instance by sharing the same room id.
  */
-export const SINGLETON_ROOM_ID = "tournaments";
+const SINGLETON_ROOM_ID = "tournaments";
 
-/** Poker room sends an update whenever server state changes */
-export type RoomUpdateRequest = {
-  action: 'update';
-  id: string;
-  tableState: TableState;
-};
 
-export type RoomDeleteRequest = {
-  id: string;
-  action: "delete";
-};
-
-export default class TournamntsServer extends PartyServer {
+export default class TournamentsServer extends PartyServer {
   options: Party.ServerOptions = {
     hibernate: true,
     // this opts the chat room into hibernation mode, which
     // allows for a higher number of concurrent connections
   };
 
-  constructor(public party: Party.Party) {
-    super(party)
+  constructor(public room: Party.Room) {
+    super(room)
   }
 
   async onConnect(connection: Party.Connection) {
@@ -39,7 +28,7 @@ export default class TournamntsServer extends PartyServer {
 
   async onRequest(req: Party.Request) {
     // we only allow one instance of chatRooms party
-    if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
+    if (this.room.id !== SINGLETON_ROOM_ID) return notFound();
 
     // Clients fetch list of rooms for server rendering pages via HTTP GET
     if (req.method === "GET") return json(await this.getTournaments(req));
@@ -48,13 +37,13 @@ export default class TournamntsServer extends PartyServer {
     // update room info and notify all connected clients
     if (req.method === "POST") {
       const roomList = await this.updateRoomInfo(req);
-      this.party.broadcast(JSON.stringify(roomList));
+      this.room.broadcast(JSON.stringify(roomList));
       return json(roomList);
     }
 
     // admin api for clearing all rooms (not used in UI)
     if (req.method === "DELETE") {
-      await this.party.storage.deleteAll();
+      await this.room.storage.deleteAll();
       return json({ message: "All room history cleared" });
     }
 
@@ -63,7 +52,7 @@ export default class TournamntsServer extends PartyServer {
 
   /** Fetches list of active rooms */
   async getTournaments(req?: any): Promise<any[]> {
-    const tournaments = await this.party.storage.list<any>();
+    const tournaments = await this.room.storage.list<any>();
     // if (gameType) {
     //   rooms = Array.from(rooms?.values())?.filter(room => {
     //     if (gameType && room.gameType !== gameType) return false;
@@ -80,14 +69,14 @@ export default class TournamntsServer extends PartyServer {
       | RoomDeleteRequest;
 
     if (update.action === "delete") {
-      await this.party.storage.delete(update.id);
+      await this.room.storage.delete(update.id);
       return this.getTournaments();
     }
 
-    const info = update.tableState;
+    const info = update.state;
     const totalPlayers = info?.queuedPlayers?.length + info?.spectatorPlayers?.length + info?.inGamePlayers?.length;
 
-    this.party.storage.put(update.id, info);
+    this.room.storage.put(update.id, info);
     return this.getTournaments();
   }
 }

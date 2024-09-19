@@ -28,6 +28,9 @@
       "@static/*": [
         "static/*"
       ],
+      "@types/*": [
+        "types/*"
+      ]
     }
   }
 }

@@ -1,22 +1,18 @@
-import * as React from 'react'
-import Main from '@app/layouts/main';
-import { PARTYKIT_URL, SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import { Cross1Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
-import { useUser } from '@clerk/clerk-react';
-import { Link } from 'react-router-dom';
-import { TableState } from '@tg/shared';
-import { Heading, SegmentedControl, Table, Text } from '@radix-ui/themes';
-import PartySocket from 'partysocket';
-import Modal from 'react-modal';
 import Select from '@app/components/Select';
-import { DEFAULT_GAME_FILTERS, GAME_STATUS_FILTERS, GAME_TYPE_FILTERS, GAMES, MODAL_STYLES } from '@app/constants/games/shared';
-import { CONFIGURABLE_PROPERTIES as POKER_CONFIG } from '@app/constants/games/poker';
-import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG } from '@app/constants/games/kuhn';
-import { DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
-import { DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
 import TgTable from '@app/components/Table';
-import { buildUrl } from '@app/utils/url';
+import { CONFIGURABLE_PROPERTIES as KUHN_CONFIG, DEFAULT_TABLE_STATE as KUHN_DEFAULT_TABLE } from '@app/constants/games/kuhn';
+import { CONFIGURABLE_PROPERTIES as POKER_CONFIG, DEFAULT_TABLE_STATE as POKER_DEFAULT_TABLE } from '@app/constants/games/poker';
+import { DEFAULT_GAME_FILTERS, GAME_TYPE_FILTERS, GAMES, MODAL_STYLES } from '@app/constants/games/shared';
+import Main from '@app/layouts/main';
 import { games } from '@app/utils/api/games';
+import { buildUrl } from '@app/utils/url';
+import { useUser } from '@clerk/clerk-react';
+import { Cross1Icon, PlusIcon, TrashIcon } from '@radix-ui/react-icons';
+import { Heading, Text } from '@radix-ui/themes';
+import { TableState } from '@tg/shared';
+import * as React from 'react';
+import Modal from 'react-modal';
+import { Link } from 'react-router-dom';
 
 
 export default function Games() {

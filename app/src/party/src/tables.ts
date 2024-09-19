@@ -1,32 +1,12 @@
+import { RoomCreateRequest, RoomDeleteRequest, RoomUpdateRequest } from "@app/types/message";
 import type * as Party from "partykit/server";
 import { json, notFound } from "../../utils/response";
 import { IPlayer, TableState } from "./shared";
-import authBotConnection from "../../utils/auth";
 
 /**
  * The tables party's purpose is to keep track of all games, so we want
  * every client to connect to the same room instance by sharing the same room id.
  */
-export const SINGLETON_ROOM_ID = "games";
-
-/** Poker room sends an update whenever server state changes */
-export type RoomCreateRequest = {
-  action: 'create';
-  id: string;
-  state: TableState;
-};
-
-export type RoomUpdateRequest = {
-  action: 'update';
-  id: string;
-  state: TableState;
-};
-
-export type RoomDeleteRequest = {
-  id: string;
-  action: "delete";
-};
-
 const defaultStack = 1000;
 
 export default class TablesServer implements Party.Server {
@@ -61,7 +41,7 @@ export default class TablesServer implements Party.Server {
     // Chatrooms report their connections via HTTP POST
     // update room info and notify all connected clients
     if (req.method === "POST") {
-      let roomList = await this.updateRoom(req);
+      const roomList = await this.updateRoom(req);;
       // if (this.gamePhase !== 'final') {
       //   roomList = await this.updateRoom(req);
       // } else {

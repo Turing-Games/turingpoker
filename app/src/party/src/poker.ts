@@ -1,9 +1,9 @@
+import { SINGLETON_GAME_ID } from '@app/constants/partykit';
+import * as Poker from '@app/party/src/game-logic/poker';
 import type * as Party from 'partykit/server';
-import * as Poker from '@app/party/src/game-logic/poker'
-import { Action, ClientMessage, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
-import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
-import TablesServer from './tables';
 import { isAction } from './game-logic/shared';
+import { Action, ClientMessage, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
+import TablesServer from './tables';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
@@ -300,7 +300,7 @@ export default class PartyServer extends TablesServer {
       version: 1
     }
 
-    return this.room.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.room.context.parties.tables.get(SINGLETON_GAME_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id: this.room.id,
@@ -405,7 +405,7 @@ export default class PartyServer extends TablesServer {
 
   /** Remove this room from the room listing party */
   async removeRoomFromRoomList(id: string) {
-    return this.room.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.room.context.parties.tables.get(SINGLETON_GAME_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id,

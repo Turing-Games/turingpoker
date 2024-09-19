@@ -15,7 +15,7 @@ export default function Interactions() {
           })
         }
       </div>
-      <style>{`
+      <style>{`  
         #root{overflow:auto!important}
       `}
         {

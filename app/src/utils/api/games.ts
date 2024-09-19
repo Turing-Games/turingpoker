@@ -1,7 +1,7 @@
 import { PARTYKIT_URL, SERVER_URL } from "@app/constants/partykit"
-import { SINGLETON_ROOM_ID } from "@tg/tables";
 import { buildUrl } from "../url";
 import PartySocket from "partysocket";
+import { SINGLETON_ROOM_ID } from "@app/constants/partykit";
 
 type GAME_CONFIG = {
   id?: string,

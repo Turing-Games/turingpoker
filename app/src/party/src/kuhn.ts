@@ -1,10 +1,10 @@
+import { SINGLETON_GAME_ID } from '@app/constants/partykit';
+import * as Kuhn from '@app/party/src/game-logic/kuhn';
 import type * as Party from 'partykit/server';
-import * as Kuhn from '@app/party/src/game-logic/kuhn'
-import { ClientMessage, TableState, ServerStateMessage, ServerUpdateMessage, IPlayer, GamePhase, Action } from './shared';
-import { SINGLETON_ROOM_ID } from '@app/constants/partykit';
 import { json, notFound } from '../../utils/response';
-import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 import { isAction } from './game-logic/shared';
+import { Action, ClientMessage, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
+import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
@@ -334,7 +334,7 @@ export default class PartyServer extends TablesServer {
       version: 1
     }
 
-    return this.room.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.room.context.parties.tables.get(SINGLETON_GAME_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id: this.room.id,
@@ -439,7 +439,7 @@ export default class PartyServer extends TablesServer {
 
   /** Remove this room from the room listing party */
   async removeRoomFromRoomList(id: string) {
-    return this.room.context.parties.tables.get(SINGLETON_ROOM_ID).fetch({
+    return this.room.context.parties.tables.get(SINGLETON_GAME_ID).fetch({
       method: "POST",
       body: JSON.stringify({
         id,

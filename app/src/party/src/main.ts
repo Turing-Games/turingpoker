@@ -1,8 +1,7 @@
 import type * as Party from "partykit/server";
 
 export default class MainPartyServer implements Party.Server {
-
-  constructor(public party: Party.Party) { }
+  constructor(public room: Party.Room) { }
 
   static async onBeforeRequest(request: Party.Request) {
     // console.log('onbeforerequest')
