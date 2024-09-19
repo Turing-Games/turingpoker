@@ -30,6 +30,7 @@ export default class TablesServer implements Party.Server {
   constructor(readonly room: Party.Room) { }
 
   async onRequest(req: Party.Request) {
+    console.log('onRequest')
     // we only allow one instance of chatRooms party
     // if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
@@ -58,6 +59,15 @@ export default class TablesServer implements Party.Server {
     }
 
     return notFound();
+  }
+
+  async onClose(connection: Party.Connection) {
+    console.log('onClose')
+  }
+
+  async onError(connection: Party.Connection, error: Error) {
+    console.log('onError')
+    console.log(error)
   }
 
   /** Fetches list of active rooms */
@@ -97,6 +107,7 @@ export default class TablesServer implements Party.Server {
   }
 
   addPlayer(playerId: string, isBot = false) {
+    console.log('addPlayer')
     if (!this.playerExists(playerId)) {
       this.stacks[playerId] = defaultStack;
       this.spectatorPlayers.push({
@@ -107,19 +118,20 @@ export default class TablesServer implements Party.Server {
   }
 
   playerExists(playerId: string) {
-    return (
-      this.inGamePlayers.find((player) => player.playerId === playerId) !==
-      undefined ||
-      this.spectatorPlayers.find((player) => player.playerId === playerId) !==
-      undefined ||
-      this.queuedPlayers.find((player) => player.playerId === playerId) !==
-      undefined
-    );
+    console.log('playerExists')
+    const isInGamePlayer = this.inGamePlayers.find(p => p.playerId === playerId)
+    const isSpectatorPlayer = this.spectatorPlayers.find(p => p.playerId === playerId)
+    const isQueuedPlayer = this.queuedPlayers.find(p => p.playerId === playerId)
+    console.log(isQueuedPlayer)
+    console.log(isSpectatorPlayer)
+    console.log(isInGamePlayer)
+
+    return !!isInGamePlayer || !!isSpectatorPlayer || !!isQueuedPlayer
   }
 
   // record winner to db
   endGame() {
-    console.log('end game')
+    console.log('endGame()')
     if (this.inGamePlayers.length === 1 && this.gamePhase !== 'pending') {
       console.log('record winner')
       this.winner = this.inGamePlayers[0]

@@ -1,5 +1,5 @@
 import combinations from "@app/utils/combinations";
-import { Card, Rank, Suit, IPlayer, GamePhase, Action } from "@tg/shared";
+import { Action, Card, GamePhase, IPlayer, Rank, Suit } from "@tg/shared";
 import { lexicoCompare } from "./shared";
 
 const eps = 1e-9;
@@ -77,7 +77,7 @@ function dealHands(players: PlayerID[], deck: Card[]): Record<PlayerID, [Card, C
     return hands;
 }
 
-export function createPokerGame(config: IPokerConfig, players: IPlayer[], stacks: number[]): IPokerGame {
+export function createGame(config: IPokerConfig, players: IPlayer[], stacks: number[]): IPokerGame {
     if (players.length != stacks.length) throw new Error("Number of players and stacks must be equal")
     if (players.length < 2) throw new Error("Must have at least 2 players");
     if (players.length > config.maxPlayers) throw new Error("Too many players");

@@ -20,6 +20,7 @@ interface Props {
 }
 
 const PokerGame = ({ clientState, previousActions }: Props) => {
+
   const serverState = clientState.serverState;
   if (!serverState) {
     return <ConnectionFailed />;
@@ -141,7 +142,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
     }
   }
 
-  console.log(clientState.serverState?.inGamePlayers)
+  console.log('clientState.serverState', clientState.serverState)
 
   // show game table
   return (

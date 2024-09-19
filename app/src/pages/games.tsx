@@ -18,11 +18,11 @@ import { Link } from 'react-router-dom';
 export default function Games() {
 
   const [loading, setLoading] = React.useState(false)
-  const [tables, setTables] = React.useState<TableState[]>([])
+  const [tables, setTables] = React.useState<any[]>([])
   const [filters, setFilters] = React.useState(DEFAULT_GAME_FILTERS)
   const [gameTypeForm, setGameTypeForm] = React.useState('')
   const [isOpen, setIsOpen] = React.useState(false)
-  const [gameConfig, setGameConfig] = React.useState<any>({})
+  const [gameConfig, setGameConfig] = React.useState({})
 
   // const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
   const isAdmin = useUser()?.user?.organizationMemberships?.[0]?.role === 'org:admin'
@@ -56,8 +56,7 @@ export default function Games() {
       const url = buildUrl('/api/v1/games', filters)
       // const games = await getGamesWithSocketData(url)
       const res = await fetch(url)
-      let rooms = await res.json()
-      console.log(rooms)
+      const rooms = await res.json()
       setTables(rooms)
     } catch (err) {
       console.log(err)

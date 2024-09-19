@@ -82,7 +82,7 @@ function dealHands(players: IPlayer[], deck: Card[]): Record<PlayerID, [Card]> {
   return hands;
 }
 
-export function createPokerGame(config: IPokerConfig, players: IPlayer[], stacks: number[]): IPokerGame {
+export function createGame(config: IPokerConfig, players: IPlayer[], stacks: number[]): IPokerGame {
   if (players.length != stacks.length) throw new Error("Number of players and stacks must be equal")
   if (players.length < 2) throw new Error("Must have at least 2 players");
   if (players.length > 2) throw new Error("Too many players");

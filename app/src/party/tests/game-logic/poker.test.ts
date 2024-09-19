@@ -1,5 +1,4 @@
 import * as poker from '@app/party/src/game-logic/poker';
-import combinations from '@app/utils/combinations';
 const { handCmp } = poker;
 
 //const Hand = require('pokersolver').Hand;
@@ -17,15 +16,15 @@ describe("Poker logic", () => {
         minPlayers: 2
     }
     test("Game throws with negative raise", () => {
-        const game = poker.createPokerGame(defaultConfig, ['0', '1'], [100, 100]);
+        const game = poker.createGame(defaultConfig, ['0', '1'], [100, 100]);
         expect(() => poker.step(game, { type: 'raise', amount: -1 })).toThrow();
     })
     test("Game throws if created and there aren't the same number of stacks and players", () => {
-        expect(() => poker.createPokerGame(defaultConfig, ['0'], [100, 100])).toThrow();
-        expect(() => poker.createPokerGame(defaultConfig, ['0', '1'], [100])).toThrow();
+        expect(() => poker.createGame(defaultConfig, ['0'], [100, 100])).toThrow();
+        expect(() => poker.createGame(defaultConfig, ['0', '1'], [100])).toThrow();
     });
     test("Big blinds and small blinds are payed initially", () => {
-        const game = poker.createPokerGame(defaultConfig, ['0', '1'], [100, 100]);
+        const game = poker.createGame(defaultConfig, ['0', '1'], [100, 100]);
         const state = game.state;
         expect(state.pot).toBe(3);
         expect(state.players[0].stack).toBe(98);
@@ -36,7 +35,7 @@ describe("Poker logic", () => {
     });
 
     test("Folding gets turn skipped in subsequent rounds", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
         // player 3 is bb, so 4 should go first
         expect(game.state.whoseTurn).toBe('4');
@@ -94,7 +93,7 @@ describe("Poker logic", () => {
     });
 
     test("Small blind calling sets its bet to big blind", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
         expect(game.state.players[4].stack).toBe(99);
         expect(game.state.players[4].currentBet).toBe(1);
@@ -104,14 +103,14 @@ describe("Poker logic", () => {
         expect(game.state.players[4].currentBet).toBe(2);
     })
     test("Small blind folding immediately skips turn in subsequent rounds", () => {
-        const game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        const game = poker.createGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
         expect(game.state.players[4].stack).toBe(99);
         expect(game.state.players[4].currentBet).toBe(1);
     })
 
     test("All others folding causes payout to last player standing", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
         game = poker.step(game, { type: 'raise', amount: 5 }).next;
         game = poker.step(game, { type: 'fold' }).next;
@@ -123,7 +122,7 @@ describe("Poker logic", () => {
     });
 
     test("The number of community cards is correct", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1'], [100, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1'], [100, 100]);
         expect(game.state.cards.length).toBe(0);
         game = poker.step(game, { type: 'call' }).next;
         game = poker.step(game, { type: 'call' }).next;
@@ -142,7 +141,7 @@ describe("Poker logic", () => {
 
     test("Going to showdown causes payout to best hand", () => {
         for (let i = 0; i < 1000; i++) {
-            let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+            let game = poker.createGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
 
             let iters = 0;
             while (!game.state.roundOver) {
@@ -175,7 +174,7 @@ describe("Poker logic", () => {
     }, 10);
 
     test("Forced fold ends game if only one player remains", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
         game = poker.step(game, { type: 'raise', amount: 5 }).next;
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.step(game, { type: 'call' }).next;
@@ -188,7 +187,7 @@ describe("Poker logic", () => {
     });
 
     test("Forced fold updates whoseTurn", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1', '2', '3', '4'], [100, 100, 100, 100, 100]);
         game = poker.step(game, { type: 'raise', amount: 5 }).next;
         game = poker.step(game, { type: 'fold' }).next;
         game = poker.step(game, { type: 'call' }).next;
@@ -202,7 +201,7 @@ describe("Poker logic", () => {
     });
 
     test("Player cannot bet more than they have", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1'], [30, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1'], [30, 100]);
         game = poker.step(game, { type: 'raise', amount: 101 }).next;
         expect(game.state.players[1].stack).toBe(0);
         expect(game.state.players[1].currentBet).toBe(100);
@@ -213,7 +212,7 @@ describe("Poker logic", () => {
     });
 
     test("Player with 0 chips game proceeds normally", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1'], [0, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1'], [0, 100]);
         expect(game.state.whoseTurn).toBe('1');
         game = poker.step(game, { type: 'call' }).next;
         expect(game.state.whoseTurn).toBe('0');
@@ -221,7 +220,7 @@ describe("Poker logic", () => {
     });
 
     test("Folded players don't get payouts even if they have the best hand", () => {
-        let game = poker.createPokerGame(defaultConfig, ['0', '1', '2'], [100, 100, 100]);
+        let game = poker.createGame(defaultConfig, ['0', '1', '2'], [100, 100, 100]);
         game = poker.step(game, { type: 'call' }).next;
         game = poker.step(game, { type: 'call' }).next;
         game = poker.step(game, { type: 'call' }).next;
@@ -251,7 +250,7 @@ describe("Poker logic", () => {
     })
 
     test("Player that was unable to call receives chips based on what they bet", () => {
-        let game = poker.createPokerGame({
+        let game = poker.createGame({
             ...defaultConfig,
             bigBlind: 20,
             smallBlind: 10

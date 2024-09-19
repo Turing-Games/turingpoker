@@ -4,7 +4,7 @@ import type * as Party from 'partykit/server';
 import { json, notFound } from '../../utils/response';
 import { isAction } from './game-logic/shared';
 import { Action, ClientMessage, ServerStateMessage, ServerUpdateMessage, TableState } from './shared';
-import TablesServer, { RoomDeleteRequest, RoomUpdateRequest } from './tables';
+import TablesServer from './tables';
 
 export const AUTO_START = true;
 export const MIN_PLAYERS_AUTO_START = 2;
@@ -53,6 +53,8 @@ export default class PartyServer extends TablesServer {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
+    console.log('this, onConnect')
+    // console.log(this)
     if (this.gamePhase === 'final') {
       this.broadcastGameState();
       return
@@ -63,16 +65,17 @@ export default class PartyServer extends TablesServer {
 
     const isBot = !!ctx.request.headers.get("tg-bot-authorization")
     this.addPlayer(conn.id, isBot);
+    this.broadcastGameState();
   }
 
   async onRequest(req: Party.Request) {
     // Clients fetch list of rooms for server rendering pages via HTTP GET
-    if (req.method === "GET") return json(await this.getActiveRooms());
+    if (req.method === "GET") return json(await this.updateRoom(req));
 
     // Chatrooms report their connections via HTTP POST
     // update room info and notify all connected clients
     if (req.method === "POST") {
-      const roomList = await this.updateRoomInfo(req);
+      const roomList = await this.updateRoom(req);
       this.room.broadcast(JSON.stringify(roomList));
       return json(roomList);
     }
@@ -210,7 +213,7 @@ export default class PartyServer extends TablesServer {
     // }
 
     this.processQueuedPlayers();
-    this.gameState = Kuhn.createPokerGame(
+    this.gameState = Kuhn.createGame(
       this.gameConfig,
       this.inGamePlayers,
       this.inGamePlayers.map((p) => this.stacks[p.playerId])
@@ -273,7 +276,6 @@ export default class PartyServer extends TablesServer {
       if (!this.gameConfig.demoMode) {
         this.endGame();
         console.log("Winner")
-        console.log(this.inGamePlayers)
       }
       this.broadcastGameState();
     } else if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
@@ -287,7 +289,6 @@ export default class PartyServer extends TablesServer {
 
   getStateMessage(playerId: string): ServerStateMessage {
     console.log('getStateMessage')
-    console.log(this.inGamePlayers)
     const isSpectator =
       this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
     return {
@@ -305,9 +306,9 @@ export default class PartyServer extends TablesServer {
   }
 
   broadcastGameState() {
-    console.log('broadcast')
-    console.log(this.inGamePlayers)
+    console.log('kuhn broadcast')
     const allGamePlayers = this.inGamePlayers.concat(this.queuedPlayers, this.spectatorPlayers);
+    console.log({ allGamePlayers })
     for (const player of allGamePlayers) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
@@ -318,7 +319,7 @@ export default class PartyServer extends TablesServer {
       }
     }
     this.queuedUpdates = [];
-    console.log('broadcast 2')
+    console.log('this.inGamePlayers')
     console.log(this.inGamePlayers)
 
     const state: TableState = {
@@ -359,6 +360,7 @@ export default class PartyServer extends TablesServer {
   }
 
   playerJoinGame(playerId: string) {
+    console.log('playerJoinGame')
     const allPlayers = [...this.inGamePlayers, ...this.spectatorPlayers, ...this.queuedPlayers];
     const newPlayer = allPlayers.find((player) => player.playerId === playerId) || { playerId };
     if (
@@ -458,35 +460,5 @@ export default class PartyServer extends TablesServer {
       // await this.removeRoomMessages();
       // await this.removeRoomFromRoomList(id);
     }
-  }
-
-  /** Fetches list of active rooms */
-  async getActiveRooms(): Promise<TableState[]> {
-    const rooms = await this.room.storage.list<TableState>();
-    return [...rooms.values()];
-  }
-
-  /** Updates list of active rooms with information received from chatroom */
-  async updateRoomInfo(req: Party.Request) {
-    const update = (await req.json()) as
-      | RoomUpdateRequest
-      | RoomDeleteRequest;
-
-    if (update.action === "delete") {
-      await this.room.storage.delete(update.id);
-      return this.getActiveRooms();
-    }
-
-    const info = update.tableState;
-    if (info.queuedPlayers.length + info.spectatorPlayers.length + info.inGamePlayers.length == 0) {
-      // if no users are present, delete the room
-      await this.room.storage.delete(update.id);
-      return this.getActiveRooms();
-    }
-
-    this.room.storage.put(update.id, info);
-
-    await this.room.storage.put(update.id, info);
-    return this.getActiveRooms();
   }
 }

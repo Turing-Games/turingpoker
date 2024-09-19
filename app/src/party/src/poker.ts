@@ -188,7 +188,7 @@ export default class PartyServer extends TablesServer {
     }
     this.processQueuedPlayers();
 
-    this.gameState = Poker.createPokerGame(
+    this.gameState = Poker.createGame(
       this.gameConfig,
       this.inGamePlayers,
       this.inGamePlayers.map((p) => this.stacks[p.playerId])
@@ -245,7 +245,7 @@ export default class PartyServer extends TablesServer {
 
       if (!this.gameConfig.demoMode) {
         this.endGame();
-        console.log("Winner")
+        console.log("after this.endgame, winner")
       }
       this.broadcastGameState();
     } else if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {

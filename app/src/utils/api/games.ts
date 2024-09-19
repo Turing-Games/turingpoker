@@ -1,7 +1,3 @@
-import { PARTYKIT_URL, SERVER_URL } from "@app/constants/partykit"
-import { buildUrl } from "../url";
-import PartySocket from "partysocket";
-import { SINGLETON_ROOM_ID } from "@app/constants/partykit";
 
 type GAME_CONFIG = {
   id?: string,
@@ -9,8 +5,6 @@ type GAME_CONFIG = {
   maxPlayers: number,
   autoStart?: boolean
 }
-
-const partyUrl = `${PARTYKIT_URL}/parties/tables/${SINGLETON_ROOM_ID}`;
 
 function recordWinner(gameId: string, winnerId: string) {
 
