@@ -61,12 +61,8 @@ export default class TablesServer implements Party.Server {
     return notFound();
   }
 
-  async onClose(connection: Party.Connection) {
-    console.log('onClose')
-  }
-
   async onError(connection: Party.Connection, error: Error) {
-    console.log('onError')
+    console.log('onError', error)
     console.log(error)
   }
 
