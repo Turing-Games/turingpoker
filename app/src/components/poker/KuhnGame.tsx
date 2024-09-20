@@ -188,7 +188,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
                     player={opp}
                     hand={hands[opp.id]}
                     isCurrentPlayerTurn={opp.id === currentTurn}
-                    showCards
+                    showCards={clientState.playerId === opp.id}
                     title={`Player ${index + 1}${clientState.playerId === opp.id ? " (You)" : ""
                       }`}
                     dealer={index === gameState?.dealerPosition}

@@ -20,6 +20,7 @@ export default class TablesServer implements Party.Server {
   public lastActed: Record<string, number> = {};
   public winner: IPlayer = { playerId: '', isBot: false }
   public stacks: Record<string, number> = {};
+  public stackSize = defaultStack;
 
   options: Party.ServerOptions = {
     hibernate: true,
@@ -30,7 +31,6 @@ export default class TablesServer implements Party.Server {
   constructor(readonly room: Party.Room) { }
 
   async onRequest(req: Party.Request) {
-    console.log('onRequest')
     // we only allow one instance of chatRooms party
     // if (this.party.id !== SINGLETON_ROOM_ID) return notFound();
 
@@ -96,16 +96,15 @@ export default class TablesServer implements Party.Server {
 
   // remove ingame players that have 0 chips
   eliminatePlayers() {
-    console.log('eliminate players')
     this.inGamePlayers = this.inGamePlayers.filter(
       (player) => this.stacks[player.playerId] > 0
     );
   }
 
   addPlayer(playerId: string, isBot = false) {
-    console.log('addPlayer')
+    // console.log('addPlayer')
     if (!this.playerExists(playerId)) {
-      this.stacks[playerId] = defaultStack;
+      this.stacks[playerId] = this.stackSize;
       this.spectatorPlayers.push({
         playerId,
         isBot
@@ -114,13 +113,13 @@ export default class TablesServer implements Party.Server {
   }
 
   playerExists(playerId: string) {
-    console.log('playerExists')
+    // console.log('playerExists') 
     const isInGamePlayer = this.inGamePlayers.find(p => p.playerId === playerId)
     const isSpectatorPlayer = this.spectatorPlayers.find(p => p.playerId === playerId)
     const isQueuedPlayer = this.queuedPlayers.find(p => p.playerId === playerId)
-    console.log(isQueuedPlayer)
-    console.log(isSpectatorPlayer)
-    console.log(isInGamePlayer)
+    // console.log(isQueuedPlayer)
+    // console.log(isSpectatorPlayer)
+    // console.log(isInGamePlayer)
 
     return !!isInGamePlayer || !!isSpectatorPlayer || !!isQueuedPlayer
   }

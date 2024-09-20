@@ -34,7 +34,7 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
 
   const handleSocket = (socket: PartySocket) => {
     const ws = socket
-    ws.addEventListener("open", () => {
+    ws.addEventListener("open", () => { // triggers onConnect
       setClientState((prevState) => ({
         ...prevState,
         isConnected: true,
@@ -75,6 +75,7 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     });
 
     ws.addEventListener("close", () => {
+      console.log('close')
       setClientState((prevState) => ({
         ...prevState,
         isConnected: false,

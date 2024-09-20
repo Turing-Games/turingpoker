@@ -91,7 +91,7 @@ export function createGame(config: IPokerConfig, players: IPlayer[], stacks: num
   const playerCompletedRound: Record<PlayerID, PokerRound> = {};
   const playerCurrentBet: Record<PlayerID, number> = {};
   for (const player of players) {
-    playerCompletedRound[player.playerId] = 'pre-flop';
+    playerCompletedRound[player.playerId] = 'flop';
     playerCurrentBet[player.playerId] = 0;
   }
 
@@ -100,7 +100,7 @@ export function createGame(config: IPokerConfig, players: IPlayer[], stacks: num
       roundOver: false,
       pot: 0,
       players: players.map((player, i) => ({ lastRound: null, id: player.playerId, isBot: player.isBot, stack: stacks[i], folded: false, currentBet: 0, shouldMove: true })),
-      round: 'pre-flop',
+      round: 'flop',
       targetBet: config.bigBlind || 1,
       dealerPosition: config.dealerPosition,
       cards: [],

@@ -30,6 +30,8 @@ export default class PartyServer extends TablesServer {
 
   constructor(public readonly room: Party.Room) {
     super(room);
+
+    this.stackSize = defaultStack;
   }
 
   onStart(): void | Promise<void> {
@@ -53,7 +55,7 @@ export default class PartyServer extends TablesServer {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
-    console.log('this, onConnect')
+    // console.log('this, onConnect')
     // console.log(this)
     if (this.gamePhase === 'final') {
       this.broadcastGameState();
@@ -69,6 +71,11 @@ export default class PartyServer extends TablesServer {
   }
 
   async onRequest(req: Party.Request) {
+    // const isBot = !!ctx.request.headers.get("tg-bot-authorization")
+    // this.addPlayer(conn.id, isBot);
+
+    // const connection = this.room.getConnection()
+
     // Clients fetch list of rooms for server rendering pages via HTTP GET
     if (req.method === "GET") return json(await this.updateRoom(req));
 
@@ -90,6 +97,7 @@ export default class PartyServer extends TablesServer {
   }
 
   onClose(conn: Party.Connection) {
+    console.log('onclose')
     this.removePlayer(conn.id);
   }
 
@@ -134,11 +142,12 @@ export default class PartyServer extends TablesServer {
   handlePlayerAction(playerId: string, action: Action) {
     const player = this.inGamePlayers.find((p) => p.playerId === playerId);
     // this is firing before endgame which means that
-    // endgame does not get a change to run
+    // endgame does not get a change to run 
     // before handling action we need to check if game is over
 
     // validate action
-    if (!player) { // this should not be a possibility via UI
+    console.log('handlePlayerAction', this.gamePhase)
+    if (!player && this.gamePhase !== 'final') { // this should not be a possibility via UI
       console.log(
         "Player attempted to make action while not in game",
         playerId
@@ -161,27 +170,29 @@ export default class PartyServer extends TablesServer {
       return;
     }
     // record action and advance game via step()
-    try {
-      const { next, log } = Kuhn.step(this.gameState, action);
-      for (const message of log) {
+    if (this.gamePhase !== 'final') {
+      try {
+        const { next, log } = Kuhn.step(this.gameState, action);
+        for (const message of log) {
+          this.queuedUpdates.push({
+            type: "engine-log",
+            message,
+          });
+        }
+        this.gameState = next;
         this.queuedUpdates.push({
-          type: "engine-log",
-          message,
+          type: "action",
+          action,
+          player,
         });
+      } catch (err) {
+        console.log(err);
       }
-      this.gameState = next;
-      this.queuedUpdates.push({
-        type: "action",
-        action,
-        player,
-      });
-    } catch (err) {
-      console.log(err);
-    }
-    if (this.gameState.state.roundOver) {
-      this.endRound(
-        this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
-      );
+      if (this.gameState.state.roundOver) {
+        this.endRound(
+          this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
+        );
+      }
     }
     this.broadcastGameState();
   }
@@ -275,7 +286,6 @@ export default class PartyServer extends TablesServer {
 
       if (!this.gameConfig.demoMode) {
         this.endGame();
-        console.log("Winner")
       }
       this.broadcastGameState();
     } else if (this.gameConfig.autoStart && this.inGamePlayers.length >= MIN_PLAYERS_AUTO_START) {
@@ -288,7 +298,6 @@ export default class PartyServer extends TablesServer {
   }
 
   getStateMessage(playerId: string): ServerStateMessage {
-    console.log('getStateMessage')
     const isSpectator =
       this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
     return {
@@ -306,9 +315,8 @@ export default class PartyServer extends TablesServer {
   }
 
   broadcastGameState() {
-    console.log('kuhn broadcast')
+    // console.log('kuhn broadcast')
     const allGamePlayers = this.inGamePlayers.concat(this.queuedPlayers, this.spectatorPlayers);
-    console.log({ allGamePlayers })
     for (const player of allGamePlayers) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
 
@@ -319,8 +327,8 @@ export default class PartyServer extends TablesServer {
       }
     }
     this.queuedUpdates = [];
-    console.log('this.inGamePlayers')
-    console.log(this.inGamePlayers)
+    // console.log('this.inGamePlayers')
+    // console.log(this.inGamePlayers)
 
     const state: TableState = {
       queuedPlayers: this.queuedPlayers,
