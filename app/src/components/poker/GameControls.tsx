@@ -6,6 +6,9 @@ import { useAuth } from "@clerk/clerk-react";
 function GameControls({ clientState, joinLeave, gameType }: { clientState: ClientState, joinLeave: boolean, gameType?: string }) {
   const serverState = clientState?.serverState;
   const gameState = serverState?.gameState;
+  const gamePhase = serverState?.gamePhase;
+
+  if (gamePhase === 'final') return <></>
 
   if (!clientState.isConnected) {
     return <p>Waiting for the game to start or connect...</p>;
@@ -74,23 +77,26 @@ function GameControls({ clientState, joinLeave, gameType }: { clientState: Clien
           </button>
         </div>
 
-        {joinLeave && <button
-          onClick={() => {
-            if (playerCanJoin) {
-              sendMessage(socket, { type: "join-game" });
-            } else {
-              sendMessage(socket, { type: "spectate" });
-            }
-          }}
-        >
-          {isPlayerSpectating
-            ? "Join game"
-            : isPlayerInGame
-              ? "Leave game"
-              : "Queued to join game"}
-        </button>}
+        {
+          (joinLeave && gamePhase !== 'final') &&
+          <button
+            onClick={() => {
+              if (playerCanJoin) {
+                sendMessage(socket, { type: "join-game" });
+              } else {
+                sendMessage(socket, { type: "spectate" });
+              }
+            }}
+          >
+            {isPlayerSpectating
+              ? "Join game"
+              : isPlayerInGame
+                ? "Leave game"
+                : "Queued to join game"}
+          </button>
+        }
       </div>
-    </div>
+    </div >
   );
 }
 

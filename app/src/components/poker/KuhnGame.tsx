@@ -36,10 +36,11 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
   const isPlayerInGame = !!inGamePlayers?.find(p => p.id == clientState?.playerId)
   const isPlayerSpectating = !!serverState.spectatorPlayers?.find(p => p.playerId == clientState?.playerId)
   const isPlayerQueued = !!serverState.queuedPlayers?.find(p => p.playerId == clientState?.playerId)
-
   const currentPlayer = gameState?.players.find(player => player.id === clientState?.playerId)
   const isCurrentPlayerTurn = currentPlayer?.id === gameState?.whoseTurn;
   const currentTurn = gameState?.whoseTurn
+  const gamePhase = serverState.gamePhase
+
   const getPlayerStatus = (playerId: string) => {
     if (serverState.spectatorPlayers.find(player => player.playerId === playerId)) return 'spectator'
     if (serverState.queuedPlayers.find(player => player.playerId === playerId)) return 'queued'
@@ -84,29 +85,33 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
   const angleOffset = -currentPlayerIndex * Math.PI * 2 / (inGamePlayers?.length ?? 1);
   const dealerIndex = (gameState?.dealerPosition ?? 0)
 
-  const joinButton = <button
-    style={{
-      position: "absolute",
-      ...(
-        smallScreen
-          ? { top: "12px", right: "12px" }
-          : { bottom: "12px", left: "50%", transform: "translateX(-50%)", width: '100%' }
-      ),
-    }}
-    onClick={() => {
-      if (isPlayerSpectating) {
-        sendMessage(socket, { type: "join-game" });
-      } else {
-        sendMessage(socket, { type: "spectate" });
-      }
-    }}
-  >
-    {isPlayerSpectating
-      ? "Join game"
-      : isPlayerInGame
-        ? "Leave game"
-        : "Queued to join game"}
-  </button>;
+  const JoinButton = () => {
+    return (
+      <button
+        style={{
+          position: "absolute",
+          ...(
+            smallScreen
+              ? { top: "12px", right: "12px" }
+              : { bottom: "12px", left: "50%", transform: "translateX(-50%)", width: '100%' }
+          ),
+        }}
+        onClick={() => {
+          if (isPlayerSpectating) {
+            sendMessage(socket, { type: "join-game" });
+          } else {
+            sendMessage(socket, { type: "spectate" });
+          }
+        }}
+      >
+        {isPlayerSpectating
+          ? "Join game"
+          : isPlayerInGame
+            ? "Leave game"
+            : "Queued to join game"}
+      </button>
+    )
+  };
 
   const verticalScreen = useSmallScreen(500, 1e9);
   const getPlayerPosition: (index: number) => {
@@ -205,7 +210,7 @@ const PokerGame = ({ clientState, previousActions }: Props) => {
           </div>
         }
       </div>
-      {smallScreen && joinButton}
+      {(smallScreen && gamePhase !== 'final') && <JoinButton />}
     </div>
   );
 };
