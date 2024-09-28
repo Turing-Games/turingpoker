@@ -44,6 +44,7 @@ export type ServerStateMessage = {
     gameState: Poker.IPokerState | null;
     hand: [Poker.Card, Poker.Card] | null | [Poker.Card];
     inGamePlayers: IPlayer[];
+    eliminatedPlayers: IPlayer[];
     winner: IPlayer;
     spectatorPlayers: IPlayer[];
     queuedPlayers: IPlayer[];

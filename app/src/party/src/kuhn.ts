@@ -146,13 +146,20 @@ export default class PartyServer extends TablesServer {
     // before handling action we need to check if game is over
     // player is removed from ingameplayers before endgame is called
 
+    // ideal flow:
+    // do not show ui controls if game is not active
+    // validate player is in game
+    // handle player action
+    // endround handles payouts, eliminations
+    // after end round, check if game is over
+
     // validate action
     if (!player) {
-      console.log("User not in game:", playerId);
+      console.log("User not in game: ", playerId);
       return;
     }
     console.log('handlePlayerAction', this.gamePhase)
-    if (!this.gameState || this.gamePhase === 'final') {
+    if (!this.gameState || this.gamePhase !== 'active') {
       console.log(
         "Player attempted to make action while game is not active",
         playerId

@@ -35,6 +35,7 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
   const handleSocket = (socket: PartySocket) => {
     const ws = socket
     ws.addEventListener("open", () => { // triggers onConnect
+      console.log('open event')
       setClientState((prevState) => ({
         ...prevState,
         isConnected: true,
@@ -45,9 +46,15 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
     });
 
     ws.addEventListener("message", (event) => {
+      console.log('message event')
       try {
         const data: ServerStateMessage = JSON.parse(event.data);
-        if (data.gamePhase === 'final') return;
+        if (data.gamePhase === 'final') {
+          setClientState((prevState) => ({
+            ...prevState,
+            serverState: data,
+          }));
+        };
         for (const update of data.lastUpdates) {
           if (update.type == 'game-ended') {
             setPreviousActions({})

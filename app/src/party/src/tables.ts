@@ -96,9 +96,9 @@ export default class TablesServer implements Party.Server {
 
   // remove ingame players that have 0 chips
   eliminatePlayers() {
-    this.inGamePlayers = this.inGamePlayers.filter(
-      (player) => this.stacks[player.playerId] > 0
-    );
+    console.log(this.stacks)
+    this.eliminatedPlayers = this.inGamePlayers.filter((player) => this.stacks[player.playerId] <= 0)
+    this.inGamePlayers = this.inGamePlayers.filter((player) => this.stacks[player.playerId] > 0);
   }
 
   addPlayer(playerId: string, isBot = false) {

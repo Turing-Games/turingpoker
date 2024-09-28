@@ -53,8 +53,9 @@ export default class PartyServer extends TablesServer {
   // Start as soon as two players are in
   // get random game if they exist, show to user
   onConnect(conn: Party.Connection, ctx: Party.ConnectionContext): void {
+    console.log('onConnect', this.gamePhase)
     if (this.gamePhase === 'final') {
-      this.broadcastGameState();
+      this.broadcastGameState(conn);
       return
     }
     if (this.inGamePlayers.length < 2) {
@@ -258,8 +259,6 @@ export default class PartyServer extends TablesServer {
   }
 
   getStateMessage(playerId: string): ServerStateMessage {
-    const isSpectator =
-      this.spectatorPlayers.map((s) => s.playerId).indexOf(playerId) !== -1;
     return {
       gameState: this.gameState?.state ?? null,
       hand: this.gameState?.hands?.[playerId] ?? null,
@@ -267,6 +266,7 @@ export default class PartyServer extends TablesServer {
       winner: this.winner,
       spectatorPlayers: this.spectatorPlayers,
       queuedPlayers: this.queuedPlayers,
+      eliminatedPlayers: this.eliminatedPlayers,
       config: this.gameConfig,
       gamePhase: this.gamePhase,
       clientId: playerId,
@@ -274,16 +274,21 @@ export default class PartyServer extends TablesServer {
     };
   }
 
-  broadcastGameState() {
-    const allGamePlayers = this.inGamePlayers.concat(this.spectatorPlayers, this.queuedPlayers);
+  broadcastGameState(connection: Party.Connection | null = null) {
+    const allGamePlayers = this.inGamePlayers.concat(this.spectatorPlayers, this.queuedPlayers, this.eliminatedPlayers);
     for (const player of allGamePlayers) {
       const message: ServerStateMessage = this.getStateMessage(player.playerId);
-
       // Send game state; ensure spectators do not receive any cards information
       const conn = this.room.getConnection(player.playerId);
       if (conn) {
         conn.send(JSON.stringify(message));
       }
+    }
+
+    if (connection) {
+      console.log('broadcast, if connection')
+      const message: ServerStateMessage = this.getStateMessage(connection.id);
+      connection.send(JSON.stringify(message));
     }
     this.queuedUpdates = [];
 
