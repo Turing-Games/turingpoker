@@ -142,19 +142,17 @@ export default class PartyServer extends TablesServer {
   handlePlayerAction(playerId: string, action: Action) {
     const player = this.inGamePlayers.find((p) => p.playerId === playerId);
     // this is firing before endgame which means that
-    // endgame does not get a change to run 
+    // endgame does not get a chance to run 
     // before handling action we need to check if game is over
+    // player is removed from ingameplayers before endgame is called
 
     // validate action
-    console.log('handlePlayerAction', this.gamePhase)
-    if (!player && this.gamePhase !== 'final') { // this should not be a possibility via UI
-      console.log(
-        "Player attempted to make action while not in game",
-        playerId
-      );
+    if (!player) {
+      console.log("User not in game:", playerId);
       return;
     }
-    if (!this.gameState) {
+    console.log('handlePlayerAction', this.gamePhase)
+    if (!this.gameState || this.gamePhase === 'final') {
       console.log(
         "Player attempted to make action while game is not active",
         playerId
@@ -170,30 +168,30 @@ export default class PartyServer extends TablesServer {
       return;
     }
     // record action and advance game via step()
-    if (this.gamePhase !== 'final') {
-      try {
-        const { next, log } = Kuhn.step(this.gameState, action);
-        for (const message of log) {
-          this.queuedUpdates.push({
-            type: "engine-log",
-            message,
-          });
-        }
-        this.gameState = next;
+    try {
+      const { next, log } = Kuhn.step(this.gameState, action);
+      for (const message of log) {
         this.queuedUpdates.push({
-          type: "action",
-          action,
-          player,
+          type: "engine-log",
+          message,
         });
-      } catch (err) {
-        console.log(err);
       }
-      if (this.gameState.state.roundOver) {
-        this.endRound(
-          this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
-        );
-      }
+      this.gameState = next;
+      this.queuedUpdates.push({
+        type: "action",
+        action,
+        player,
+      });
+    } catch (err) {
+      console.log(err);
     }
+
+    if (this.gameState.state.roundOver) {
+      this.endRound( //endGame() is called in endRound(), payouts also handled in endRound()
+        this.gameState?.state?.round === "showdown" ? "showdown" : "fold"
+      );
+    }
+
     this.broadcastGameState();
   }
 
@@ -214,7 +212,6 @@ export default class PartyServer extends TablesServer {
     if (this.gameState && !this.gameState.state.roundOver) {
       return;
     }
-
     // if anyone has zero chips just reset them to 1000
     // for (const player of this.inGamePlayers.concat(this.queuedPlayers)) {
     //   this.lastActed[player.playerId] = Date.now();
