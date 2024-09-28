@@ -49,12 +49,6 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
       console.log('message event')
       try {
         const data: ServerStateMessage = JSON.parse(event.data);
-        if (data.gamePhase === 'final') {
-          setClientState((prevState) => ({
-            ...prevState,
-            serverState: data,
-          }));
-        };
         for (const update of data.lastUpdates) {
           if (update.type == 'game-ended') {
             setPreviousActions({})
@@ -66,13 +60,11 @@ export default function GameClient({ gameId, gameType = 'poker' }: { gameId?: st
             }));
           }
         }
-        startTransition(() => {
-          setClientState((prevState) => ({
-            ...prevState,
-            serverState: data,
-            updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-500),
-          }));
-        });
+        setClientState((prevState) => ({
+          ...prevState,
+          serverState: data,
+          updateLog: [...prevState.updateLog, ...data.lastUpdates].slice(-500),
+        }));
       } catch {
         setClientState((prevState) => ({
           ...prevState,
